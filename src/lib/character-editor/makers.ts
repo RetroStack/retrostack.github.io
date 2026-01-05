@@ -151,7 +151,7 @@ export const DIMENSION_PRESETS: DimensionPreset[] = [
     name: "8x8 (Standard)",
     width: 8,
     height: 8,
-    systems: ["C64", "VIC-20", "ZX Spectrum", "Atari 400/800", "NES/Famicom", "Apple II"],
+    systems: ["C64", "VIC-20", "ZX Spectrum", "ZX81", "ZX80", "Atari 400/800", "NES/Famicom", "Apple II", "Amstrad CPC"],
   },
   {
     name: "8x16 (Extended)",
@@ -208,4 +208,54 @@ export function findPresetByDimensions(
   height: number
 ): DimensionPreset | undefined {
   return DIMENSION_PRESETS.find((p) => p.width === width && p.height === height);
+}
+
+/**
+ * System-specific dimension preset
+ * Used for organizing presets by system in dropdowns
+ */
+export interface SystemDimensionPreset {
+  /** System name */
+  system: string;
+  /** Hardware manufacturer */
+  maker: string;
+  /** Character width in pixels */
+  width: number;
+  /** Character height in pixels */
+  height: number;
+}
+
+/**
+ * System-organized presets for 8-bit classics
+ * Used in SizePresetDropdown for quick system-based selection
+ */
+export const SYSTEM_PRESETS: SystemDimensionPreset[] = [
+  { system: "C64", maker: "Commodore", width: 8, height: 8 },
+  { system: "VIC-20", maker: "Commodore", width: 8, height: 8 },
+  { system: "ZX80", maker: "Sinclair", width: 8, height: 8 },
+  { system: "ZX81", maker: "Sinclair", width: 8, height: 8 },
+  { system: "ZX Spectrum", maker: "Sinclair", width: 8, height: 8 },
+  { system: "Apple II", maker: "Apple", width: 8, height: 8 },
+  { system: "Atari 400/800", maker: "Atari", width: 8, height: 8 },
+  { system: "NES/Famicom", maker: "Nintendo", width: 8, height: 8 },
+  { system: "CPC 464", maker: "Amstrad", width: 8, height: 16 },
+  { system: "CPC 6128", maker: "Amstrad", width: 8, height: 16 },
+  { system: "BBC Micro", maker: "Acorn", width: 8, height: 8 },
+  { system: "TRS-80 Model I", maker: "Tandy", width: 8, height: 8 },
+  { system: "MSX", maker: "MSX", width: 8, height: 8 },
+  { system: "TI-99/4A", maker: "Texas Instruments", width: 8, height: 8 },
+];
+
+/**
+ * Get system presets grouped by maker
+ */
+export function getSystemPresetsByMaker(): Record<string, SystemDimensionPreset[]> {
+  const grouped: Record<string, SystemDimensionPreset[]> = {};
+  for (const preset of SYSTEM_PRESETS) {
+    if (!grouped[preset.maker]) {
+      grouped[preset.maker] = [];
+    }
+    grouped[preset.maker].push(preset);
+  }
+  return grouped;
 }

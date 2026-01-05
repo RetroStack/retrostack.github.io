@@ -13,6 +13,7 @@ import {
   CharacterPreview,
   MakerSystemSelect,
   ImportStepIndicator,
+  SizePresetDropdown,
 } from "@/components/character-editor";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
@@ -371,80 +372,62 @@ export function ImportView() {
                   </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Configuration */}
-                  <div className="card-retro p-4 space-y-5">
-                    {/* Dimensions */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-300 mb-3">
-                        Character Dimensions
-                      </h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label
-                            htmlFor="width"
-                            className="block text-xs text-gray-500 mb-1"
-                          >
-                            Width (pixels)
-                          </label>
-                          <input
-                            type="number"
-                            id="width"
-                            min={1}
-                            max={16}
-                            value={config.width}
-                            onChange={handleWidthChange}
-                            className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="height"
-                            className="block text-xs text-gray-500 mb-1"
-                          >
-                            Height (pixels)
-                          </label>
-                          <input
-                            type="number"
-                            id="height"
-                            min={1}
-                            max={16}
-                            value={config.height}
-                            onChange={handleHeightChange}
-                            className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
-                          />
-                        </div>
+                {/* Configuration */}
+                <div className="card-retro p-4 space-y-5">
+                  {/* Dimensions */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-3">
+                      Character Dimensions
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 max-w-xs">
+                      <div>
+                        <label
+                          htmlFor="width"
+                          className="block text-xs text-gray-500 mb-1"
+                        >
+                          Width (pixels)
+                        </label>
+                        <input
+                          type="number"
+                          id="width"
+                          min={1}
+                          max={16}
+                          value={config.width}
+                          onChange={handleWidthChange}
+                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        />
                       </div>
-
-                      {/* Quick presets */}
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {[
-                          { label: "8x8", width: 8, height: 8 },
-                          { label: "8x16", width: 8, height: 16 },
-                          { label: "5x7", width: 5, height: 7 },
-                          { label: "5x8", width: 5, height: 8 },
-                          { label: "6x8", width: 6, height: 8 },
-                        ].map((preset) => (
-                          <button
-                            key={preset.label}
-                            type="button"
-                            onClick={() => handlePresetClick(preset.width, preset.height)}
-                            className={`
-                              px-2 py-1 text-xs rounded border transition-colors
-                              ${
-                                config.width === preset.width &&
-                                config.height === preset.height
-                                  ? "border-retro-pink bg-retro-pink/10 text-retro-pink"
-                                  : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
-                              }
-                            `}
-                          >
-                            {preset.label}
-                          </button>
-                        ))}
+                      <div>
+                        <label
+                          htmlFor="height"
+                          className="block text-xs text-gray-500 mb-1"
+                        >
+                          Height (pixels)
+                        </label>
+                        <input
+                          type="number"
+                          id="height"
+                          min={1}
+                          max={16}
+                          value={config.height}
+                          onChange={handleHeightChange}
+                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        />
                       </div>
                     </div>
 
+                    {/* Quick presets */}
+                    <div className="mt-3">
+                      <SizePresetDropdown
+                        currentWidth={config.width}
+                        currentHeight={config.height}
+                        onSelect={handlePresetClick}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Binary options row */}
+                  <div className="grid grid-cols-2 gap-4">
                     {/* Padding direction */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-300 mb-2">
@@ -518,69 +501,67 @@ export function ImportView() {
                         </button>
                       </div>
                     </div>
-
-                    {/* Stats */}
-                    {file && (
-                      <div className="text-xs text-gray-500 pt-2 border-t border-retro-grid/30">
-                        {bytesPerChar} bytes/char = {characterCount} characters
-                      </div>
-                    )}
                   </div>
 
-                  {/* Preview */}
-                  <div className="card-retro p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-gray-300">
-                        Preview
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {config.width}x{config.height}
-                      </span>
+                  {/* Stats */}
+                  {file && (
+                    <div className="text-xs text-gray-500 pt-2 border-t border-retro-grid/30">
+                      {bytesPerChar} bytes/char = {characterCount} characters
                     </div>
+                  )}
+                </div>
 
-                    {characters.length > 0 ? (
-                      <div>
-                        <div className="bg-black/50 rounded-lg p-3 overflow-auto max-h-[400px]">
-                          <CharacterPreview
-                            characters={characters}
-                            config={config}
-                            maxCharacters={256}
-                            maxWidth={400}
-                            maxHeight={400}
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-3">
-                          {characters.length} character
-                          {characters.length !== 1 ? "s" : ""} detected
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          If scrambled, try adjusting dimensions or bit settings.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <svg
-                          className="w-10 h-10 text-gray-600 mb-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <p className="text-sm text-gray-400">
-                          No characters detected
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Try adjusting the dimensions
-                        </p>
-                      </div>
-                    )}
+                {/* Preview - full width, larger */}
+                <div className="card-retro p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-300">
+                      Preview
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {config.width}x{config.height} - {characters.length} character
+                      {characters.length !== 1 ? "s" : ""} detected
+                    </span>
                   </div>
+
+                  {characters.length > 0 ? (
+                    <div>
+                      <div className="bg-black/50 rounded-lg p-4 overflow-auto max-h-[500px]">
+                        <CharacterPreview
+                          characters={characters}
+                          config={config}
+                          maxCharacters={256}
+                          maxWidth={600}
+                          maxHeight={400}
+                          scale={3}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3">
+                        If scrambled, try adjusting dimensions or bit settings above.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <svg
+                        className="w-12 h-12 text-gray-600 mb-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p className="text-sm text-gray-400">
+                        No characters detected
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Try adjusting the dimensions
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Error message */}

@@ -17,6 +17,10 @@ export interface TransformToolbarProps {
   onClear: () => void;
   /** Callback for fill */
   onFill: () => void;
+  /** Callback for delete */
+  onDelete?: () => void;
+  /** Callback for copy from current set */
+  onCopy?: () => void;
   /** Whether toolbar is disabled */
   disabled?: boolean;
   /** Additional CSS classes */
@@ -99,6 +103,24 @@ function InvertIcon({ className = "w-4 h-4" }: { className?: string }) {
 }
 
 function ClearIcon({ className = "w-4 h-4" }: { className?: string }) {
+  // Hollow/empty square - represents clearing to empty
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="16" height="16" rx="1" strokeWidth={2} />
+    </svg>
+  );
+}
+
+function FillIcon({ className = "w-4 h-4" }: { className?: string }) {
+  // Solid filled square - represents filling with pixels
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <rect x="4" y="4" width="16" height="16" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function DeleteIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -106,11 +128,10 @@ function ClearIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function FillIcon({ className = "w-4 h-4" }: { className?: string }) {
+function CopyIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5h16v14H4z" fill="currentColor" fillOpacity={0.3} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
     </svg>
   );
 }
@@ -180,6 +201,8 @@ export function TransformToolbar({
   onInvert,
   onClear,
   onFill,
+  onDelete,
+  onCopy,
   disabled = false,
   className = "",
 }: TransformToolbarProps) {
@@ -299,7 +322,7 @@ export function TransformToolbar({
           <ToolbarButton
             onClick={onClear}
             disabled={disabled}
-            title="Clear (Delete)"
+            title="Clear"
           >
             <ClearIcon />
           </ToolbarButton>
@@ -312,6 +335,35 @@ export function TransformToolbar({
           </ToolbarButton>
         </div>
       </div>
+
+      {/* Character section */}
+      {(onCopy || onDelete) && (
+        <>
+          <ToolbarDivider />
+          <ToolbarLabel>Char</ToolbarLabel>
+          <div className="flex items-center gap-1">
+            {onCopy && (
+              <ToolbarButton
+                onClick={onCopy}
+                disabled={disabled}
+                title="Copy from character set (C)"
+              >
+                <CopyIcon />
+              </ToolbarButton>
+            )}
+            {onDelete && (
+              <ToolbarButton
+                onClick={onDelete}
+                disabled={disabled}
+                title="Delete character (Del)"
+                className="hover:text-red-400"
+              >
+                <DeleteIcon />
+              </ToolbarButton>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

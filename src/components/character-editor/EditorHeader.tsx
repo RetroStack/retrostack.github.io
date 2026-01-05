@@ -1,7 +1,7 @@
 "use client";
 
 import { ColorPresetSelector } from "./ColorPresetSelector";
-import { CustomColors } from "@/lib/character-editor";
+import { CustomColors, getCharacterDisplayName, isPrintableAscii } from "@/lib/character-editor";
 
 export interface EditorHeaderProps {
   /** Character set name */
@@ -66,13 +66,12 @@ export function EditorHeader({
     }
   };
 
-  // Check if character is printable ASCII (32-126)
-  const isPrintableAscii = characterIndex >= 32 && characterIndex <= 126;
+  // Check if character is printable ASCII (32-126) or control character
+  const isPrintable = isPrintableAscii(characterIndex);
+  const controlCharName = getCharacterDisplayName(characterIndex);
 
   return (
-    <div
-      className={`flex items-center gap-4 px-4 py-2 bg-retro-navy/50 border-b border-retro-grid/50 ${className}`}
-    >
+    <div className={`flex items-center gap-4 px-4 py-2 bg-retro-navy/50 border-b border-retro-grid/50 ${className}`}>
       {/* Back button */}
       <button
         onClick={onBack}
@@ -104,16 +103,24 @@ export function EditorHeader({
           Char <span className="text-retro-cyan">{characterIndex}</span>
           <span className="text-gray-500">/{totalCharacters}</span>
         </span>
-        {isPrintableAscii && (
-          <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-cyan rounded text-xs font-mono">
+        {isPrintable && (
+          <span
+            className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-cyan rounded text-xs font-mono"
+            title="Printable ASCII Character"
+          >
             &apos;{String.fromCharCode(characterIndex)}&apos;
           </span>
         )}
-        {batchMode && (
-          <span className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded">
-            Batch
+        {controlCharName && (
+          <span
+            className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded"
+            title="ASCII Control Character"
+          >
+            {" "}
+            ({controlCharName})
           </span>
         )}
+        {batchMode && <span className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded">Batch</span>}
       </div>
 
       {/* Flexible spacer */}
@@ -148,10 +155,7 @@ export function EditorHeader({
       <div className="w-px h-4 bg-retro-grid/50" />
 
       {/* Color preset selector */}
-      <ColorPresetSelector
-        colors={colors}
-        onColorsChange={onColorsChange}
-      />
+      <ColorPresetSelector colors={colors} onColorsChange={onColorsChange} />
     </div>
   );
 }

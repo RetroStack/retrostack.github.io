@@ -11,16 +11,20 @@ export interface CharacterPreviewProps {
   config: CharacterSetConfig;
   /** Maximum number of characters to show */
   maxCharacters?: number;
-  /** Maximum width in pixels */
+  /** Maximum width in pixels (used to calculate layout) */
   maxWidth?: number;
-  /** Maximum height in pixels */
+  /** Maximum height in pixels (used to calculate layout) */
   maxHeight?: number;
+  /** Pixel scale factor (1 = 1:1, 2 = 2x, etc.) */
+  scale?: number;
   /** Foreground color */
   foregroundColor?: string;
   /** Background color */
   backgroundColor?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Force a specific number of columns (overrides auto-calculation) */
+  forceColumns?: number;
 }
 
 /**
@@ -35,14 +39,30 @@ export function CharacterPreview({
   maxCharacters = 32,
   maxWidth = 128,
   maxHeight = 64,
+  scale = 1,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
   className = "",
+  forceColumns,
 }: CharacterPreviewProps) {
   // Calculate how many characters we can display
   const { displayChars, columns, rows } = useMemo(() => {
     const charWidth = config.width;
     const charHeight = config.height;
+
+    // If forceColumns is set, use that instead of calculating
+    if (forceColumns) {
+      const cols = forceColumns;
+      const maxDisplay = Math.min(maxCharacters, characters.length);
+      const rowCount = Math.ceil(maxDisplay / cols);
+      const displayCount = Math.min(cols * rowCount, maxDisplay);
+
+      return {
+        displayChars: characters.slice(0, displayCount),
+        columns: cols,
+        rows: rowCount,
+      };
+    }
 
     // Calculate max chars per row based on width
     const maxCols = Math.floor(maxWidth / charWidth);
@@ -54,22 +74,22 @@ export function CharacterPreview({
 
     // Try to make a reasonable grid
     let cols = maxCols;
-    let rows = Math.ceil(maxDisplay / cols);
+    let rowCount = Math.ceil(maxDisplay / cols);
 
     // Adjust if too many rows
-    while (rows > maxRows && cols > 1) {
+    while (rowCount > maxRows && cols > 1) {
       cols--;
-      rows = Math.ceil(maxDisplay / cols);
+      rowCount = Math.ceil(maxDisplay / cols);
     }
 
-    const displayCount = Math.min(cols * rows, maxDisplay);
+    const displayCount = Math.min(cols * rowCount, maxDisplay);
 
     return {
       displayChars: characters.slice(0, displayCount),
       columns: cols,
-      rows: rows,
+      rows: rowCount,
     };
-  }, [characters, config, maxCharacters, maxWidth, maxHeight]);
+  }, [characters, config, maxCharacters, maxWidth, maxHeight, forceColumns]);
 
   // Combine all characters into a single pixel grid
   const combinedPixels = useMemo(() => {
@@ -105,7 +125,7 @@ export function CharacterPreview({
     <div className={`relative inline-block ${className}`}>
       <PixelGrid
         pixels={combinedPixels}
-        scale={1}
+        scale={scale}
         showGrid={false}
         foregroundColor={foregroundColor}
         backgroundColor={backgroundColor}

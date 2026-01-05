@@ -79,8 +79,18 @@ export {
   DIMENSION_PRESETS,
   getPresetsForSystem,
   findPresetByDimensions,
+  SYSTEM_PRESETS,
+  getSystemPresetsByMaker,
 } from "./makers";
-export type { MakerSystems, DimensionPreset } from "./makers";
+export type { MakerSystems, DimensionPreset, SystemDimensionPreset } from "./makers";
+
+// ASCII utilities
+export {
+  CONTROL_CHAR_NAMES,
+  getCharacterDisplayName,
+  isPrintableAscii,
+  isControlCharacter,
+} from "./ascii";
 
 // Utilities
 export {

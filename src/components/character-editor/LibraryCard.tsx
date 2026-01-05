@@ -8,7 +8,6 @@ import {
   SerializedCharacterSet,
   deserializeCharacterSet,
   formatSize,
-  formatTimestamp,
 } from "@/lib/character-editor";
 
 export interface LibraryCardProps {
@@ -101,7 +100,7 @@ export function LibraryCard({
 
   return (
     <div className="card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all">
-      {/* Header with title, source, date, and menu */}
+      {/* Header with title and menu */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-retro-cyan truncate">
@@ -119,15 +118,7 @@ export function LibraryCard({
           )}
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {metadata.source && metadata.source !== "yourself" && (
-            <span className="text-[10px] text-gray-500 truncate max-w-[80px]" title={metadata.source}>
-              {metadata.source}
-            </span>
-          )}
-          <span className="text-[10px] text-gray-500">
-            {formatTimestamp(metadata.updatedAt)}
-          </span>
+        <div className="flex-shrink-0">
           {menuItems.length > 0 && (
             <OverflowMenu items={menuItems} align="right" label="Character set actions" />
           )}
@@ -139,9 +130,9 @@ export function LibraryCard({
         <CharacterPreview
           characters={characters}
           config={config}
-          maxCharacters={128}
+          maxCharacters={512}
           maxWidth={256}
-          maxHeight={128}
+          maxHeight={4096}
         />
       </div>
 
@@ -166,25 +157,15 @@ export function LibraryCard({
           )}
         </div>
 
-        {/* Quick action buttons */}
-        <div className="flex gap-1">
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="px-2 py-1 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors"
-            >
-              Edit
-            </button>
-          )}
-          {onExport && (
-            <button
-              onClick={onExport}
-              className="px-2 py-1 text-xs bg-retro-pink/20 text-retro-pink rounded hover:bg-retro-pink/30 transition-colors"
-            >
-              Export
-            </button>
-          )}
-        </div>
+        {/* Quick action button */}
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="px-2 py-1 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors"
+          >
+            Edit
+          </button>
+        )}
       </div>
     </div>
   );
@@ -292,20 +273,20 @@ export function LibraryCardEmpty({
       </div>
 
       <div className="flex gap-2">
+        {onCreate && (
+          <button
+            onClick={onCreate}
+            className="px-3 py-1.5 text-xs bg-retro-pink/20 text-retro-pink rounded hover:bg-retro-pink/30 transition-colors"
+          >
+            Add
+          </button>
+        )}
         {onImport && (
           <button
             onClick={onImport}
             className="px-3 py-1.5 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors"
           >
             Import
-          </button>
-        )}
-        {onCreate && (
-          <button
-            onClick={onCreate}
-            className="px-3 py-1.5 text-xs bg-retro-pink/20 text-retro-pink rounded hover:bg-retro-pink/30 transition-colors"
-          >
-            Create New
           </button>
         )}
       </div>

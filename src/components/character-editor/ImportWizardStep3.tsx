@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import { CharacterPreview } from "./CharacterPreview";
+import { SizePresetDropdown } from "./SizePresetDropdown";
 import {
   CharacterSetConfig,
   Character,
@@ -9,7 +10,6 @@ import {
   BitDirection,
   calculateCharacterCount,
   formatFileSize,
-  DIMENSION_PRESETS,
 } from "@/lib/character-editor";
 
 export interface ImportWizardStep3Props {
@@ -92,15 +92,6 @@ export function ImportWizardStep3({
     }
   `;
 
-  const presetButtonClasses = (active: boolean) => `
-    px-3 py-1.5 text-xs rounded border transition-colors
-    ${
-      active
-        ? "border-retro-pink bg-retro-pink/10 text-retro-pink"
-        : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
-    }
-  `;
-
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -120,22 +111,11 @@ export function ImportWizardStep3({
             <h3 className="text-sm font-medium text-gray-300 mb-2">
               Dimension Presets
             </h3>
-            <div className="flex flex-wrap gap-2">
-              {DIMENSION_PRESETS.map((preset) => (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handlePresetClick(preset.width, preset.height)}
-                  className={presetButtonClasses(
-                    config.width === preset.width &&
-                      config.height === preset.height
-                  )}
-                  title={`Used by: ${preset.systems.join(", ")}`}
-                >
-                  {preset.width}x{preset.height}
-                </button>
-              ))}
-            </div>
+            <SizePresetDropdown
+              currentWidth={config.width}
+              currentHeight={config.height}
+              onSelect={handlePresetClick}
+            />
           </div>
 
           {/* Custom dimensions */}
@@ -242,14 +222,13 @@ export function ImportWizardStep3({
             </span>
           </div>
 
-          <div className="bg-black/50 rounded-lg p-4 min-h-[280px] max-h-[320px] overflow-auto">
+          <div className="bg-black/50 rounded-lg p-4 min-h-[280px] max-h-[400px] overflow-auto">
             {characters.length > 0 ? (
               <CharacterPreview
                 characters={characters}
                 config={config}
-                maxCharacters={256}
-                maxWidth={280}
-                maxHeight={280}
+                maxCharacters={512}
+                forceColumns={32}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-[200px] text-center">

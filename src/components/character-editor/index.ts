@@ -88,6 +88,9 @@ export type { ResizeModalProps } from "./ResizeModal";
 export { MakerSystemSelect, MakerSystemSelectCompact } from "./MakerSystemSelect";
 export type { MakerSystemSelectProps } from "./MakerSystemSelect";
 
+export { SizePresetDropdown } from "./SizePresetDropdown";
+export type { SizePresetDropdownProps } from "./SizePresetDropdown";
+
 // Import Wizard components
 export { ImportWizard } from "./ImportWizard";
 export type { ImportWizardProps, ImportWizardState } from "./ImportWizard";
@@ -107,6 +110,15 @@ export type { ImportFromLibraryModalProps } from "./ImportFromLibraryModal";
 
 export { CharacterPickerModal } from "./CharacterPickerModal";
 export type { CharacterPickerModalProps } from "./CharacterPickerModal";
+
+export { ImportCharactersModal } from "./ImportCharactersModal";
+export type { ImportCharactersModalProps } from "./ImportCharactersModal";
+
+export { CopyCharacterModal } from "./CopyCharacterModal";
+export type { CopyCharacterModalProps } from "./CopyCharacterModal";
+
+export { ReorderModal } from "./ReorderModal";
+export type { ReorderModalProps } from "./ReorderModal";
 
 // Import wizard
 export { ImportStepIndicator } from "./ImportStepIndicator";

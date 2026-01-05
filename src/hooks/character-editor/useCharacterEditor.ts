@@ -41,7 +41,7 @@ export interface UseCharacterEditorResult {
   /** Batch selected character indices */
   batchSelection: Set<number>;
   /** Toggle batch selection for an index */
-  toggleBatchSelection: (index: number, extend: boolean) => void;
+  toggleBatchSelection: (index: number, extend: boolean, toggle?: boolean) => void;
   /** Clear batch selection */
   clearBatchSelection: () => void;
   /** Select all characters */
@@ -68,6 +68,8 @@ export interface UseCharacterEditorResult {
   fillSelected: () => void;
   /** Add a new character at the end */
   addCharacter: () => void;
+  /** Add multiple characters at the end */
+  addCharacters: (characters: Character[]) => void;
   /** Delete selected character(s) */
   deleteSelected: () => void;
   /** Copy a character to another position */
@@ -150,8 +152,31 @@ export function useCharacterEditor(
 
   // Toggle batch selection
   const toggleBatchSelection = useCallback(
-    (index: number, extend: boolean) => {
-      if (extend) {
+    (index: number, extend: boolean, toggle: boolean = false) => {
+      if (toggle) {
+        // CMD/CTRL+click: toggle individual item in/out of selection
+        setBatchSelection((prev) => {
+          const next = new Set(prev);
+          if (index === selectedIndex) {
+            // Clicking the primary selection with CMD/CTRL
+            // If there are other items in batch, make one of them the new primary
+            if (next.size > 0) {
+              const [newPrimary] = next;
+              next.delete(newPrimary);
+              next.add(selectedIndex);
+              setSelectedIndex(newPrimary);
+            }
+            // If nothing else selected, ignore (can't deselect everything)
+          } else if (next.has(index)) {
+            // Remove from batch selection
+            next.delete(index);
+          } else {
+            // Add to batch selection
+            next.add(index);
+          }
+          return next;
+        });
+      } else if (extend) {
         // Shift+click: select range from anchor (or current selection) to clicked index
         const anchor = selectionAnchor ?? selectedIndex;
         const start = Math.min(anchor, index);
@@ -338,6 +363,21 @@ export function useCharacterEditor(
     setBatchSelection(new Set());
   }, [updateState, editorState.characters.length]);
 
+  const addCharacters = useCallback(
+    (newCharacters: Character[]) => {
+      if (newCharacters.length === 0) return;
+
+      updateState((state) => {
+        state.characters = [...state.characters, ...newCharacters.map(c => cloneCharacter(c))];
+        return state;
+      });
+      // Select the first new character
+      setSelectedIndex(editorState.characters.length);
+      setBatchSelection(new Set());
+    },
+    [updateState, editorState.characters.length]
+  );
+
   const deleteSelected = useCallback(() => {
     if (editorState.characters.length <= 1) return; // Keep at least one character
 
@@ -442,6 +482,7 @@ export function useCharacterEditor(
     clearSelected,
     fillSelected,
     addCharacter,
+    addCharacters,
     deleteSelected,
     copyCharacter,
     resizeCharacters,

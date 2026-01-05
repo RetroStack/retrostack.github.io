@@ -15,7 +15,7 @@ export interface EditorSidebarProps {
   /** Batch selected character indices */
   batchSelection: Set<number>;
   /** Callback when selection changes */
-  onSelect: (index: number, shiftKey: boolean) => void;
+  onSelect: (index: number, shiftKey: boolean, metaOrCtrlKey?: boolean) => void;
   /** Callback to add a new character */
   onAddCharacter?: () => void;
   /** Callback to delete selected character(s) */
@@ -66,14 +66,14 @@ export function EditorSidebar({
         case "ArrowLeft": {
           e.preventDefault();
           const newIndex = selectedIndex > 0 ? selectedIndex - 1 : charCount - 1;
-          onSelect(newIndex, e.shiftKey);
+          onSelect(newIndex, e.shiftKey, e.metaKey || e.ctrlKey);
           break;
         }
         case "ArrowDown":
         case "ArrowRight": {
           e.preventDefault();
           const newIndex = selectedIndex < charCount - 1 ? selectedIndex + 1 : 0;
-          onSelect(newIndex, e.shiftKey);
+          onSelect(newIndex, e.shiftKey, e.metaKey || e.ctrlKey);
           break;
         }
         case "Delete":

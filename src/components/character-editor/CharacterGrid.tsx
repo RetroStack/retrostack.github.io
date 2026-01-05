@@ -15,7 +15,7 @@ export interface CharacterGridProps {
   /** Set of batch-selected character indices */
   batchSelection?: Set<number>;
   /** Callback when a character is selected */
-  onSelect?: (index: number, shiftKey: boolean) => void;
+  onSelect?: (index: number, shiftKey: boolean, metaOrCtrlKey?: boolean) => void;
   /** Whether to show the add button at the end */
   showAddButton?: boolean;
   /** Callback when add button is clicked */
@@ -277,11 +277,11 @@ export function InteractiveCharacterGrid({
         {characters.map((character, index) => (
           <div
             key={index}
-            onClick={(e) => onSelect?.(index, e.shiftKey)}
+            onClick={(e) => onSelect?.(index, e.shiftKey, e.metaKey || e.ctrlKey)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onSelect?.(index, e.shiftKey);
+                onSelect?.(index, e.shiftKey, e.metaKey || e.ctrlKey);
               }
             }}
             role="option"

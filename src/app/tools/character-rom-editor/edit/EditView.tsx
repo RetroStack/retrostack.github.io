@@ -14,6 +14,9 @@ import {
   TransformToolbar,
   MetadataEditModal,
   ResizeModal,
+  ImportCharactersModal,
+  CopyCharacterModal,
+  ReorderModal,
 } from "@/components/character-editor";
 import {
   useCharacterLibrary,
@@ -66,6 +69,9 @@ export function EditView() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Reset confirmation state
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   // Save as dialog state
   const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
@@ -73,6 +79,15 @@ export function EditView() {
 
   // Resize modal state
   const [showResizeModal, setShowResizeModal] = useState(false);
+
+  // Import characters modal state
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Copy character modal state
+  const [showCopyModal, setShowCopyModal] = useState(false);
+
+  // Reorder modal state
+  const [showReorderModal, setShowReorderModal] = useState(false);
 
   // Auto-save
   const autoSave = useAutoSave({
@@ -161,9 +176,15 @@ export function EditView() {
 
   // Handle reset to last saved state
   const handleReset = useCallback(() => {
+    setShowResetConfirm(true);
+  }, []);
+
+  // Confirm reset
+  const confirmReset = useCallback(() => {
     if (characterSet) {
       editor.reset(characterSet);
     }
+    setShowResetConfirm(false);
   }, [characterSet, editor]);
 
   // Handle resize
@@ -379,6 +400,26 @@ export function EditView() {
       onClick: () => setShowResizeModal(true),
     },
     {
+      id: "import",
+      label: "Import",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+      ),
+      onClick: () => setShowImportModal(true),
+    },
+    {
+      id: "reorder",
+      label: "Reorder",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+        </svg>
+      ),
+      onClick: () => setShowReorderModal(true),
+    },
+    {
       id: "export",
       label: "Export",
       icon: (
@@ -500,6 +541,8 @@ export function EditView() {
             onInvert={editor.invertSelected}
             onClear={editor.clearSelected}
             onFill={editor.fillSelected}
+            onDelete={editor.deleteSelected}
+            onCopy={() => setShowCopyModal(true)}
             disabled={!selectedCharacter}
             className="h-full"
           />
@@ -582,6 +625,37 @@ export function EditView() {
         onResize={handleResize}
       />
 
+      {/* Import characters modal */}
+      <ImportCharactersModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        currentConfig={editor.config}
+        onImport={editor.addCharacters}
+      />
+
+      {/* Copy character modal */}
+      <CopyCharacterModal
+        isOpen={showCopyModal}
+        onClose={() => setShowCopyModal(false)}
+        characters={editor.characters}
+        currentIndex={editor.selectedIndex}
+        onCopy={(sourceIndex) => {
+          // Copy to the current selection (and all batch selected)
+          const targetIndices = [editor.selectedIndex, ...Array.from(editor.batchSelection)];
+          targetIndices.forEach((targetIndex) => {
+            editor.copyCharacter(sourceIndex, targetIndex);
+          });
+        }}
+      />
+
+      {/* Reorder characters modal */}
+      <ReorderModal
+        isOpen={showReorderModal}
+        onClose={() => setShowReorderModal(false)}
+        characters={editor.characters}
+        onReorder={editor.setCharacters}
+      />
+
       {/* Save As dialog */}
       {showSaveAsDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -647,6 +721,33 @@ export function EditView() {
                 className="flex-1 px-4 py-2 text-sm bg-red-500/20 border border-red-500 rounded text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
               >
                 {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset confirmation dialog */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowResetConfirm(false)} />
+          <div className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6">
+            <h2 className="text-lg font-medium text-white mb-2">Reset to Last Saved?</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              This will discard all unsaved changes and restore &quot;{characterSet?.metadata.name}&quot; to its last saved state. This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 px-4 py-2 text-sm border border-retro-grid/50 rounded text-gray-400 hover:border-retro-grid hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmReset}
+                className="flex-1 px-4 py-2 text-sm bg-orange-500/20 border border-orange-500 rounded text-orange-400 hover:bg-orange-500/30 transition-colors"
+              >
+                Reset
               </button>
             </div>
           </div>

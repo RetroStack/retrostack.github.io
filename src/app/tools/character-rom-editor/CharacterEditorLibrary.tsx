@@ -160,6 +160,10 @@ export function CharacterEditorLibrary() {
     router.push("/tools/character-rom-editor/import");
   }, [router]);
 
+  const handleCreate = useCallback(() => {
+    router.push("/tools/character-rom-editor/add");
+  }, [router]);
+
   const handleRename = useCallback((id: string) => {
     const set = characterSets.find((s) => s.metadata.id === id);
     if (set) {
@@ -261,9 +265,14 @@ export function CharacterEditorLibrary() {
               </p>
             </div>
 
-            <Button href="/tools/character-rom-editor/import" variant="cyan">
-              Import ROM
-            </Button>
+            <div className="flex gap-2">
+              <Button href="/tools/character-rom-editor/add" variant="pink">
+                Add ROM
+              </Button>
+              <Button href="/tools/character-rom-editor/import" variant="cyan">
+                Import ROM
+              </Button>
+            </div>
           </div>
 
           {/* Filters */}
@@ -301,6 +310,7 @@ export function CharacterEditorLibrary() {
               onDuplicate={handleDuplicate}
               onRename={handleRename}
               onImport={handleImport}
+              onCreate={handleCreate}
             />
           )}
         </Container>

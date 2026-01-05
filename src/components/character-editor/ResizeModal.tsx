@@ -164,16 +164,16 @@ export function ResizeModal({
           </div>
         </div>
 
-        {/* Info text */}
-        {hasChanges && (
-          <p className="text-xs text-gray-500 mb-4 text-center">
-            {width > currentWidth || height > currentHeight
-              ? "New pixels will be added with background color"
-              : width < currentWidth || height < currentHeight
-              ? "Some pixels will be cropped"
-              : ""}
-          </p>
-        )}
+        {/* Info text - always visible with consistent height */}
+        <p className="text-xs text-gray-500 mb-4 text-center h-4">
+          {!hasChanges
+            ? "No changes"
+            : width > currentWidth || height > currentHeight
+            ? "New pixels will be added with background color"
+            : width < currentWidth || height < currentHeight
+            ? "Some pixels will be cropped"
+            : "No changes"}
+        </p>
 
         {/* Actions */}
         <div className="flex gap-3">
