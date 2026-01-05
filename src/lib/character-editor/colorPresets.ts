@@ -15,7 +15,7 @@ export interface ColorPreset {
 export const COLOR_PRESETS: ColorPreset[] = [
   {
     id: "classic",
-    name: "Classic (White/Black)",
+    name: "White Phosphor",
     foreground: "#ffffff",
     background: "#000000",
     gridColor: "#333333",
