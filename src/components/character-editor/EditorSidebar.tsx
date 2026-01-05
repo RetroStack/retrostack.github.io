@@ -48,6 +48,7 @@ export function EditorSidebar({
 }: EditorSidebarProps) {
   const totalSelected = batchSelection.size + 1;
   const hasMultipleSelected = totalSelected > 1;
+  const [gridCollapsed, setGridCollapsed] = useState(false);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -90,70 +91,91 @@ export function EditorSidebar({
 
   return (
     <div
-      className={`flex flex-col h-full ${className}`}
+      className={`flex flex-col h-full overflow-hidden ${className}`}
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-retro-grid/30">
+      <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-retro-grid/30">
         <div className="text-sm font-medium text-gray-300">
           Characters
-          <span className="ml-2 text-xs text-gray-500">
-            ({characters.length})
-          </span>
         </div>
       </div>
 
-      {/* Character set overview - collapsible */}
-      <div className="border-b border-retro-grid/30">
-        <CharacterSetOverview
-          characters={characters}
-          config={config}
-          selectedIndex={selectedIndex}
-          onSelect={(index) => onSelect(index, false)}
-          foregroundColor={foregroundColor}
-          backgroundColor={backgroundColor}
-          maxWidth={200}
-          pixelScale={1}
-          collapsible
-          defaultCollapsed={false}
-        />
-      </div>
-
-      {/* Selection info */}
-      {hasMultipleSelected && (
-        <div className="px-3 py-2 bg-retro-pink/10 border-b border-retro-grid/30">
-          <span className="text-xs text-retro-pink">
-            {totalSelected} characters selected
-          </span>
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        {/* Character set overview - collapsible */}
+        <div className="border-b border-retro-grid/30">
+          <CharacterSetOverview
+            characters={characters}
+            config={config}
+            selectedIndex={selectedIndex}
+            onSelect={(index) => onSelect(index, false)}
+            foregroundColor={foregroundColor}
+            backgroundColor={backgroundColor}
+            maxWidth={200}
+            pixelScale={1}
+            collapsible
+            defaultCollapsed={false}
+          />
         </div>
-      )}
 
-      {/* Character grid - larger tiles, no indices */}
-      <div className="flex-1 overflow-hidden">
-        <InteractiveCharacterGrid
-          characters={characters}
-          config={config}
-          selectedIndex={selectedIndex}
-          batchSelection={batchSelection}
-          onSelect={onSelect}
-          showAddButton={showAddButton && !!onAddCharacter}
-          onAdd={onAddCharacter}
-          foregroundColor={foregroundColor}
-          backgroundColor={backgroundColor}
-          showIndices={false}
-          smallScale={4}
-          minColumns={3}
-          maxColumns={8}
-          gap={6}
-          className="h-full"
-        />
-      </div>
+        {/* Selection info */}
+        {hasMultipleSelected && (
+          <div className="px-3 py-2 bg-retro-pink/10 border-b border-retro-grid/30">
+            <span className="text-xs text-retro-pink">
+              {totalSelected} characters selected
+            </span>
+          </div>
+        )}
 
-      {/* Footer with actions */}
-      <div className="p-3 border-t border-retro-grid/30">
-        <div className="text-[10px] text-gray-500 space-y-1">
-          <div>Click to select • Shift+click to multi-select</div>
-          <div>Arrow keys to navigate • Del to delete</div>
+        {/* Character grid - collapsible, improved density */}
+        <div className="border-b border-retro-grid/30">
+          <button
+            onClick={() => setGridCollapsed(!gridCollapsed)}
+            className="w-full flex items-center justify-between p-2 text-sm text-gray-300 hover:text-retro-cyan transition-colors"
+          >
+            <span className="font-medium">
+              Characters
+              <span className="ml-2 text-xs text-gray-500">
+                ({characters.length})
+              </span>
+            </span>
+            <svg
+              className={`w-4 h-4 transition-transform ${gridCollapsed ? "" : "rotate-180"}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {!gridCollapsed && (
+            <div className="p-2">
+              <InteractiveCharacterGrid
+                characters={characters}
+                config={config}
+                selectedIndex={selectedIndex}
+                batchSelection={batchSelection}
+                onSelect={onSelect}
+                showAddButton={showAddButton && !!onAddCharacter}
+                onAdd={onAddCharacter}
+                foregroundColor={foregroundColor}
+                backgroundColor={backgroundColor}
+                showIndices={false}
+                smallScale={2}
+                minColumns={4}
+                maxColumns={10}
+                gap={4}
+                className="max-h-[400px] overflow-y-auto"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -8,9 +8,11 @@ import { ToolbarItem } from "@/components/ui/ResponsiveToolbar";
 import {
   EditorCanvas,
   EditorSidebar,
-  ColorPresetSelector,
+  EditorHeader,
+  EditorFooter,
   KeyboardShortcutsHelp,
   TransformToolbar,
+  MetadataEditModal,
 } from "@/components/character-editor";
 import {
   useCharacterLibrary,
@@ -35,7 +37,7 @@ export function EditView() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const { getById, save } = useCharacterLibrary();
+  const { getById, save, deleteSet } = useCharacterLibrary();
 
   // Loading and error states
   const [loading, setLoading] = useState(true);
@@ -54,6 +56,18 @@ export function EditView() {
 
   // Help modal state
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
+
+  // Metadata edit modal state
+  const [showMetadataModal, setShowMetadataModal] = useState(false);
+
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  // Save as dialog state
+  const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
+  const [saveAsName, setSaveAsName] = useState("");
+  const [savingAs, setSavingAs] = useState(false);
 
   // Auto-save
   const autoSave = useAutoSave({
@@ -158,6 +172,82 @@ export function EditView() {
     }
   }, [autoSave, characterSet, editor]);
 
+  // Handle Save As
+  const handleSaveAs = useCallback(async () => {
+    if (!characterSet || !saveAsName.trim()) return;
+
+    try {
+      setSavingAs(true);
+
+      const newSet: CharacterSet = {
+        metadata: {
+          ...characterSet.metadata,
+          id: crypto.randomUUID(),
+          name: saveAsName.trim(),
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          isBuiltIn: false,
+        },
+        config: editor.config,
+        characters: editor.characters,
+      };
+
+      await save(newSet);
+      autoSave.clearAutoSave();
+
+      // Navigate to the new character set
+      router.push(`/tools/character-rom-editor/edit?id=${newSet.metadata.id}`);
+    } catch (e) {
+      console.error("Failed to save as:", e);
+    } finally {
+      setSavingAs(false);
+      setShowSaveAsDialog(false);
+      setSaveAsName("");
+    }
+  }, [characterSet, saveAsName, editor, save, autoSave, router]);
+
+  // Handle delete character set
+  const handleDelete = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      setDeleting(true);
+      await deleteSet(id);
+      router.push("/tools/character-rom-editor");
+    } catch (e) {
+      console.error("Failed to delete:", e);
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  }, [id, deleteSet, router]);
+
+  // Handle metadata update
+  const handleMetadataUpdate = useCallback(
+    async (updates: Partial<CharacterSet["metadata"]>) => {
+      if (!characterSet) return;
+
+      const updatedSet: CharacterSet = {
+        ...characterSet,
+        metadata: {
+          ...characterSet.metadata,
+          ...updates,
+          updatedAt: Date.now(),
+        },
+      };
+
+      await save(updatedSet);
+      setCharacterSet(updatedSet);
+    },
+    [characterSet, save]
+  );
+
+  // Open Save As dialog
+  const openSaveAsDialog = useCallback(() => {
+    setSaveAsName(characterSet?.metadata.name ? `${characterSet.metadata.name} (copy)` : "");
+    setShowSaveAsDialog(true);
+  }, [characterSet?.metadata.name]);
+
   // Keyboard shortcuts
   const shortcuts = useMemo(
     () =>
@@ -213,7 +303,7 @@ export function EditView() {
     // File operations group
     {
       id: "save",
-      label: saving ? "Saving..." : "Save (Ctrl+S)",
+      label: saving ? "Saving..." : "Save",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -222,6 +312,16 @@ export function EditView() {
       onClick: handleSave,
       disabled: saving || !editor.isDirty,
       active: editor.isDirty,
+    },
+    {
+      id: "save-as",
+      label: "Save As",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m0 0V4m0 0H9m3 0v3" />
+        </svg>
+      ),
+      onClick: openSaveAsDialog,
     },
     {
       id: "export",
@@ -234,6 +334,28 @@ export function EditView() {
       onClick: handleExport,
     },
     { type: "separator", id: "sep-2" },
+    {
+      id: "edit-metadata",
+      label: "Edit Info",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ),
+      onClick: () => setShowMetadataModal(true),
+    },
+    {
+      id: "delete",
+      label: "Delete",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      onClick: () => setShowDeleteConfirm(true),
+      disabled: characterSet?.metadata.isBuiltIn,
+    },
+    { type: "separator", id: "sep-3" },
     {
       id: "help",
       label: "Shortcuts (?)",
@@ -294,30 +416,19 @@ export function EditView() {
       title={characterSet?.metadata.name || "Character Editor"}
       toolbar={toolbarActions}
     >
-      {/* Back button overlay */}
-      <button
-        onClick={handleBack}
-        className="absolute top-[calc(var(--header-height)+var(--toolbar-height)+0.5rem)] left-4 z-30 flex items-center gap-1 text-xs text-gray-400 hover:text-retro-cyan transition-colors"
-      >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back
-      </button>
-
-      {/* Title overlay */}
-      <div className="absolute top-[calc(var(--header-height)+var(--toolbar-height)+0.5rem)] left-1/2 -translate-x-1/2 z-30 text-sm text-gray-300">
-        {characterSet?.metadata.name}
-        {editor.isDirty && <span className="text-retro-pink ml-1">*</span>}
-      </div>
-
-      {/* Color preset selector */}
-      <div className="absolute top-[calc(var(--header-height)+var(--toolbar-height)+0.5rem)] right-4 z-30">
-        <ColorPresetSelector
-          colors={colors}
-          onColorsChange={setColors}
-        />
-      </div>
+      {/* Consolidated editor header */}
+      <EditorHeader
+        characterSetName={characterSet?.metadata.name || "Untitled"}
+        isDirty={editor.isDirty}
+        characterIndex={editor.selectedIndex}
+        totalCharacters={editor.characters.length}
+        batchMode={isBatchMode}
+        zoom={zoom}
+        onZoomChange={setZoom}
+        colors={colors}
+        onColorsChange={setColors}
+        onBack={handleBack}
+      />
 
       <ToolContent
         leftSidebar={
@@ -361,11 +472,11 @@ export function EditView() {
           backgroundColor={colors.background}
           gridColor={colors.gridColor}
           zoom={zoom}
-          onZoomChange={setZoom}
-          characterIndex={editor.selectedIndex}
-          totalCharacters={editor.characters.length}
         />
       </ToolContent>
+
+      {/* Keyboard shortcuts footer */}
+      <EditorFooter />
 
       {/* Recovery dialog */}
       {autoSave.hasRecoveryData && (
@@ -405,6 +516,87 @@ export function EditView() {
         onClose={() => setShowShortcutsHelp(false)}
         shortcuts={shortcuts}
       />
+
+      {/* Metadata edit modal */}
+      {characterSet && (
+        <MetadataEditModal
+          isOpen={showMetadataModal}
+          onClose={() => setShowMetadataModal(false)}
+          metadata={characterSet.metadata}
+          onSave={handleMetadataUpdate}
+        />
+      )}
+
+      {/* Save As dialog */}
+      {showSaveAsDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowSaveAsDialog(false)} />
+          <div className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6">
+            <h2 className="text-lg font-medium text-white mb-4">Save As</h2>
+            <div className="mb-4">
+              <label className="block text-sm text-gray-300 mb-1">New name</label>
+              <input
+                type="text"
+                value={saveAsName}
+                onChange={(e) => setSaveAsName(e.target.value)}
+                placeholder="Character set name"
+                className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && saveAsName.trim()) {
+                    handleSaveAs();
+                  } else if (e.key === "Escape") {
+                    setShowSaveAsDialog(false);
+                  }
+                }}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSaveAsDialog(false)}
+                className="flex-1 px-4 py-2 text-sm border border-retro-grid/50 rounded text-gray-400 hover:border-retro-grid hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveAs}
+                disabled={!saveAsName.trim() || savingAs}
+                className="flex-1 px-4 py-2 text-sm bg-retro-cyan/20 border border-retro-cyan rounded text-retro-cyan hover:bg-retro-cyan/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingAs ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6">
+            <h2 className="text-lg font-medium text-white mb-2">Delete Character Set?</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              Are you sure you want to delete &quot;{characterSet?.metadata.name}&quot;? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2 text-sm border border-retro-grid/50 rounded text-gray-400 hover:border-retro-grid hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 px-4 py-2 text-sm bg-red-500/20 border border-red-500 rounded text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ToolLayout>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState, useEffect } from "react";
+import { useMemo, useCallback, useRef, useState } from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
 import { Character, CharacterSetConfig } from "@/lib/character-editor";
 
@@ -29,22 +29,13 @@ export interface EditorCanvasProps {
   gridThickness?: number;
   /** Zoom level (scale factor) */
   zoom?: number;
-  /** Callback when zoom changes */
-  onZoomChange?: (zoom: number) => void;
-  /** Character index being edited */
-  characterIndex?: number;
-  /** Total number of characters */
-  totalCharacters?: number;
   /** Additional CSS classes */
   className?: string;
 }
 
-const MIN_ZOOM = 8;
-const MAX_ZOOM = 40;
-const ZOOM_STEP = 4;
-
 /**
  * Main editing canvas for character pixels
+ * Simplified version - header/footer moved to EditorHeader/EditorFooter
  */
 export function EditorCanvas({
   character,
@@ -59,9 +50,6 @@ export function EditorCanvas({
   gridColor = "#333333",
   gridThickness = 1,
   zoom = 20,
-  onZoomChange,
-  characterIndex,
-  totalCharacters,
   className = "",
 }: EditorCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -114,38 +102,6 @@ export function EditorCanvas({
     }
   }, [isDragging, onDragEnd]);
 
-  // Handle zoom controls
-  const zoomIn = useCallback(() => {
-    if (onZoomChange && zoom < MAX_ZOOM) {
-      onZoomChange(Math.min(zoom + ZOOM_STEP, MAX_ZOOM));
-    }
-  }, [zoom, onZoomChange]);
-
-  const zoomOut = useCallback(() => {
-    if (onZoomChange && zoom > MIN_ZOOM) {
-      onZoomChange(Math.max(zoom - ZOOM_STEP, MIN_ZOOM));
-    }
-  }, [zoom, onZoomChange]);
-
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle if focused on editor
-      if (!containerRef.current?.contains(document.activeElement)) return;
-
-      if (e.key === "+" || e.key === "=") {
-        e.preventDefault();
-        zoomIn();
-      } else if (e.key === "-" || e.key === "_") {
-        e.preventDefault();
-        zoomOut();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [zoomIn, zoomOut]);
-
   if (!character) {
     return (
       <div className={`flex items-center justify-center h-full ${className}`}>
@@ -172,88 +128,28 @@ export function EditorCanvas({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-col h-full ${className}`}
+      className={`flex items-center justify-center h-full overflow-hidden bg-black/20 ${className}`}
       tabIndex={0}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-retro-grid/30">
-        <div className="text-sm text-gray-400 flex items-center flex-wrap gap-2">
-          {characterIndex !== undefined && totalCharacters !== undefined ? (
-            <>
-              <span>
-                Character <span className="text-retro-cyan">{characterIndex}</span>{" "}
-                of {totalCharacters}
-              </span>
-              {/* ASCII character preview for printable characters (32-126) */}
-              {characterIndex >= 32 && characterIndex <= 126 && (
-                <span className="px-2 py-0.5 bg-retro-purple/30 text-retro-cyan rounded text-xs font-mono">
-                  = &apos;{String.fromCharCode(characterIndex)}&apos;
-                </span>
-              )}
-            </>
-          ) : (
-            <span>Editor</span>
-          )}
-          {batchMode && (
-            <span className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded">
-              Batch
-            </span>
-          )}
-        </div>
-
-        {/* Zoom controls */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={zoomOut}
-            disabled={zoom <= MIN_ZOOM}
-            className="p-1 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Zoom out (-)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <span className="text-xs text-gray-500 w-12 text-center">{zoom}x</span>
-          <button
-            onClick={zoomIn}
-            disabled={zoom >= MAX_ZOOM}
-            className="p-1 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Zoom in (+)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Canvas area */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-auto bg-black/20">
-        <div
-          className="inline-block"
-          onMouseLeave={handleDragEnd}
-          onMouseUp={handleDragEnd}
-        >
-          <CharacterDisplay
-            character={character}
-            mode="large"
-            scale={zoom}
-            foregroundColor={foregroundColor}
-            backgroundColor={backgroundColor}
-            gridColor={gridColor}
-            gridThickness={gridThickness}
-            onPixelClick={handlePixelClick}
-            onPixelDrag={handlePixelDrag}
-            onDragEnd={handleDragEnd}
-            interactive={true}
-            mixedPixels={mixedPixels}
-          />
-        </div>
-      </div>
-
-      {/* Footer with size info */}
-      <div className="px-4 py-2 border-t border-retro-grid/30 text-xs text-gray-500">
-        {config.width}x{config.height} pixels
+      <div
+        className="inline-block"
+        onMouseLeave={handleDragEnd}
+        onMouseUp={handleDragEnd}
+      >
+        <CharacterDisplay
+          character={character}
+          mode="large"
+          scale={zoom}
+          foregroundColor={foregroundColor}
+          backgroundColor={backgroundColor}
+          gridColor={gridColor}
+          gridThickness={gridThickness}
+          onPixelClick={handlePixelClick}
+          onPixelDrag={handlePixelDrag}
+          onDragEnd={handleDragEnd}
+          interactive={true}
+          mixedPixels={mixedPixels}
+        />
       </div>
     </div>
   );

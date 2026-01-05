@@ -36,8 +36,27 @@ export function CharacterEditorLibrary() {
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [widthFilter, setWidthFilter] = useState<number | null>(null);
-  const [heightFilter, setHeightFilter] = useState<number | null>(null);
+  const [widthFilters, setWidthFilters] = useState<number[]>([]);
+  const [heightFilters, setHeightFilters] = useState<number[]>([]);
+  const [makerFilters, setMakerFilters] = useState<string[]>([]);
+  const [systemFilters, setSystemFilters] = useState<string[]>([]);
+
+  // Get available makers and systems from character sets
+  const availableMakers = useMemo(() => {
+    const makers = new Set<string>();
+    characterSets.forEach((set) => {
+      if (set.metadata.maker) makers.add(set.metadata.maker);
+    });
+    return Array.from(makers).sort();
+  }, [characterSets]);
+
+  const availableSystems = useMemo(() => {
+    const systems = new Set<string>();
+    characterSets.forEach((set) => {
+      if (set.metadata.system) systems.add(set.metadata.system);
+    });
+    return Array.from(systems).sort();
+  }, [characterSets]);
 
   // Delete confirmation state
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -63,16 +82,30 @@ export function CharacterEditorLibrary() {
       );
     }
 
-    // Apply size filters
-    if (widthFilter !== null) {
-      result = result.filter((set) => set.config.width === widthFilter);
+    // Apply size filters (OR logic - match any selected)
+    if (widthFilters.length > 0) {
+      result = result.filter((set) => widthFilters.includes(set.config.width));
     }
-    if (heightFilter !== null) {
-      result = result.filter((set) => set.config.height === heightFilter);
+    if (heightFilters.length > 0) {
+      result = result.filter((set) => heightFilters.includes(set.config.height));
+    }
+
+    // Apply maker filter (OR logic)
+    if (makerFilters.length > 0) {
+      result = result.filter(
+        (set) => set.metadata.maker && makerFilters.includes(set.metadata.maker)
+      );
+    }
+
+    // Apply system filter (OR logic)
+    if (systemFilters.length > 0) {
+      result = result.filter(
+        (set) => set.metadata.system && systemFilters.includes(set.metadata.system)
+      );
     }
 
     return result;
-  }, [characterSets, searchQuery, widthFilter, heightFilter]);
+  }, [characterSets, searchQuery, widthFilters, heightFilters, makerFilters, systemFilters]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -151,21 +184,35 @@ export function CharacterEditorLibrary() {
   }, [renameId, renameName, rename]);
 
   const handleSizeFilterChange = useCallback(
-    (width: number | null, height: number | null) => {
-      setWidthFilter(width);
-      setHeightFilter(height);
+    (widths: number[], heights: number[]) => {
+      setWidthFilters(widths);
+      setHeightFilters(heights);
     },
     []
   );
 
+  const handleMakerFilterChange = useCallback((makers: string[]) => {
+    setMakerFilters(makers);
+  }, []);
+
+  const handleSystemFilterChange = useCallback((systems: string[]) => {
+    setSystemFilters(systems);
+  }, []);
+
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
-    setWidthFilter(null);
-    setHeightFilter(null);
+    setWidthFilters([]);
+    setHeightFilters([]);
+    setMakerFilters([]);
+    setSystemFilters([]);
   }, []);
 
   const hasActiveFilters =
-    searchQuery.length > 0 || widthFilter !== null || heightFilter !== null;
+    searchQuery.length > 0 ||
+    widthFilters.length > 0 ||
+    heightFilters.length > 0 ||
+    makerFilters.length > 0 ||
+    systemFilters.length > 0;
 
   // Find the set being deleted for confirmation
   const setToDelete = deleteId
@@ -225,9 +272,15 @@ export function CharacterEditorLibrary() {
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               availableSizes={availableSizes}
-              widthFilter={widthFilter}
-              heightFilter={heightFilter}
+              widthFilters={widthFilters}
+              heightFilters={heightFilters}
               onSizeFilterChange={handleSizeFilterChange}
+              availableMakers={availableMakers}
+              availableSystems={availableSystems}
+              makerFilters={makerFilters}
+              systemFilters={systemFilters}
+              onMakerFilterChange={handleMakerFilterChange}
+              onSystemFilterChange={handleSystemFilterChange}
               totalCount={characterSets.length}
               filteredCount={filteredSets.length}
             />

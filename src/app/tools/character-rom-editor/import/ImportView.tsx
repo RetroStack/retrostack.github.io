@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/Button";
 import { NeonText } from "@/components/effects/NeonText";
 import {
   ImportDropZone,
-  ImportConfigForm,
   CharacterPreview,
+  MakerSystemSelect,
+  ImportStepIndicator,
 } from "@/components/character-editor";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
@@ -19,28 +20,44 @@ import {
   createDefaultConfig,
   parseCharacterRom,
   generateId,
+  PaddingDirection,
+  BitDirection,
+  calculateCharacterCount,
+  formatFileSize,
 } from "@/lib/character-editor";
 
+type WizardStep = 1 | 2 | 3;
+
+const STEP_LABELS = ["Upload", "Metadata", "Configure"];
+
 /**
- * Import view for the Character ROM Editor
+ * Import view for the Character ROM Editor - Multi-step wizard
  */
 export function ImportView() {
   const router = useRouter();
   const { save } = useCharacterLibrary();
 
-  // File state
+  // Current step
+  const [step, setStep] = useState<WizardStep>(1);
+
+  // Step 1: File state
   const [file, setFile] = useState<File | null>(null);
   const [fileData, setFileData] = useState<ArrayBuffer | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  // Config state
-  const [config, setConfig] = useState<CharacterSetConfig>(createDefaultConfig());
+  // Step 2: Metadata state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [maker, setMaker] = useState("");
+  const [system, setSystem] = useState("");
+  const [source, setSource] = useState("");
+
+  // Step 3: Config state
+  const [config, setConfig] = useState<CharacterSetConfig>(createDefaultConfig());
 
   // Saving state
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Parse characters from file data
   const characters = useMemo(() => {
@@ -52,25 +69,87 @@ export function ImportView() {
     }
   }, [fileData, config]);
 
+  // Calculate character count for preview info
+  const characterCount = useMemo(() => {
+    if (!file?.size) return 0;
+    return calculateCharacterCount(file.size, config);
+  }, [file?.size, config]);
+
+  const bytesPerChar = useMemo(() => {
+    const bytesPerLine = Math.ceil(config.width / 8);
+    return bytesPerLine * config.height;
+  }, [config.width, config.height]);
+
+  // Step validation
+  const canProceedStep1 = file && fileData;
+  const canProceedStep2 = name.trim().length > 0;
+  const canSave = canProceedStep1 && canProceedStep2 && characters.length > 0;
+
+  // Handlers
   const handleFileSelect = useCallback((selectedFile: File, data: ArrayBuffer) => {
     setFile(selectedFile);
     setFileData(data);
-    setError(null);
+    setUploadError(null);
 
     // Set default name from filename
     const baseName = selectedFile.name.replace(/\.[^/.]+$/, "");
     setName(baseName);
   }, []);
 
+  const handleNext = useCallback(() => {
+    if (step < 3) {
+      setStep((step + 1) as WizardStep);
+    }
+  }, [step]);
+
+  const handleBack = useCallback(() => {
+    if (step > 1) {
+      setStep((step - 1) as WizardStep);
+    }
+  }, [step]);
+
+  const handleWidthChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value, 10);
+      if (!isNaN(value) && value >= 1 && value <= 16) {
+        setConfig((prev) => ({ ...prev, width: value }));
+      }
+    },
+    []
+  );
+
+  const handleHeightChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value, 10);
+      if (!isNaN(value) && value >= 1 && value <= 16) {
+        setConfig((prev) => ({ ...prev, height: value }));
+      }
+    },
+    []
+  );
+
+  const handlePaddingChange = useCallback((padding: PaddingDirection) => {
+    setConfig((prev) => ({ ...prev, padding }));
+  }, []);
+
+  const handleBitDirectionChange = useCallback((bitDirection: BitDirection) => {
+    setConfig((prev) => ({ ...prev, bitDirection }));
+  }, []);
+
+  const handlePresetClick = useCallback((width: number, height: number) => {
+    setConfig((prev) => ({ ...prev, width, height }));
+  }, []);
+
   const handleSave = useCallback(
     async (openEditor: boolean = false) => {
       if (!fileData || !name.trim()) {
-        setError("Please provide a name for the character set");
+        setSaveError("Please provide a name for the character set");
         return;
       }
 
       try {
         setSaving(true);
+        setSaveError(null);
 
         const now = Date.now();
         const id = generateId();
@@ -80,9 +159,9 @@ export function ImportView() {
             id,
             name: name.trim(),
             description: description.trim(),
-            source: "yourself",
-            maker: "",
-            system: "",
+            source: source.trim() || "yourself",
+            maker: maker.trim(),
+            system: system.trim(),
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -99,15 +178,13 @@ export function ImportView() {
           router.push("/tools/character-rom-editor");
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to save character set");
+        setSaveError(e instanceof Error ? e.message : "Failed to save character set");
       } finally {
         setSaving(false);
       }
     },
-    [fileData, name, description, config, characters, save, router]
+    [fileData, name, description, source, maker, system, config, characters, save, router]
   );
-
-  const isValid = file && fileData && name.trim() && characters.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col safe-top">
@@ -116,7 +193,7 @@ export function ImportView() {
       <main className="flex-1 bg-retro-dark pt-24 pb-12">
         <Container size="default">
           {/* Page header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <Link
               href="/tools/character-rom-editor"
               className="text-xs text-gray-500 hover:text-retro-cyan transition-colors mb-2 inline-flex items-center gap-1"
@@ -139,148 +216,404 @@ export function ImportView() {
             <h1 className="text-2xl sm:text-3xl font-display">
               <NeonText color="cyan">Import Character ROM</NeonText>
             </h1>
-            <p className="text-sm text-gray-400 mt-2">
-              Upload a binary ROM file and configure the character format
-            </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left column: Upload and config */}
-            <div className="space-y-8">
-              {/* File upload */}
-              <section>
-                <h2 className="text-sm font-medium text-gray-300 mb-4">
-                  1. Select File
-                </h2>
+          {/* Step indicator */}
+          <ImportStepIndicator
+            currentStep={step}
+            totalSteps={3}
+            labels={STEP_LABELS}
+          />
+
+          {/* Step content */}
+          <div className="max-w-2xl mx-auto">
+            {/* Step 1: Upload */}
+            {step === 1 && (
+              <div className="space-y-6">
+                <div className="text-center mb-6">
+                  <h2 className="text-lg font-medium text-gray-200 mb-2">
+                    Upload ROM File
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Select a binary ROM file containing character data
+                  </p>
+                </div>
+
                 <ImportDropZone
                   onFileSelect={handleFileSelect}
                   selectedFile={file}
-                  loading={loading}
-                  error={error}
+                  loading={false}
+                  error={uploadError}
                 />
-              </section>
 
-              {/* Configuration */}
-              <section>
-                <h2 className="text-sm font-medium text-gray-300 mb-4">
-                  2. Configure Format
-                </h2>
-                <div className="card-retro p-4 sm:p-6">
-                  <ImportConfigForm
-                    config={config}
-                    onConfigChange={setConfig}
-                    fileSize={file?.size}
-                    name={name}
-                    onNameChange={setName}
-                    description={description}
-                    onDescriptionChange={setDescription}
-                    disabled={!file}
-                  />
+                {file && (
+                  <div className="text-center text-sm text-gray-400">
+                    <span className="text-retro-cyan">{file.name}</span>
+                    <span className="mx-2">-</span>
+                    <span>{formatFileSize(file.size)}</span>
+                  </div>
+                )}
+
+                {/* Navigation */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleNext}
+                    disabled={!canProceedStep1}
+                    variant="cyan"
+                  >
+                    Next
+                  </Button>
                 </div>
-              </section>
-            </div>
+              </div>
+            )}
 
-            {/* Right column: Preview */}
-            <div>
-              <section>
-                <h2 className="text-sm font-medium text-gray-300 mb-4">
-                  3. Preview
-                </h2>
-                <div className="card-retro p-4 sm:p-6">
-                  {characters.length > 0 ? (
+            {/* Step 2: Metadata */}
+            {step === 2 && (
+              <div className="space-y-6">
+                <div className="text-center mb-6">
+                  <h2 className="text-lg font-medium text-gray-200 mb-2">
+                    Character Set Details
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Add information about this character set
+                  </p>
+                </div>
+
+                <div className="card-retro p-6 space-y-6">
+                  {/* Name */}
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-300 mb-1.5"
+                    >
+                      Name <span className="text-retro-pink">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="My Character Set"
+                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label
+                      htmlFor="description"
+                      className="block text-sm font-medium text-gray-300 mb-1.5"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Optional description..."
+                      rows={2}
+                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 resize-none"
+                    />
+                  </div>
+
+                  {/* Maker and System */}
+                  <MakerSystemSelect
+                    maker={maker}
+                    system={system}
+                    onMakerChange={setMaker}
+                    onSystemChange={setSystem}
+                  />
+
+                  {/* Source */}
+                  <div>
+                    <label
+                      htmlFor="source"
+                      className="block text-sm font-medium text-gray-300 mb-1.5"
+                    >
+                      Source
+                    </label>
+                    <input
+                      type="text"
+                      id="source"
+                      value={source}
+                      onChange={(e) => setSource(e.target.value)}
+                      placeholder="Where did this ROM come from?"
+                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div className="flex justify-between pt-4">
+                  <Button onClick={handleBack} variant="ghost">
+                    Back
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    disabled={!canProceedStep2}
+                    variant="cyan"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Configure and Preview */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <div className="text-center mb-6">
+                  <h2 className="text-lg font-medium text-gray-200 mb-2">
+                    Configure Binary Format
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Adjust settings until the preview looks correct
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Configuration */}
+                  <div className="card-retro p-4 space-y-5">
+                    {/* Dimensions */}
                     <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm text-gray-400">
+                      <h3 className="text-sm font-medium text-gray-300 mb-3">
+                        Character Dimensions
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            htmlFor="width"
+                            className="block text-xs text-gray-500 mb-1"
+                          >
+                            Width (pixels)
+                          </label>
+                          <input
+                            type="number"
+                            id="width"
+                            min={1}
+                            max={16}
+                            value={config.width}
+                            onChange={handleWidthChange}
+                            className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="height"
+                            className="block text-xs text-gray-500 mb-1"
+                          >
+                            Height (pixels)
+                          </label>
+                          <input
+                            type="number"
+                            id="height"
+                            min={1}
+                            max={16}
+                            value={config.height}
+                            onChange={handleHeightChange}
+                            className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Quick presets */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {[
+                          { label: "8x8", width: 8, height: 8 },
+                          { label: "8x16", width: 8, height: 16 },
+                          { label: "5x7", width: 5, height: 7 },
+                          { label: "5x8", width: 5, height: 8 },
+                          { label: "6x8", width: 6, height: 8 },
+                        ].map((preset) => (
+                          <button
+                            key={preset.label}
+                            type="button"
+                            onClick={() => handlePresetClick(preset.width, preset.height)}
+                            className={`
+                              px-2 py-1 text-xs rounded border transition-colors
+                              ${
+                                config.width === preset.width &&
+                                config.height === preset.height
+                                  ? "border-retro-pink bg-retro-pink/10 text-retro-pink"
+                                  : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                              }
+                            `}
+                          >
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Padding direction */}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">
+                        Bit Padding
+                      </h3>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handlePaddingChange("right")}
+                          className={`
+                            flex-1 px-3 py-1.5 text-xs rounded border transition-colors
+                            ${
+                              config.padding === "right"
+                                ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                                : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                            }
+                          `}
+                        >
+                          Right
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handlePaddingChange("left")}
+                          className={`
+                            flex-1 px-3 py-1.5 text-xs rounded border transition-colors
+                            ${
+                              config.padding === "left"
+                                ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                                : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                            }
+                          `}
+                        >
+                          Left
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bit direction */}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">
+                        Bit Direction
+                      </h3>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleBitDirectionChange("ltr")}
+                          className={`
+                            flex-1 px-3 py-1.5 text-xs rounded border transition-colors
+                            ${
+                              config.bitDirection === "ltr"
+                                ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                                : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                            }
+                          `}
+                        >
+                          Left to Right
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBitDirectionChange("rtl")}
+                          className={`
+                            flex-1 px-3 py-1.5 text-xs rounded border transition-colors
+                            ${
+                              config.bitDirection === "rtl"
+                                ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                                : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                            }
+                          `}
+                        >
+                          Right to Left
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    {file && (
+                      <div className="text-xs text-gray-500 pt-2 border-t border-retro-grid/30">
+                        {bytesPerChar} bytes/char = {characterCount} characters
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Preview */}
+                  <div className="card-retro p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-300">
+                        Preview
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {config.width}x{config.height}
+                      </span>
+                    </div>
+
+                    {characters.length > 0 ? (
+                      <div>
+                        <div className="bg-black/50 rounded-lg p-3 overflow-auto max-h-[280px]">
+                          <CharacterPreview
+                            characters={characters}
+                            config={config}
+                            maxCharacters={256}
+                            maxWidth={280}
+                            maxHeight={280}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-3">
                           {characters.length} character
                           {characters.length !== 1 ? "s" : ""} detected
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {config.width}x{config.height}
-                        </span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          If scrambled, try adjusting dimensions or bit settings.
+                        </p>
                       </div>
-
-                      {/* Character preview */}
-                      <div className="bg-black/50 rounded-lg p-4 overflow-auto max-h-[400px]">
-                        <CharacterPreview
-                          characters={characters}
-                          config={config}
-                          maxCharacters={256}
-                          maxWidth={320}
-                          maxHeight={320}
-                        />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <svg
+                          className="w-10 h-10 text-gray-600 mb-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <p className="text-sm text-gray-400">
+                          No characters detected
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Try adjusting the dimensions
+                        </p>
                       </div>
-
-                      {/* Tip */}
-                      <p className="text-xs text-gray-500 mt-4">
-                        If the preview looks scrambled, try adjusting the
-                        dimensions, padding, or bit direction.
-                      </p>
-                    </div>
-                  ) : file ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <svg
-                        className="w-12 h-12 text-gray-600 mb-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <p className="text-sm text-gray-400">
-                        No characters detected with current settings
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Try adjusting the dimensions
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <svg
-                        className="w-12 h-12 text-gray-600 mb-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <p className="text-sm text-gray-400">
-                        Select a file to preview
-                      </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </section>
 
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <Button
-                  onClick={() => handleSave(false)}
-                  disabled={!isValid || saving}
-                  variant="cyan"
-                  className="flex-1"
-                >
-                  {saving ? "Saving..." : "Save to Library"}
-                </Button>
-                <Button
-                  onClick={() => handleSave(true)}
-                  disabled={!isValid || saving}
-                  variant="pink"
-                  className="flex-1"
-                >
-                  {saving ? "Saving..." : "Save & Edit"}
-                </Button>
+                {/* Error message */}
+                {saveError && (
+                  <div className="text-sm text-red-400 text-center">
+                    {saveError}
+                  </div>
+                )}
+
+                {/* Navigation */}
+                <div className="flex justify-between pt-4">
+                  <Button onClick={handleBack} variant="ghost">
+                    Back
+                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => handleSave(false)}
+                      disabled={!canSave || saving}
+                      variant="cyan"
+                    >
+                      {saving ? "Saving..." : "Save to Library"}
+                    </Button>
+                    <Button
+                      onClick={() => handleSave(true)}
+                      disabled={!canSave || saving}
+                      variant="pink"
+                    >
+                      {saving ? "Saving..." : "Save & Edit"}
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </Container>
       </main>

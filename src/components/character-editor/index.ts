@@ -61,6 +61,12 @@ export type { EditorCanvasProps } from "./EditorCanvas";
 export { EditorSidebar } from "./EditorSidebar";
 export type { EditorSidebarProps } from "./EditorSidebar";
 
+export { EditorHeader } from "./EditorHeader";
+export type { EditorHeaderProps } from "./EditorHeader";
+
+export { EditorFooter } from "./EditorFooter";
+export type { EditorFooterProps } from "./EditorFooter";
+
 export { ColorPresetSelector } from "./ColorPresetSelector";
 export type { ColorPresetSelectorProps } from "./ColorPresetSelector";
 
@@ -72,6 +78,9 @@ export type { TransformToolbarProps } from "./TransformToolbar";
 
 export { CharacterSetOverview } from "./CharacterSetOverview";
 export type { CharacterSetOverviewProps } from "./CharacterSetOverview";
+
+export { MetadataEditModal } from "./MetadataEditModal";
+export type { MetadataEditModalProps } from "./MetadataEditModal";
 
 export { MakerSystemSelect, MakerSystemSelectCompact } from "./MakerSystemSelect";
 export type { MakerSystemSelectProps } from "./MakerSystemSelect";
@@ -95,3 +104,7 @@ export type { ImportFromLibraryModalProps } from "./ImportFromLibraryModal";
 
 export { CharacterPickerModal } from "./CharacterPickerModal";
 export type { CharacterPickerModalProps } from "./CharacterPickerModal";
+
+// Import wizard
+export { ImportStepIndicator } from "./ImportStepIndicator";
+export type { ImportStepIndicatorProps } from "./ImportStepIndicator";

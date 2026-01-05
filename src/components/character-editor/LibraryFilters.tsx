@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { KNOWN_MAKERS, getSystemsForMaker } from "@/lib/character-editor";
+import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 
 export interface LibraryFiltersProps {
   /** Current search query */
@@ -10,24 +11,24 @@ export interface LibraryFiltersProps {
   onSearchChange: (query: string) => void;
   /** Available sizes for filtering */
   availableSizes: { width: number; height: number }[];
-  /** Current width filter */
-  widthFilter: number | null;
-  /** Current height filter */
-  heightFilter: number | null;
-  /** Callback when size filter changes */
-  onSizeFilterChange: (width: number | null, height: number | null) => void;
+  /** Current width filters (multi-select) */
+  widthFilters: number[];
+  /** Current height filters (multi-select) */
+  heightFilters: number[];
+  /** Callback when size filters change */
+  onSizeFilterChange: (widths: number[], heights: number[]) => void;
   /** Available makers from library */
   availableMakers?: string[];
   /** Available systems from library */
   availableSystems?: string[];
-  /** Current maker filter */
-  makerFilter?: string | null;
-  /** Current system filter */
-  systemFilter?: string | null;
-  /** Callback when maker filter changes */
-  onMakerFilterChange?: (maker: string | null) => void;
-  /** Callback when system filter changes */
-  onSystemFilterChange?: (system: string | null) => void;
+  /** Current maker filters (multi-select) */
+  makerFilters?: string[];
+  /** Current system filters (multi-select) */
+  systemFilters?: string[];
+  /** Callback when maker filters change */
+  onMakerFilterChange?: (makers: string[]) => void;
+  /** Callback when system filters change */
+  onSystemFilterChange?: (systems: string[]) => void;
   /** Total count of items */
   totalCount: number;
   /** Filtered count of items */
@@ -35,19 +36,19 @@ export interface LibraryFiltersProps {
 }
 
 /**
- * Filter controls for the character set library
+ * Filter controls for the character set library with multi-select support
  */
 export function LibraryFilters({
   searchQuery,
   onSearchChange,
   availableSizes,
-  widthFilter,
-  heightFilter,
+  widthFilters,
+  heightFilters,
   onSizeFilterChange,
   availableMakers = [],
   availableSystems = [],
-  makerFilter = null,
-  systemFilter = null,
+  makerFilters = [],
+  systemFilters = [],
   onMakerFilterChange,
   onSystemFilterChange,
   totalCount,
@@ -63,19 +64,31 @@ export function LibraryFilters({
     return Array.from(uniqueMakers).sort();
   }, [availableMakers]);
 
-  // Get systems for the selected maker
-  const systemsForMaker = useMemo(() => {
-    if (!makerFilter) {
+  // Get systems - show all if no maker selected, or filtered by selected makers
+  const systemsForMakers = useMemo(() => {
+    if (makerFilters.length === 0) {
       // If no maker selected, show all available systems
       return availableSystems.sort();
     }
-    const knownSystems = getSystemsForMaker(makerFilter);
-    // Include any available systems not in the known list
-    const uniqueSystems = new Set([...knownSystems, ...availableSystems.filter(s =>
-      availableSystems.includes(s)
-    )]);
-    return Array.from(uniqueSystems).sort();
-  }, [makerFilter, availableSystems]);
+    // Get systems for all selected makers
+    const systems = new Set<string>();
+    makerFilters.forEach((maker) => {
+      const knownSystems = getSystemsForMaker(maker);
+      knownSystems.forEach((s) => systems.add(s));
+    });
+    // Also include any available systems
+    availableSystems.forEach((s) => systems.add(s));
+    return Array.from(systems).sort();
+  }, [makerFilters, availableSystems]);
+
+  // Get unique widths and heights
+  const availableWidths = useMemo(() => {
+    return Array.from(new Set(availableSizes.map((s) => s.width))).sort((a, b) => a - b);
+  }, [availableSizes]);
+
+  const availableHeights = useMemo(() => {
+    return Array.from(new Set(availableSizes.map((s) => s.height))).sort((a, b) => a - b);
+  }, [availableSizes]);
 
   const handleSearchSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -97,158 +110,114 @@ export function LibraryFilters({
   const handleClearFilters = useCallback(() => {
     setLocalSearch("");
     onSearchChange("");
-    onSizeFilterChange(null, null);
-    onMakerFilterChange?.(null);
-    onSystemFilterChange?.(null);
+    onSizeFilterChange([], []);
+    onMakerFilterChange?.([]);
+    onSystemFilterChange?.([]);
   }, [onSearchChange, onSizeFilterChange, onMakerFilterChange, onSystemFilterChange]);
-
-  const handleMakerChange = useCallback(
-    (maker: string | null) => {
-      onMakerFilterChange?.(maker);
-      // Clear system filter when maker changes
-      if (maker !== makerFilter) {
-        onSystemFilterChange?.(null);
-      }
-    },
-    [makerFilter, onMakerFilterChange, onSystemFilterChange]
-  );
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
-    widthFilter !== null ||
-    heightFilter !== null ||
-    makerFilter !== null ||
-    systemFilter !== null;
+    widthFilters.length > 0 ||
+    heightFilters.length > 0 ||
+    makerFilters.length > 0 ||
+    systemFilters.length > 0;
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Search and filters row */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {/* Search input */}
-        <form onSubmit={handleSearchSubmit} className="flex-1">
-          <div className="relative">
-            <input
-              type="text"
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              onBlur={() => onSearchChange(localSearch)}
-              placeholder="Search character sets..."
-              className="w-full px-4 py-2 pl-10 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 transition-colors"
-              aria-label="Search character sets"
+      {/* Search input */}
+      <form onSubmit={handleSearchSubmit}>
+        <div className="relative">
+          <input
+            type="text"
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            onBlur={() => onSearchChange(localSearch)}
+            placeholder="Search character sets..."
+            className="w-full px-4 py-2 pl-10 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 transition-colors"
+            aria-label="Search character sets"
+          />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          </svg>
+
+          {localSearch && (
+            <button
+              type="button"
+              onClick={() => {
+                setLocalSearch("");
+                onSearchChange("");
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+              aria-label="Clear search"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-
-            {localSearch && (
-              <button
-                type="button"
-                onClick={() => {
-                  setLocalSearch("");
-                  onSearchChange("");
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
-                aria-label="Clear search"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            )}
-          </div>
-        </form>
-
-        {/* Size filter */}
-        <div className="flex gap-2">
-          <select
-            value={widthFilter ?? ""}
-            onChange={(e) => {
-              const value = e.target.value ? parseInt(e.target.value, 10) : null;
-              onSizeFilterChange(value, heightFilter);
-            }}
-            className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 cursor-pointer"
-            aria-label="Filter by width"
-          >
-            <option value="">Width</option>
-            {Array.from(new Set(availableSizes.map((s) => s.width)))
-              .sort((a, b) => a - b)
-              .map((w) => (
-                <option key={w} value={w}>
-                  {w}px
-                </option>
-              ))}
-          </select>
-
-          <select
-            value={heightFilter ?? ""}
-            onChange={(e) => {
-              const value = e.target.value ? parseInt(e.target.value, 10) : null;
-              onSizeFilterChange(widthFilter, value);
-            }}
-            className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 cursor-pointer"
-            aria-label="Filter by height"
-          >
-            <option value="">Height</option>
-            {Array.from(new Set(availableSizes.map((s) => s.height)))
-              .sort((a, b) => a - b)
-              .map((h) => (
-                <option key={h} value={h}>
-                  {h}px
-                </option>
-              ))}
-          </select>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
+      </form>
 
-        {/* Maker/System filter */}
-        {onMakerFilterChange && onSystemFilterChange && (
-          <div className="flex gap-2">
-            <select
-              value={makerFilter ?? ""}
-              onChange={(e) => handleMakerChange(e.target.value || null)}
-              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 cursor-pointer"
-              aria-label="Filter by maker"
-            >
-              <option value="">All Makers</option>
-              {allMakers.map((maker) => (
-                <option key={maker} value={maker}>
-                  {maker}
-                </option>
-              ))}
-            </select>
+      {/* Filter dropdowns */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Width filter */}
+        <MultiSelectDropdown
+          label="Width"
+          options={availableWidths.map((w) => ({ value: w, label: `${w}px` }))}
+          selected={widthFilters}
+          onChange={(widths) => onSizeFilterChange(widths, heightFilters)}
+          placeholder="Width"
+          allOptionLabel="Any width"
+        />
 
-            <select
-              value={systemFilter ?? ""}
-              onChange={(e) => onSystemFilterChange(e.target.value || null)}
-              disabled={!makerFilter && systemsForMaker.length === 0}
-              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 cursor-pointer disabled:opacity-50"
-              aria-label="Filter by system"
-            >
-              <option value="">
-                {makerFilter ? "All Systems" : "Select Maker..."}
-              </option>
-              {systemsForMaker.map((system) => (
-                <option key={system} value={system}>
-                  {system}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Height filter */}
+        <MultiSelectDropdown
+          label="Height"
+          options={availableHeights.map((h) => ({ value: h, label: `${h}px` }))}
+          selected={heightFilters}
+          onChange={(heights) => onSizeFilterChange(widthFilters, heights)}
+          placeholder="Height"
+          allOptionLabel="Any height"
+        />
+
+        {/* Maker filter */}
+        {onMakerFilterChange && (
+          <MultiSelectDropdown
+            label="Maker"
+            options={allMakers.map((m) => ({ value: m, label: m }))}
+            selected={makerFilters}
+            onChange={onMakerFilterChange}
+            placeholder="Maker"
+            allOptionLabel="Any maker"
+          />
+        )}
+
+        {/* System filter */}
+        {onSystemFilterChange && (
+          <MultiSelectDropdown
+            label="System"
+            options={systemsForMakers.map((s) => ({ value: s, label: s }))}
+            selected={systemFilters}
+            onChange={onSystemFilterChange}
+            placeholder="System"
+            allOptionLabel="Any system"
+          />
         )}
       </div>
 
