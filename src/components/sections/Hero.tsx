@@ -12,12 +12,18 @@ export function Hero() {
     <GridBackground
       animated
       overlay
-      className="min-h-screen flex items-center justify-center pt-20"
+      className="min-h-screen min-h-[100dvh] flex items-center justify-center pt-16 sm:pt-20"
     >
-      <Container className="relative z-10 text-center py-20">
-        {/* Logo */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+      <Container className="relative z-10 text-center py-12 sm:py-16 md:py-20">
+        {/* Logo - fluid sizing */}
+        <div className="mb-6 sm:mb-8 flex justify-center">
+          <div
+            className="relative overflow-hidden"
+            style={{
+              width: "clamp(100px, 20vw + 60px, 200px)",
+              height: "clamp(100px, 20vw + 60px, 200px)",
+            }}
+          >
             <Image
               src="/images/logo.png"
               alt={SITE_CONFIG.name}
@@ -28,47 +34,54 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Title */}
-        <h1 className="mb-4">
+        {/* Title - fluid typography */}
+        <h1 className="mb-3 sm:mb-4">
           <NeonText
             as="span"
             color="pink"
-            className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl block"
+            className="font-display block"
+            style={{ fontSize: "clamp(1.25rem, 4vw + 0.5rem, 3rem)" }}
           >
             {SITE_CONFIG.name}
           </NeonText>
         </h1>
 
-        {/* Tagline */}
-        <p className="font-ui text-lg sm:text-xl md:text-2xl text-retro-cyan mb-8">
+        {/* Tagline - fluid */}
+        <p
+          className="font-ui text-retro-cyan mb-6 sm:mb-8"
+          style={{ fontSize: "clamp(1rem, 2vw + 0.5rem, 1.5rem)" }}
+        >
           {SITE_CONFIG.tagline}
         </p>
 
-        {/* Description */}
-        <p className="font-terminal text-xl sm:text-2xl text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed">
+        {/* Description - fluid */}
+        <p
+          className="font-terminal text-gray-300 max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-2"
+          style={{ fontSize: "clamp(1rem, 1.5vw + 0.75rem, 1.5rem)" }}
+        >
           {SITE_CONFIG.description}
         </p>
 
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        {/* CTAs - stack on mobile, row on larger screens */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
           <Link
             href="/systems"
-            className="btn-neon btn-neon-pink px-8 py-3 text-sm"
+            className="btn-neon btn-neon-pink px-6 sm:px-8 py-3 text-xs sm:text-sm touch-target"
           >
             Explore Systems
           </Link>
           <Link
             href="/tools"
-            className="btn-neon btn-neon-cyan px-8 py-3 text-sm"
+            className="btn-neon btn-neon-cyan px-6 sm:px-8 py-3 text-xs sm:text-sm touch-target"
           >
             Try Our Tools
           </Link>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        {/* Scroll indicator - hidden on very short screens */}
+        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
           <svg
-            className="w-6 h-6 text-retro-violet"
+            className="w-5 h-5 sm:w-6 sm:h-6 text-retro-violet"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/constants";
 
@@ -12,6 +12,29 @@ interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -20,14 +43,24 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div
         className="fixed inset-0 bg-retro-dark/80 backdrop-blur-sm z-40 md:hidden"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Menu Panel */}
-      <div className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-retro-navy z-50 md:hidden overflow-y-auto">
-        <div className="p-4 border-b border-retro-grid">
+      {/* Menu Panel - adaptive width based on viewport */}
+      <div
+        className="fixed top-0 right-0 h-full z-50 md:hidden overflow-y-auto
+          w-[85vw] max-w-[320px] sm:w-80 sm:max-w-[380px]
+          bg-retro-navy safe-top safe-right safe-bottom
+          shadow-xl shadow-retro-purple/30"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+      >
+        {/* Close button - 44px touch target */}
+        <div className="p-3 sm:p-4 border-b border-retro-grid flex justify-end">
           <button
             onClick={onClose}
-            className="ml-auto block p-2 text-retro-pink hover:text-retro-cyan transition-colors"
+            className="touch-target flex items-center justify-center text-retro-pink hover:text-retro-cyan transition-colors rounded-md hover:bg-retro-purple/30"
             aria-label="Close menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +69,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </button>
         </div>
 
-        <nav className="p-4">
+        <nav className="p-3 sm:p-4" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => (
             <div key={item.label} className="border-b border-retro-grid/50">
               {item.children ? (
@@ -45,7 +78,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     onClick={() =>
                       setExpandedItem(expandedItem === item.label ? null : item.label)
                     }
-                    className="w-full flex items-center justify-between py-4 font-ui text-sm uppercase tracking-wider text-gray-300"
+                    className="w-full flex items-center justify-between touch-target font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
+                    aria-expanded={expandedItem === item.label}
                   >
                     {item.label}
                     <span
@@ -58,13 +92,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </button>
 
                   {expandedItem === item.label && (
-                    <div className="pb-4 pl-4 space-y-1">
+                    <div className="pb-3 pl-4 space-y-1">
                       {item.children.map((child) => (
                         <Link
                           key={child.href}
                           href={child.href}
                           onClick={onClose}
-                          className="block py-2 text-sm text-gray-400 hover:text-retro-cyan transition-colors"
+                          className="block touch-target flex items-center text-sm text-gray-400 hover:text-retro-cyan transition-colors"
                         >
                           {child.label}
                         </Link>
@@ -76,7 +110,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Link
                   href={item.href}
                   onClick={onClose}
-                  className="block py-4 font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
+                  className="block touch-target flex items-center font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -86,13 +120,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </nav>
 
         {/* Social Links */}
-        <div className="p-4 mt-4">
-          <div className="flex gap-4">
+        <div className="p-3 sm:p-4 mt-4 border-t border-retro-grid/30">
+          <div className="flex gap-2">
             <a
               href="https://github.com/retrostack"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-retro-cyan transition-colors"
+              className="touch-target flex items-center justify-center text-gray-400 hover:text-retro-cyan transition-colors rounded-md hover:bg-retro-purple/30"
               aria-label="GitHub"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -114,8 +148,9 @@ export function HamburgerButton({ onClick }: HamburgerButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="md:hidden p-2 text-gray-300 hover:text-retro-cyan transition-colors"
+      className="md:hidden touch-target flex items-center justify-center text-gray-300 hover:text-retro-cyan transition-colors rounded-md hover:bg-retro-purple/30"
       aria-label="Open menu"
+      aria-haspopup="dialog"
     >
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

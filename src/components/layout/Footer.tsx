@@ -6,19 +6,19 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-retro-navy border-t border-retro-grid">
+    <footer className="bg-retro-navy border-t border-retro-grid safe-bottom safe-x">
       <Container>
-        <div className="py-12">
-          {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="py-8 sm:py-12">
+          {/* Main Footer Content - fluid grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {/* Brand */}
-            <div className="lg:col-span-1">
-              <Link href="/" className="inline-block">
-                <span className="font-display text-lg text-retro-pink">
+            <div className="sm:col-span-2 lg:col-span-1">
+              <Link href="/" className="inline-block touch-target">
+                <span className="font-display text-base sm:text-lg text-retro-pink">
                   {SITE_CONFIG.name}
                 </span>
               </Link>
-              <p className="mt-4 text-sm text-gray-400 max-w-xs">
+              <p className="mt-3 sm:mt-4 text-sm text-gray-400 max-w-xs">
                 {SITE_CONFIG.description}
               </p>
             </div>
@@ -26,15 +26,15 @@ export function Footer() {
             {/* Navigation Links */}
             {NAV_ITEMS.filter((section) => section.children).map((section) => (
               <div key={section.label}>
-                <h3 className="font-ui text-sm uppercase tracking-wider text-retro-cyan mb-4">
+                <h3 className="font-ui text-xs sm:text-sm uppercase tracking-wider text-retro-cyan mb-3 sm:mb-4">
                   {section.label}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-1 sm:space-y-2">
                   {section.children?.map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className="text-sm text-gray-400 hover:text-retro-pink transition-colors duration-200"
+                        className="inline-flex items-center min-h-[36px] sm:min-h-[32px] text-sm text-gray-400 hover:text-retro-pink transition-colors duration-200"
                       >
                         {item.label}
                       </Link>
@@ -46,19 +46,19 @@ export function Footer() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 border-t border-retro-grid/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="pt-6 sm:pt-8 border-t border-retro-grid/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Copyright */}
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
               © {currentYear} {SITE_CONFIG.name}. All rights reserved.
             </p>
 
-            {/* Social Links */}
-            <div className="flex items-center gap-4">
+            {/* Social Links - touch-friendly */}
+            <div className="flex items-center gap-2">
               <a
                 href={SOCIAL_LINKS.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 text-gray-400 hover:text-retro-cyan transition-colors duration-200"
+                className="touch-target flex items-center justify-center text-gray-400 hover:text-retro-cyan transition-colors duration-200 rounded-md hover:bg-retro-purple/30"
                 aria-label="GitHub"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@ export function Footer() {
                 href={SOCIAL_LINKS.patreon}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 text-gray-400 hover:text-retro-pink transition-colors duration-200"
+                className="touch-target flex items-center justify-center text-gray-400 hover:text-retro-pink transition-colors duration-200 rounded-md hover:bg-retro-purple/30"
                 aria-label="Patreon"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

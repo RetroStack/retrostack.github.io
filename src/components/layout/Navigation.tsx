@@ -8,7 +8,7 @@ export function Navigation() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   return (
-    <nav className="hidden md:flex items-center gap-1">
+    <nav className="hidden lg:flex items-center gap-1">
       {NAV_ITEMS.map((item) => (
         <div
           key={item.label}
@@ -18,7 +18,7 @@ export function Navigation() {
         >
           <Link
             href={item.href}
-            className="px-4 py-2 font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors duration-200"
+            className="px-3 xl:px-4 py-2 font-ui text-xs xl:text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors duration-200 whitespace-nowrap"
           >
             {item.label}
             {item.children && (
@@ -28,12 +28,12 @@ export function Navigation() {
 
           {item.children && openDropdown === item.label && (
             <div className="absolute left-0 top-full pt-2 z-50">
-              <div className="glass rounded-md py-2 min-w-[240px] shadow-lg shadow-retro-purple/20">
+              <div className="glass rounded-md py-2 min-w-[220px] xl:min-w-[260px] shadow-lg shadow-retro-purple/20">
                 {item.children.map((child) => (
                   <Link
                     key={child.href}
                     href={child.href}
-                    className="block px-4 py-3 hover:bg-retro-purple/30 transition-colors duration-200"
+                    className="block px-4 py-3 hover:bg-retro-purple/30 transition-colors duration-200 touch-target"
                   >
                     <span className="block font-ui text-sm text-retro-cyan">
                       {child.label}
@@ -47,6 +47,26 @@ export function Navigation() {
             </div>
           )}
         </div>
+      ))}
+    </nav>
+  );
+}
+
+/**
+ * Condensed navigation for tablet viewports (768px - 1023px).
+ * Shows only top-level items without dropdowns.
+ */
+export function TabletNavigation() {
+  return (
+    <nav className="hidden md:flex lg:hidden items-center gap-1 overflow-x-auto">
+      {NAV_ITEMS.map((item) => (
+        <Link
+          key={item.label}
+          href={item.href}
+          className="px-3 py-2 font-ui text-xs uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors duration-200 whitespace-nowrap flex-shrink-0"
+        >
+          {item.label}
+        </Link>
       ))}
     </nav>
   );

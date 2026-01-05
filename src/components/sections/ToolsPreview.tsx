@@ -37,52 +37,62 @@ const FEATURED_TOOLS = [
 
 export function ToolsPreview() {
   return (
-    <section className="py-20 bg-gradient-to-b from-retro-dark to-retro-navy/30">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-retro-dark to-retro-navy/30">
       <Container>
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-10 md:mb-12 gap-4">
           <div>
-            <NeonText as="h2" color="cyan" className="font-display text-xl sm:text-2xl mb-4">
+            <NeonText
+              as="h2"
+              color="cyan"
+              className="font-display mb-3 sm:mb-4"
+              style={{ fontSize: "clamp(1.125rem, 2vw + 0.5rem, 1.5rem)" }}
+            >
               Development Tools
             </NeonText>
-            <p className="text-gray-400 max-w-xl">
+            <p className="text-gray-400 max-w-xl text-sm sm:text-base">
               Browser-based tools for working with vintage hardware and software.
             </p>
           </div>
           <Link
             href="/tools"
-            className="mt-4 sm:mt-0 text-retro-pink hover:text-retro-cyan transition-colors font-ui text-sm uppercase tracking-wider"
+            className="text-retro-pink hover:text-retro-cyan transition-colors font-ui text-xs sm:text-sm uppercase tracking-wider touch-target inline-flex items-center"
           >
             View All Tools →
           </Link>
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Tools Grid - fluid auto-fit */}
+        <div
+          className="grid gap-4 sm:gap-6"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))",
+          }}
+        >
           {FEATURED_TOOLS.map((tool) => (
             <Link
               key={tool.name}
               href={tool.href}
-              className="glass p-8 rounded-lg hover-glow-cyan group block"
+              className="glass p-5 sm:p-6 md:p-8 rounded-lg hover-glow-cyan group block"
             >
               {/* Icon */}
-              <div className="text-retro-cyan group-hover:text-retro-pink transition-colors duration-300 mb-6">
+              <div className="text-retro-cyan group-hover:text-retro-pink transition-colors duration-300 mb-4 sm:mb-6">
                 {tool.icon}
               </div>
 
               {/* Name */}
-              <h3 className="font-ui text-xl text-white mb-3 group-hover:text-retro-cyan transition-colors duration-300">
+              <h3 className="font-ui text-lg sm:text-xl text-white mb-2 sm:mb-3 group-hover:text-retro-cyan transition-colors duration-300">
                 {tool.name}
               </h3>
 
               {/* Description */}
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm sm:text-base">
                 {tool.description}
               </p>
 
               {/* Launch indicator */}
-              <div className="mt-6 flex items-center text-retro-violet group-hover:text-retro-cyan transition-colors duration-300">
-                <span className="text-sm font-ui uppercase tracking-wider">Launch Tool</span>
+              <div className="mt-4 sm:mt-6 flex items-center text-retro-violet group-hover:text-retro-cyan transition-colors duration-300">
+                <span className="text-xs sm:text-sm font-ui uppercase tracking-wider">Launch Tool</span>
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>

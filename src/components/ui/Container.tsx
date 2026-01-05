@@ -1,21 +1,29 @@
 import { HTMLAttributes, forwardRef } from "react";
 
 interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
-  size?: "default" | "narrow" | "wide";
+  size?: "default" | "narrow" | "wide" | "full";
+  padding?: "default" | "compact" | "none";
 }
 
 const sizeStyles = {
   narrow: "max-w-4xl",
   default: "max-w-7xl",
   wide: "max-w-[1600px]",
+  full: "max-w-none",
+};
+
+const paddingStyles = {
+  default: "px-3 sm:px-4 md:px-6 lg:px-8",
+  compact: "px-2 sm:px-3 md:px-4",
+  none: "",
 };
 
 export const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  ({ className = "", size = "default", children, ...props }, ref) => {
+  ({ className = "", size = "default", padding = "default", children, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={`mx-auto w-full px-4 sm:px-6 lg:px-8 ${sizeStyles[size]} ${className}`}
+        className={`mx-auto w-full ${paddingStyles[padding]} ${sizeStyles[size]} ${className}`}
         {...props}
       >
         {children}

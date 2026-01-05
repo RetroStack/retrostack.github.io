@@ -60,32 +60,42 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section className="py-20 bg-retro-navy/50">
+    <section className="py-12 sm:py-16 md:py-20 bg-retro-navy/50">
       <Container>
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <NeonText as="h2" color="cyan" className="font-display text-xl sm:text-2xl mb-4">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16">
+          <NeonText
+            as="h2"
+            color="cyan"
+            className="font-display mb-3 sm:mb-4"
+            style={{ fontSize: "clamp(1.125rem, 2vw + 0.5rem, 1.5rem)" }}
+          >
             What We Offer
           </NeonText>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base px-2">
             Everything you need to explore, preserve, and build vintage computing hardware and software.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Features Grid - fluid auto-fit */}
+        <div
+          className="grid gap-4 sm:gap-6"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
+          }}
+        >
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="card-retro p-6 hover-glow-cyan group"
+              className="card-retro p-4 sm:p-6 hover-glow-cyan group"
             >
-              <div className="text-retro-pink group-hover:text-retro-cyan transition-colors duration-300 mb-4">
+              <div className="text-retro-pink group-hover:text-retro-cyan transition-colors duration-300 mb-3 sm:mb-4">
                 {feature.icon}
               </div>
-              <h3 className="font-ui text-lg text-white mb-2">
+              <h3 className="font-ui text-base sm:text-lg text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-xs sm:text-sm">
                 {feature.description}
               </p>
             </div>

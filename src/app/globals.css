@@ -11,6 +11,24 @@
   --retro-grid: #2a2a5a;
   --retro-pink-glow: rgba(255, 42, 109, 0.6);
   --retro-cyan-glow: rgba(0, 245, 255, 0.6);
+
+  /* Fluid layout dimensions */
+  --header-height: clamp(56px, 5vw + 40px, 72px);
+  --toolbar-height: clamp(44px, 4vw + 32px, 56px);
+
+  /* Fluid spacing scale */
+  --space-xs: clamp(4px, 1vw, 8px);
+  --space-sm: clamp(8px, 2vw, 16px);
+  --space-md: clamp(16px, 3vw, 24px);
+  --space-lg: clamp(24px, 4vw, 48px);
+
+  /* Fluid font sizes */
+  --font-size-sm: clamp(12px, 0.8vw + 10px, 14px);
+  --font-size-base: clamp(14px, 1vw + 12px, 16px);
+  --font-size-lg: clamp(16px, 1.5vw + 12px, 20px);
+  --font-size-xl: clamp(20px, 2vw + 14px, 28px);
+  --font-size-2xl: clamp(24px, 3vw + 12px, 40px);
+  --font-size-3xl: clamp(28px, 4vw + 12px, 48px);
 }
 
 /* Tailwind v4 Theme Configuration */
@@ -290,5 +308,109 @@ body {
 @media (min-width: 1024px) {
   .container-retro {
     padding: 0 2rem;
+  }
+}
+
+/* Safe Area Utilities for iPhone notch/home indicator */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-all {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Touch Target Utility - 44px minimum for iOS accessibility */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Dynamic Viewport Height for tools */
+.tool-canvas {
+  height: calc(100dvh - var(--header-height) - var(--toolbar-height));
+  height: calc(100vh - var(--header-height) - var(--toolbar-height)); /* fallback */
+}
+
+@supports (height: 100dvh) {
+  .tool-canvas {
+    height: calc(100dvh - var(--header-height) - var(--toolbar-height));
+  }
+}
+
+/* Full height minus header */
+.full-height {
+  min-height: calc(100dvh - var(--header-height));
+  min-height: calc(100vh - var(--header-height)); /* fallback */
+}
+
+@supports (height: 100dvh) {
+  .full-height {
+    min-height: calc(100dvh - var(--header-height));
+  }
+}
+
+/* Fluid Grid - auto-fit columns that wrap naturally */
+.grid-fluid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.grid-fluid-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-sm);
+}
+
+.grid-fluid-lg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* Touch-specific styles */
+@media (pointer: coarse) {
+  /* Increase touch targets on touch devices */
+  .touch-target-auto {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Add more spacing between interactive elements */
+  .touch-spacing > * + * {
+    margin-top: 8px;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .tablet-compact {
+    padding: var(--space-sm);
+  }
+}
+
+/* Wide desktop - maximize space */
+@media (min-width: 1920px) {
+  .wide-expand {
+    max-width: 1800px;
   }
 }
