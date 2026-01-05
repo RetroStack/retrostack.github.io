@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CharacterSetMetadata } from "@/lib/character-editor";
-import { MakerSystemSelect } from "./MakerSystemSelect";
+import { ManufacturerSystemSelect } from "./ManufacturerSystemSelect";
 
 export interface MetadataEditModalProps {
   /** Whether the modal is open */
@@ -27,7 +27,7 @@ export function MetadataEditModal({
   const [name, setName] = useState(metadata.name);
   const [description, setDescription] = useState(metadata.description);
   const [source, setSource] = useState(metadata.source);
-  const [maker, setMaker] = useState(metadata.maker);
+  const [manufacturer, setManufacturer] = useState(metadata.manufacturer);
   const [system, setSystem] = useState(metadata.system);
   const [saving, setSaving] = useState(false);
 
@@ -37,7 +37,7 @@ export function MetadataEditModal({
       setName(metadata.name);
       setDescription(metadata.description);
       setSource(metadata.source);
-      setMaker(metadata.maker);
+      setManufacturer(metadata.manufacturer);
       setSystem(metadata.system);
     }
   }, [isOpen, metadata]);
@@ -51,7 +51,7 @@ export function MetadataEditModal({
         name: name.trim(),
         description: description.trim(),
         source: source.trim() || "yourself",
-        maker: maker,
+        manufacturer: manufacturer,
         system: system,
       });
       onClose();
@@ -108,13 +108,13 @@ export function MetadataEditModal({
             />
           </div>
 
-          {/* Maker & System */}
+          {/* Manufacturer & System */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Maker & System</label>
-            <MakerSystemSelect
-              maker={maker}
+            <label className="block text-sm text-gray-300 mb-1">Manufacturer & System</label>
+            <ManufacturerSystemSelect
+              manufacturer={manufacturer}
               system={system}
-              onMakerChange={setMaker}
+              onManufacturerChange={setManufacturer}
               onSystemChange={setSystem}
             />
           </div>

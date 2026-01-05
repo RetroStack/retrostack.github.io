@@ -85,8 +85,8 @@ export type { MetadataEditModalProps } from "./MetadataEditModal";
 export { ResizeModal } from "./ResizeModal";
 export type { ResizeModalProps } from "./ResizeModal";
 
-export { MakerSystemSelect, MakerSystemSelectCompact } from "./MakerSystemSelect";
-export type { MakerSystemSelectProps } from "./MakerSystemSelect";
+export { ManufacturerSystemSelect, ManufacturerSystemSelectCompact } from "./ManufacturerSystemSelect";
+export type { ManufacturerSystemSelectProps } from "./ManufacturerSystemSelect";
 
 export { SizePresetDropdown } from "./SizePresetDropdown";
 export type { SizePresetDropdownProps } from "./SizePresetDropdown";

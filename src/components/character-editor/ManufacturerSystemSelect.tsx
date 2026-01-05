@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { KNOWN_MAKERS, getSystemsForMaker } from "@/lib/character-editor";
+import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor";
 
-export interface MakerSystemSelectProps {
-  /** Currently selected maker */
-  maker: string;
+export interface ManufacturerSystemSelectProps {
+  /** Currently selected manufacturer */
+  manufacturer: string;
   /** Currently selected system */
   system: string;
-  /** Callback when maker changes */
-  onMakerChange: (maker: string) => void;
+  /** Callback when manufacturer changes */
+  onManufacturerChange: (manufacturer: string) => void;
   /** Callback when system changes */
   onSystemChange: (system: string) => void;
   /** Whether the selects are disabled */
@@ -19,68 +19,68 @@ export interface MakerSystemSelectProps {
 }
 
 /**
- * Paired dropdown selects for maker and system
- * Supports both known makers/systems and custom values
+ * Paired dropdown selects for manufacturer and system
+ * Supports both known manufacturers/systems and custom values
  */
-export function MakerSystemSelect({
-  maker,
+export function ManufacturerSystemSelect({
+  manufacturer,
   system,
-  onMakerChange,
+  onManufacturerChange,
   onSystemChange,
   disabled = false,
   className = "",
-}: MakerSystemSelectProps) {
-  const [showCustomMaker, setShowCustomMaker] = useState(false);
+}: ManufacturerSystemSelectProps) {
+  const [showCustomManufacturer, setShowCustomManufacturer] = useState(false);
   const [showCustomSystem, setShowCustomSystem] = useState(false);
-  const [customMakerInput, setCustomMakerInput] = useState("");
+  const [customManufacturerInput, setCustomManufacturerInput] = useState("");
   const [customSystemInput, setCustomSystemInput] = useState("");
 
-  // Get all known makers
-  const allMakers = useMemo(() => KNOWN_MAKERS.map((m) => m.maker), []);
+  // Get all known manufacturers
+  const allManufacturers = useMemo(() => KNOWN_MANUFACTURERS.map((m) => m.manufacturer), []);
 
-  // Get systems for the selected maker
+  // Get systems for the selected manufacturer
   const availableSystems = useMemo(() => {
-    if (!maker) return [];
-    return getSystemsForMaker(maker);
-  }, [maker]);
+    if (!manufacturer) return [];
+    return getSystemsForManufacturer(manufacturer);
+  }, [manufacturer]);
 
-  // Check if current maker is custom (not in known list)
-  const isCustomMaker = maker && !allMakers.includes(maker);
+  // Check if current manufacturer is custom (not in known list)
+  const isCustomManufacturer = manufacturer && !allManufacturers.includes(manufacturer);
 
-  // Check if current system is custom (not in available systems for this maker)
+  // Check if current system is custom (not in available systems for this manufacturer)
   const isCustomSystem = system && !availableSystems.includes(system);
 
-  // Handle maker select change
-  const handleMakerSelectChange = useCallback(
+  // Handle manufacturer select change
+  const handleManufacturerSelectChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
       if (value === "__custom__") {
-        setShowCustomMaker(true);
-        setCustomMakerInput("");
+        setShowCustomManufacturer(true);
+        setCustomManufacturerInput("");
       } else {
-        onMakerChange(value);
-        // Reset system when maker changes
+        onManufacturerChange(value);
+        // Reset system when manufacturer changes
         onSystemChange("");
-        setShowCustomMaker(false);
+        setShowCustomManufacturer(false);
       }
     },
-    [onMakerChange, onSystemChange]
+    [onManufacturerChange, onSystemChange]
   );
 
-  // Handle custom maker submit
-  const handleCustomMakerSubmit = useCallback(() => {
-    if (customMakerInput.trim()) {
-      onMakerChange(customMakerInput.trim());
+  // Handle custom manufacturer submit
+  const handleCustomManufacturerSubmit = useCallback(() => {
+    if (customManufacturerInput.trim()) {
+      onManufacturerChange(customManufacturerInput.trim());
       onSystemChange("");
-      setShowCustomMaker(false);
-      setCustomMakerInput("");
+      setShowCustomManufacturer(false);
+      setCustomManufacturerInput("");
     }
-  }, [customMakerInput, onMakerChange, onSystemChange]);
+  }, [customManufacturerInput, onManufacturerChange, onSystemChange]);
 
-  // Handle custom maker cancel
-  const handleCustomMakerCancel = useCallback(() => {
-    setShowCustomMaker(false);
-    setCustomMakerInput("");
+  // Handle custom manufacturer cancel
+  const handleCustomManufacturerCancel = useCallback(() => {
+    setShowCustomManufacturer(false);
+    setCustomManufacturerInput("");
   }, []);
 
   // Handle system select change
@@ -121,11 +121,11 @@ export function MakerSystemSelect({
         submitFn();
       } else if (e.key === "Escape") {
         e.preventDefault();
-        if (showCustomMaker) handleCustomMakerCancel();
+        if (showCustomManufacturer) handleCustomManufacturerCancel();
         if (showCustomSystem) handleCustomSystemCancel();
       }
     },
-    [showCustomMaker, showCustomSystem, handleCustomMakerCancel, handleCustomSystemCancel]
+    [showCustomManufacturer, showCustomSystem, handleCustomManufacturerCancel, handleCustomSystemCancel]
   );
 
   const selectClasses = `
@@ -146,33 +146,33 @@ export function MakerSystemSelect({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Maker field */}
+      {/* Manufacturer field */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          Maker
+          Manufacturer
         </label>
 
-        {showCustomMaker ? (
+        {showCustomManufacturer ? (
           <div className="flex gap-2">
             <input
               type="text"
-              value={customMakerInput}
-              onChange={(e) => setCustomMakerInput(e.target.value)}
-              onKeyDown={(e) => handleKeyPress(e, handleCustomMakerSubmit)}
-              placeholder="Enter maker name..."
+              value={customManufacturerInput}
+              onChange={(e) => setCustomManufacturerInput(e.target.value)}
+              onKeyDown={(e) => handleKeyPress(e, handleCustomManufacturerSubmit)}
+              placeholder="Enter manufacturer name..."
               className={inputClasses}
               autoFocus
               disabled={disabled}
             />
             <button
-              onClick={handleCustomMakerSubmit}
-              disabled={disabled || !customMakerInput.trim()}
+              onClick={handleCustomManufacturerSubmit}
+              disabled={disabled || !customManufacturerInput.trim()}
               className={`${buttonClasses} bg-retro-cyan/20 text-retro-cyan hover:bg-retro-cyan/30 disabled:opacity-50`}
             >
               Add
             </button>
             <button
-              onClick={handleCustomMakerCancel}
+              onClick={handleCustomManufacturerCancel}
               disabled={disabled}
               className={`${buttonClasses} bg-retro-grid/20 text-gray-400 hover:bg-retro-grid/30`}
             >
@@ -181,34 +181,34 @@ export function MakerSystemSelect({
           </div>
         ) : (
           <select
-            value={isCustomMaker ? "" : maker}
-            onChange={handleMakerSelectChange}
+            value={isCustomManufacturer ? "" : manufacturer}
+            onChange={handleManufacturerSelectChange}
             disabled={disabled}
             className={selectClasses}
           >
-            <option value="">Select maker...</option>
-            {allMakers.map((m) => (
+            <option value="">Select manufacturer...</option>
+            {allManufacturers.map((m) => (
               <option key={m} value={m}>
                 {m}
               </option>
             ))}
             <option value="__custom__">Other (custom)...</option>
-            {isCustomMaker && (
-              <option value={maker} disabled>
-                {maker} (custom)
+            {isCustomManufacturer && (
+              <option value={manufacturer} disabled>
+                {manufacturer} (custom)
               </option>
             )}
           </select>
         )}
 
-        {isCustomMaker && !showCustomMaker && (
+        {isCustomManufacturer && !showCustomManufacturer && (
           <div className="mt-1.5 flex items-center gap-2">
             <span className="text-xs text-gray-500">
-              Custom: <span className="text-retro-cyan">{maker}</span>
+              Custom: <span className="text-retro-cyan">{manufacturer}</span>
             </span>
             <button
               onClick={() => {
-                onMakerChange("");
+                onManufacturerChange("");
                 onSystemChange("");
               }}
               className="text-xs text-gray-500 hover:text-retro-pink"
@@ -257,18 +257,18 @@ export function MakerSystemSelect({
           <select
             value={isCustomSystem ? "" : system}
             onChange={handleSystemSelectChange}
-            disabled={disabled || !maker}
+            disabled={disabled || !manufacturer}
             className={selectClasses}
           >
             <option value="">
-              {maker ? "Select system..." : "Select a maker first..."}
+              {manufacturer ? "Select system..." : "Select a manufacturer first..."}
             </option>
             {availableSystems.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-            {maker && <option value="__custom__">Other (custom)...</option>}
+            {manufacturer && <option value="__custom__">Other (custom)...</option>}
             {isCustomSystem && (
               <option value={system} disabled>
                 {system} (custom)
@@ -299,19 +299,19 @@ export function MakerSystemSelect({
 /**
  * Compact version for use in filters
  */
-export function MakerSystemSelectCompact({
-  maker,
+export function ManufacturerSystemSelectCompact({
+  manufacturer,
   system,
-  onMakerChange,
+  onManufacturerChange,
   onSystemChange,
   disabled = false,
   className = "",
-}: MakerSystemSelectProps) {
-  const allMakers = useMemo(() => KNOWN_MAKERS.map((m) => m.maker), []);
+}: ManufacturerSystemSelectProps) {
+  const allManufacturers = useMemo(() => KNOWN_MANUFACTURERS.map((m) => m.manufacturer), []);
   const availableSystems = useMemo(() => {
-    if (!maker) return [];
-    return getSystemsForMaker(maker);
-  }, [maker]);
+    if (!manufacturer) return [];
+    return getSystemsForManufacturer(manufacturer);
+  }, [manufacturer]);
 
   const selectClasses = `
     px-2 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded
@@ -322,16 +322,16 @@ export function MakerSystemSelectCompact({
   return (
     <div className={`flex gap-2 ${className}`}>
       <select
-        value={maker}
+        value={manufacturer}
         onChange={(e) => {
-          onMakerChange(e.target.value);
-          if (e.target.value !== maker) onSystemChange("");
+          onManufacturerChange(e.target.value);
+          if (e.target.value !== manufacturer) onSystemChange("");
         }}
         disabled={disabled}
         className={selectClasses}
       >
-        <option value="">All makers</option>
-        {allMakers.map((m) => (
+        <option value="">All manufacturers</option>
+        {allManufacturers.map((m) => (
           <option key={m} value={m}>
             {m}
           </option>
@@ -341,10 +341,10 @@ export function MakerSystemSelectCompact({
       <select
         value={system}
         onChange={(e) => onSystemChange(e.target.value)}
-        disabled={disabled || !maker}
+        disabled={disabled || !manufacturer}
         className={selectClasses}
       >
-        <option value="">{maker ? "All systems" : "Select maker..."}</option>
+        <option value="">{manufacturer ? "All systems" : "Select manufacturer..."}</option>
         {availableSystems.map((s) => (
           <option key={s} value={s}>
             {s}

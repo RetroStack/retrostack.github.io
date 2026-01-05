@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import {
   DIMENSION_PRESETS,
   SYSTEM_PRESETS,
-  getSystemPresetsByMaker,
+  getSystemPresetsByManufacturer,
 } from "@/lib/character-editor";
 
 export interface SizePresetDropdownProps {
@@ -52,8 +52,8 @@ export function SizePresetDropdown({
     { label: "5x7", width: 5, height: 7 },
   ];
 
-  // Group system presets by maker
-  const presetsByMaker = getSystemPresetsByMaker();
+  // Group system presets by manufacturer
+  const presetsByManufacturer = getSystemPresetsByManufacturer();
 
   const isCurrentPreset = (w: number, h: number) =>
     currentWidth === w && currentHeight === h;
@@ -136,15 +136,15 @@ export function SizePresetDropdown({
           </div>
 
           {/* System-organized presets */}
-          {Object.entries(presetsByMaker)
+          {Object.entries(presetsByManufacturer)
             .filter(([, presets]) => presets.length > 0)
-            .map(([maker, presets]) => (
+            .map(([manufacturer, presets]) => (
               <div
-                key={maker}
+                key={manufacturer}
                 className="p-2 border-b border-retro-grid/30 last:border-0"
               >
                 <div className="text-[10px] text-gray-500 uppercase mb-1">
-                  {maker}
+                  {manufacturer}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {presets.map((preset) => (

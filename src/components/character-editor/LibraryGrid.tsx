@@ -72,11 +72,6 @@ export function LibraryGrid({
           onRename={onRename ? () => onRename(characterSet.metadata.id) : undefined}
         />
       ))}
-
-      {/* Add card at the end */}
-      {(onImport || onCreate) && (
-        <LibraryCardEmpty onImport={onImport} onCreate={onCreate} />
-      )}
     </div>
   );
 }

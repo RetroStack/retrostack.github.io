@@ -11,7 +11,7 @@ import { NeonText } from "@/components/effects/NeonText";
 import {
   ImportDropZone,
   CharacterPreview,
-  MakerSystemSelect,
+  ManufacturerSystemSelect,
   ImportStepIndicator,
   SizePresetDropdown,
 } from "@/components/character-editor";
@@ -49,7 +49,7 @@ export function ImportView() {
   // Step 2: Metadata state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [maker, setMaker] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
   const [source, setSource] = useState("");
 
@@ -161,7 +161,7 @@ export function ImportView() {
             name: name.trim(),
             description: description.trim(),
             source: source.trim() || "yourself",
-            maker: maker.trim(),
+            manufacturer: manufacturer.trim(),
             system: system.trim(),
             createdAt: now,
             updatedAt: now,
@@ -184,7 +184,7 @@ export function ImportView() {
         setSaving(false);
       }
     },
-    [fileData, name, description, source, maker, system, config, characters, save, router]
+    [fileData, name, description, source, manufacturer, system, config, characters, save, router]
   );
 
   return (
@@ -317,11 +317,11 @@ export function ImportView() {
                     />
                   </div>
 
-                  {/* Maker and System */}
-                  <MakerSystemSelect
-                    maker={maker}
+                  {/* Manufacturer and System */}
+                  <ManufacturerSystemSelect
+                    manufacturer={manufacturer}
                     system={system}
-                    onMakerChange={setMaker}
+                    onManufacturerChange={setManufacturer}
                     onSystemChange={setSystem}
                   />
 

@@ -56,7 +56,7 @@ export interface CharacterSetMetadata {
   /** Source attribution ("yourself" for user uploads) */
   source: string;
   /** Hardware manufacturer (e.g., "Commodore", "Apple") */
-  maker: string;
+  manufacturer: string;
   /** Specific system (e.g., "C64", "Apple II") */
   system: string;
   /** Creation timestamp */
@@ -132,8 +132,8 @@ export interface LibraryFilter {
   searchQuery: string;
   widthFilter: number | null;
   heightFilter: number | null;
-  /** Multi-select filter for makers (OR logic) */
-  makerFilters: string[];
+  /** Multi-select filter for manufacturers (OR logic) */
+  manufacturerFilters: string[];
   /** Multi-select filter for systems (OR logic) */
   systemFilters: string[];
 }

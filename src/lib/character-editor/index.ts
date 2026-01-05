@@ -68,21 +68,21 @@ export {
   isBuiltInCharacterSet,
 } from "./defaults";
 
-// Makers and systems
+// Manufacturers and systems
 export {
-  KNOWN_MAKERS,
-  getAllMakers,
-  getSystemsForMaker,
+  KNOWN_MANUFACTURERS,
+  getAllManufacturers,
+  getSystemsForManufacturer,
   getAllSystems,
-  isKnownMaker,
+  isKnownManufacturer,
   isKnownSystem,
   DIMENSION_PRESETS,
   getPresetsForSystem,
   findPresetByDimensions,
   SYSTEM_PRESETS,
-  getSystemPresetsByMaker,
-} from "./makers";
-export type { MakerSystems, DimensionPreset, SystemDimensionPreset } from "./makers";
+  getSystemPresetsByManufacturer,
+} from "./manufacturers";
+export type { ManufacturerSystems, DimensionPreset, SystemDimensionPreset } from "./manufacturers";
 
 // ASCII utilities
 export {

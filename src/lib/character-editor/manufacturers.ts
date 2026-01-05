@@ -1,134 +1,134 @@
 /**
- * Character ROM Editor - Makers and Systems Constants
+ * Character ROM Editor - Manufacturers and Systems Constants
  *
  * Defines known hardware manufacturers and their systems for character set categorization.
  */
 
 /**
- * Maker and associated systems
+ * Manufacturer and associated systems
  */
-export interface MakerSystems {
+export interface ManufacturerSystems {
   /** Hardware manufacturer name */
-  maker: string;
+  manufacturer: string;
   /** List of systems from this manufacturer */
   systems: string[];
 }
 
 /**
- * Known makers and their systems
+ * Known manufacturers and their systems
  * Used for dropdown suggestions in the import wizard and filters
  */
-export const KNOWN_MAKERS: MakerSystems[] = [
+export const KNOWN_MANUFACTURERS: ManufacturerSystems[] = [
   {
-    maker: "Commodore",
+    manufacturer: "Commodore",
     systems: ["C64", "VIC-20", "C128", "PET", "Plus/4", "C16", "Amiga"],
   },
   {
-    maker: "Apple",
+    manufacturer: "Apple",
     systems: ["Apple II", "Apple IIe", "Apple IIc", "Apple IIgs", "Apple III"],
   },
   {
-    maker: "Sinclair",
+    manufacturer: "Sinclair",
     systems: ["ZX Spectrum", "ZX81", "ZX80", "QL"],
   },
   {
-    maker: "Atari",
+    manufacturer: "Atari",
     systems: ["Atari 400/800", "Atari ST", "Atari 2600", "Atari 7800", "Atari Lynx"],
   },
   {
-    maker: "IBM",
+    manufacturer: "IBM",
     systems: ["PC CGA", "PC EGA", "PC VGA", "PC MDA", "PC Hercules"],
   },
   {
-    maker: "Nintendo",
+    manufacturer: "Nintendo",
     systems: ["NES/Famicom", "SNES", "Game Boy", "Game Boy Color", "Game Boy Advance"],
   },
   {
-    maker: "Sega",
+    manufacturer: "Sega",
     systems: ["Master System", "Genesis/Mega Drive", "Game Gear", "Saturn"],
   },
   {
-    maker: "Amstrad",
+    manufacturer: "Amstrad",
     systems: ["CPC 464", "CPC 6128", "CPC 664", "PCW"],
   },
   {
-    maker: "Texas Instruments",
+    manufacturer: "Texas Instruments",
     systems: ["TI-99/4A"],
   },
   {
-    maker: "Tandy",
+    manufacturer: "Tandy",
     systems: ["TRS-80 Model I", "TRS-80 Model III", "TRS-80 Color Computer", "TRS-80 Model 4"],
   },
   {
-    maker: "MSX",
+    manufacturer: "MSX",
     systems: ["MSX", "MSX2", "MSX2+", "MSX turbo R"],
   },
   {
-    maker: "Acorn",
+    manufacturer: "Acorn",
     systems: ["BBC Micro", "Electron", "Archimedes"],
   },
   {
-    maker: "Coleco",
+    manufacturer: "Coleco",
     systems: ["ColecoVision", "Adam"],
   },
   {
-    maker: "Mattel",
+    manufacturer: "Mattel",
     systems: ["Intellivision"],
   },
   {
-    maker: "NEC",
+    manufacturer: "NEC",
     systems: ["PC Engine/TurboGrafx-16", "PC-8801", "PC-9801"],
   },
   {
-    maker: "Sharp",
+    manufacturer: "Sharp",
     systems: ["MZ-80", "X1", "X68000"],
   },
 ];
 
 /**
- * Get all unique maker names
+ * Get all unique manufacturer names
  */
-export function getAllMakers(): string[] {
-  return KNOWN_MAKERS.map((m) => m.maker);
+export function getAllManufacturers(): string[] {
+  return KNOWN_MANUFACTURERS.map((m) => m.manufacturer);
 }
 
 /**
- * Get systems for a specific maker
- * @param maker - The maker name
- * @returns Array of system names, or empty array if maker not found
+ * Get systems for a specific manufacturer
+ * @param manufacturer - The manufacturer name
+ * @returns Array of system names, or empty array if manufacturer not found
  */
-export function getSystemsForMaker(maker: string): string[] {
-  const found = KNOWN_MAKERS.find(
-    (m) => m.maker.toLowerCase() === maker.toLowerCase()
+export function getSystemsForManufacturer(manufacturer: string): string[] {
+  const found = KNOWN_MANUFACTURERS.find(
+    (m) => m.manufacturer.toLowerCase() === manufacturer.toLowerCase()
   );
   return found?.systems || [];
 }
 
 /**
- * Get all unique systems across all makers
+ * Get all unique systems across all manufacturers
  */
 export function getAllSystems(): string[] {
   const systems = new Set<string>();
-  KNOWN_MAKERS.forEach((m) => {
+  KNOWN_MANUFACTURERS.forEach((m) => {
     m.systems.forEach((s) => systems.add(s));
   });
   return Array.from(systems).sort();
 }
 
 /**
- * Check if a maker exists in the known list
+ * Check if a manufacturer exists in the known list
  */
-export function isKnownMaker(maker: string): boolean {
-  return KNOWN_MAKERS.some(
-    (m) => m.maker.toLowerCase() === maker.toLowerCase()
+export function isKnownManufacturer(manufacturer: string): boolean {
+  return KNOWN_MANUFACTURERS.some(
+    (m) => m.manufacturer.toLowerCase() === manufacturer.toLowerCase()
   );
 }
 
 /**
- * Check if a system exists for a specific maker
+ * Check if a system exists for a specific manufacturer
  */
-export function isKnownSystem(maker: string, system: string): boolean {
-  const systems = getSystemsForMaker(maker);
+export function isKnownSystem(manufacturer: string, system: string): boolean {
+  const systems = getSystemsForManufacturer(manufacturer);
   return systems.some((s) => s.toLowerCase() === system.toLowerCase());
 }
 
@@ -218,7 +218,7 @@ export interface SystemDimensionPreset {
   /** System name */
   system: string;
   /** Hardware manufacturer */
-  maker: string;
+  manufacturer: string;
   /** Character width in pixels */
   width: number;
   /** Character height in pixels */
@@ -230,32 +230,32 @@ export interface SystemDimensionPreset {
  * Used in SizePresetDropdown for quick system-based selection
  */
 export const SYSTEM_PRESETS: SystemDimensionPreset[] = [
-  { system: "C64", maker: "Commodore", width: 8, height: 8 },
-  { system: "VIC-20", maker: "Commodore", width: 8, height: 8 },
-  { system: "ZX80", maker: "Sinclair", width: 8, height: 8 },
-  { system: "ZX81", maker: "Sinclair", width: 8, height: 8 },
-  { system: "ZX Spectrum", maker: "Sinclair", width: 8, height: 8 },
-  { system: "Apple II", maker: "Apple", width: 8, height: 8 },
-  { system: "Atari 400/800", maker: "Atari", width: 8, height: 8 },
-  { system: "NES/Famicom", maker: "Nintendo", width: 8, height: 8 },
-  { system: "CPC 464", maker: "Amstrad", width: 8, height: 16 },
-  { system: "CPC 6128", maker: "Amstrad", width: 8, height: 16 },
-  { system: "BBC Micro", maker: "Acorn", width: 8, height: 8 },
-  { system: "TRS-80 Model I", maker: "Tandy", width: 8, height: 8 },
-  { system: "MSX", maker: "MSX", width: 8, height: 8 },
-  { system: "TI-99/4A", maker: "Texas Instruments", width: 8, height: 8 },
+  { system: "C64", manufacturer: "Commodore", width: 8, height: 8 },
+  { system: "VIC-20", manufacturer: "Commodore", width: 8, height: 8 },
+  { system: "ZX80", manufacturer: "Sinclair", width: 8, height: 8 },
+  { system: "ZX81", manufacturer: "Sinclair", width: 8, height: 8 },
+  { system: "ZX Spectrum", manufacturer: "Sinclair", width: 8, height: 8 },
+  { system: "Apple II", manufacturer: "Apple", width: 8, height: 8 },
+  { system: "Atari 400/800", manufacturer: "Atari", width: 8, height: 8 },
+  { system: "NES/Famicom", manufacturer: "Nintendo", width: 8, height: 8 },
+  { system: "CPC 464", manufacturer: "Amstrad", width: 8, height: 16 },
+  { system: "CPC 6128", manufacturer: "Amstrad", width: 8, height: 16 },
+  { system: "BBC Micro", manufacturer: "Acorn", width: 8, height: 8 },
+  { system: "TRS-80 Model I", manufacturer: "Tandy", width: 8, height: 8 },
+  { system: "MSX", manufacturer: "MSX", width: 8, height: 8 },
+  { system: "TI-99/4A", manufacturer: "Texas Instruments", width: 8, height: 8 },
 ];
 
 /**
- * Get system presets grouped by maker
+ * Get system presets grouped by manufacturer
  */
-export function getSystemPresetsByMaker(): Record<string, SystemDimensionPreset[]> {
+export function getSystemPresetsByManufacturer(): Record<string, SystemDimensionPreset[]> {
   const grouped: Record<string, SystemDimensionPreset[]> = {};
   for (const preset of SYSTEM_PRESETS) {
-    if (!grouped[preset.maker]) {
-      grouped[preset.maker] = [];
+    if (!grouped[preset.manufacturer]) {
+      grouped[preset.manufacturer] = [];
     }
-    grouped[preset.maker].push(preset);
+    grouped[preset.manufacturer].push(preset);
   }
   return grouped;
 }

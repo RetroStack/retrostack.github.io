@@ -38,16 +38,16 @@ export function CharacterEditorLibrary() {
   const [searchQuery, setSearchQuery] = useState("");
   const [widthFilters, setWidthFilters] = useState<number[]>([]);
   const [heightFilters, setHeightFilters] = useState<number[]>([]);
-  const [makerFilters, setMakerFilters] = useState<string[]>([]);
+  const [manufacturerFilters, setManufacturerFilters] = useState<string[]>([]);
   const [systemFilters, setSystemFilters] = useState<string[]>([]);
 
-  // Get available makers and systems from character sets
-  const availableMakers = useMemo(() => {
-    const makers = new Set<string>();
+  // Get available manufacturers and systems from character sets
+  const availableManufacturers = useMemo(() => {
+    const manufacturers = new Set<string>();
     characterSets.forEach((set) => {
-      if (set.metadata.maker) makers.add(set.metadata.maker);
+      if (set.metadata.manufacturer) manufacturers.add(set.metadata.manufacturer);
     });
-    return Array.from(makers).sort();
+    return Array.from(manufacturers).sort();
   }, [characterSets]);
 
   const availableSystems = useMemo(() => {
@@ -90,10 +90,10 @@ export function CharacterEditorLibrary() {
       result = result.filter((set) => heightFilters.includes(set.config.height));
     }
 
-    // Apply maker filter (OR logic)
-    if (makerFilters.length > 0) {
+    // Apply manufacturer filter (OR logic)
+    if (manufacturerFilters.length > 0) {
       result = result.filter(
-        (set) => set.metadata.maker && makerFilters.includes(set.metadata.maker)
+        (set) => set.metadata.manufacturer && manufacturerFilters.includes(set.metadata.manufacturer)
       );
     }
 
@@ -105,7 +105,7 @@ export function CharacterEditorLibrary() {
     }
 
     return result;
-  }, [characterSets, searchQuery, widthFilters, heightFilters, makerFilters, systemFilters]);
+  }, [characterSets, searchQuery, widthFilters, heightFilters, manufacturerFilters, systemFilters]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -195,8 +195,8 @@ export function CharacterEditorLibrary() {
     []
   );
 
-  const handleMakerFilterChange = useCallback((makers: string[]) => {
-    setMakerFilters(makers);
+  const handleManufacturerFilterChange = useCallback((manufacturers: string[]) => {
+    setManufacturerFilters(manufacturers);
   }, []);
 
   const handleSystemFilterChange = useCallback((systems: string[]) => {
@@ -207,7 +207,7 @@ export function CharacterEditorLibrary() {
     setSearchQuery("");
     setWidthFilters([]);
     setHeightFilters([]);
-    setMakerFilters([]);
+    setManufacturerFilters([]);
     setSystemFilters([]);
   }, []);
 
@@ -215,7 +215,7 @@ export function CharacterEditorLibrary() {
     searchQuery.length > 0 ||
     widthFilters.length > 0 ||
     heightFilters.length > 0 ||
-    makerFilters.length > 0 ||
+    manufacturerFilters.length > 0 ||
     systemFilters.length > 0;
 
   // Find the set being deleted for confirmation
@@ -284,11 +284,11 @@ export function CharacterEditorLibrary() {
               widthFilters={widthFilters}
               heightFilters={heightFilters}
               onSizeFilterChange={handleSizeFilterChange}
-              availableMakers={availableMakers}
+              availableManufacturers={availableManufacturers}
               availableSystems={availableSystems}
-              makerFilters={makerFilters}
+              manufacturerFilters={manufacturerFilters}
               systemFilters={systemFilters}
-              onMakerFilterChange={handleMakerFilterChange}
+              onManufacturerFilterChange={handleManufacturerFilterChange}
               onSystemFilterChange={handleSystemFilterChange}
               totalCount={characterSets.length}
               filteredCount={filteredSets.length}

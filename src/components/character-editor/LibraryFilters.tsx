@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { KNOWN_MAKERS, getSystemsForMaker } from "@/lib/character-editor";
+import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 
 export interface LibraryFiltersProps {
@@ -17,16 +17,16 @@ export interface LibraryFiltersProps {
   heightFilters: number[];
   /** Callback when size filters change */
   onSizeFilterChange: (widths: number[], heights: number[]) => void;
-  /** Available makers from library */
-  availableMakers?: string[];
+  /** Available manufacturers from library */
+  availableManufacturers?: string[];
   /** Available systems from library */
   availableSystems?: string[];
-  /** Current maker filters (multi-select) */
-  makerFilters?: string[];
+  /** Current manufacturer filters (multi-select) */
+  manufacturerFilters?: string[];
   /** Current system filters (multi-select) */
   systemFilters?: string[];
-  /** Callback when maker filters change */
-  onMakerFilterChange?: (makers: string[]) => void;
+  /** Callback when manufacturer filters change */
+  onManufacturerFilterChange?: (manufacturers: string[]) => void;
   /** Callback when system filters change */
   onSystemFilterChange?: (systems: string[]) => void;
   /** Total count of items */
@@ -45,41 +45,41 @@ export function LibraryFilters({
   widthFilters,
   heightFilters,
   onSizeFilterChange,
-  availableMakers = [],
+  availableManufacturers = [],
   availableSystems = [],
-  makerFilters = [],
+  manufacturerFilters = [],
   systemFilters = [],
-  onMakerFilterChange,
+  onManufacturerFilterChange,
   onSystemFilterChange,
   totalCount,
   filteredCount,
 }: LibraryFiltersProps) {
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
-  // Get all known makers for dropdown
-  const allMakers = useMemo(() => {
-    const known = KNOWN_MAKERS.map((m) => m.maker);
-    // Include any available makers not in the known list
-    const uniqueMakers = new Set([...known, ...availableMakers]);
-    return Array.from(uniqueMakers).sort();
-  }, [availableMakers]);
+  // Get all known manufacturers for dropdown
+  const allManufacturers = useMemo(() => {
+    const known = KNOWN_MANUFACTURERS.map((m) => m.manufacturer);
+    // Include any available manufacturers not in the known list
+    const uniqueManufacturers = new Set([...known, ...availableManufacturers]);
+    return Array.from(uniqueManufacturers).sort();
+  }, [availableManufacturers]);
 
-  // Get systems - show all if no maker selected, or filtered by selected makers
-  const systemsForMakers = useMemo(() => {
-    if (makerFilters.length === 0) {
-      // If no maker selected, show all available systems
+  // Get systems - show all if no manufacturer selected, or filtered by selected manufacturers
+  const systemsForManufacturers = useMemo(() => {
+    if (manufacturerFilters.length === 0) {
+      // If no manufacturer selected, show all available systems
       return availableSystems.sort();
     }
-    // Get systems for all selected makers
+    // Get systems for all selected manufacturers
     const systems = new Set<string>();
-    makerFilters.forEach((maker) => {
-      const knownSystems = getSystemsForMaker(maker);
+    manufacturerFilters.forEach((manufacturer) => {
+      const knownSystems = getSystemsForManufacturer(manufacturer);
       knownSystems.forEach((s) => systems.add(s));
     });
     // Also include any available systems
     availableSystems.forEach((s) => systems.add(s));
     return Array.from(systems).sort();
-  }, [makerFilters, availableSystems]);
+  }, [manufacturerFilters, availableSystems]);
 
   // Get unique widths and heights
   const availableWidths = useMemo(() => {
@@ -111,15 +111,15 @@ export function LibraryFilters({
     setLocalSearch("");
     onSearchChange("");
     onSizeFilterChange([], []);
-    onMakerFilterChange?.([]);
+    onManufacturerFilterChange?.([]);
     onSystemFilterChange?.([]);
-  }, [onSearchChange, onSizeFilterChange, onMakerFilterChange, onSystemFilterChange]);
+  }, [onSearchChange, onSizeFilterChange, onManufacturerFilterChange, onSystemFilterChange]);
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
     widthFilters.length > 0 ||
     heightFilters.length > 0 ||
-    makerFilters.length > 0 ||
+    manufacturerFilters.length > 0 ||
     systemFilters.length > 0;
 
   return (
@@ -196,15 +196,15 @@ export function LibraryFilters({
           allOptionLabel="Any height"
         />
 
-        {/* Maker filter */}
-        {onMakerFilterChange && (
+        {/* Manufacturer filter */}
+        {onManufacturerFilterChange && (
           <MultiSelectDropdown
-            label="Maker"
-            options={allMakers.map((m) => ({ value: m, label: m }))}
-            selected={makerFilters}
-            onChange={onMakerFilterChange}
-            placeholder="Maker"
-            allOptionLabel="Any maker"
+            label="Manufacturer"
+            options={allManufacturers.map((m) => ({ value: m, label: m }))}
+            selected={manufacturerFilters}
+            onChange={onManufacturerFilterChange}
+            placeholder="Manufacturer"
+            allOptionLabel="Any manufacturer"
           />
         )}
 
@@ -212,7 +212,7 @@ export function LibraryFilters({
         {onSystemFilterChange && (
           <MultiSelectDropdown
             label="System"
-            options={systemsForMakers.map((s) => ({ value: s, label: s }))}
+            options={systemsForManufacturers.map((s) => ({ value: s, label: s }))}
             selected={systemFilters}
             onChange={onSystemFilterChange}
             placeholder="System"

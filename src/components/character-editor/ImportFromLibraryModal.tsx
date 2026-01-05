@@ -45,7 +45,7 @@ export function ImportFromLibraryModal({
         return (
           set.metadata.name.toLowerCase().includes(query) ||
           set.metadata.description?.toLowerCase().includes(query) ||
-          set.metadata.maker?.toLowerCase().includes(query) ||
+          set.metadata.manufacturer?.toLowerCase().includes(query) ||
           set.metadata.system?.toLowerCase().includes(query)
         );
       }
@@ -170,9 +170,9 @@ export function ImportFromLibraryModal({
                 <p className="text-xs text-gray-400 mt-1">
                   {selectedSet.characters.length} characters ({selectedSet.config.width}x{selectedSet.config.height})
                 </p>
-                {selectedSet.metadata.maker && (
+                {selectedSet.metadata.manufacturer && (
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {selectedSet.metadata.maker}
+                    {selectedSet.metadata.manufacturer}
                     {selectedSet.metadata.system && ` / ${selectedSet.metadata.system}`}
                   </p>
                 )}
@@ -251,10 +251,10 @@ function CharacterSetListItem({
           <span>{characterSet.characters.length} chars</span>
           <span>·</span>
           <span>{characterSet.config.width}x{characterSet.config.height}</span>
-          {meta.maker && (
+          {meta.manufacturer && (
             <>
               <span>·</span>
-              <span className="truncate">{meta.maker}</span>
+              <span className="truncate">{meta.manufacturer}</span>
             </>
           )}
         </div>

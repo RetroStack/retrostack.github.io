@@ -8,7 +8,7 @@
 import { SerializedCharacterSet, CharacterSetMetadata, generateId } from "./types";
 
 const DB_NAME = "retrostack-character-editor";
-const DB_VERSION = 2; // Bumped for maker/system fields migration
+const DB_VERSION = 2; // Bumped for manufacturer/system fields migration
 const STORE_NAME = "character-sets";
 const FALLBACK_KEY = "retrostack-character-sets";
 
@@ -80,30 +80,30 @@ class CharacterStorage {
             unique: false,
           });
           store.createIndex("by-size", "sizeKey", { unique: false });
-          store.createIndex("by-maker", "metadata.maker", { unique: false });
+          store.createIndex("by-manufacturer", "metadata.manufacturer", { unique: false });
           store.createIndex("by-system", "metadata.system", { unique: false });
         } else {
-          // Migration from v1 to v2: add maker/system indexes and fields
+          // Migration from v1 to v2: add manufacturer/system indexes and fields
           if (oldVersion < 2) {
             const store = transaction.objectStore(STORE_NAME);
 
             // Add new indexes if they don't exist
-            if (!store.indexNames.contains("by-maker")) {
-              store.createIndex("by-maker", "metadata.maker", { unique: false });
+            if (!store.indexNames.contains("by-manufacturer")) {
+              store.createIndex("by-manufacturer", "metadata.manufacturer", { unique: false });
             }
             if (!store.indexNames.contains("by-system")) {
               store.createIndex("by-system", "metadata.system", { unique: false });
             }
 
-            // Migrate existing records to add maker/system fields
+            // Migrate existing records to add manufacturer/system fields
             const cursorRequest = store.openCursor();
             cursorRequest.onsuccess = (e) => {
               const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
               if (cursor) {
                 const record = cursor.value;
-                // Add maker/system fields if missing
-                if (record.metadata && record.metadata.maker === undefined) {
-                  record.metadata.maker = "";
+                // Add manufacturer/system fields if missing
+                if (record.metadata && record.metadata.manufacturer === undefined) {
+                  record.metadata.manufacturer = "";
                 }
                 if (record.metadata && record.metadata.system === undefined) {
                   record.metadata.system = "";
@@ -133,12 +133,12 @@ class CharacterStorage {
       const data = localStorage.getItem(FALLBACK_KEY);
       if (!data) return [];
       const sets = JSON.parse(data) as SerializedCharacterSet[];
-      // Ensure maker/system fields exist for migrated data
+      // Ensure manufacturer/system fields exist for migrated data
       return sets.map((set) => ({
         ...set,
         metadata: {
           ...set.metadata,
-          maker: set.metadata.maker ?? "",
+          manufacturer: set.metadata.manufacturer ?? "",
           system: set.metadata.system ?? "",
         },
       }));
@@ -312,7 +312,7 @@ class CharacterStorage {
   }
 
   /**
-   * Search character sets by name, description, source, maker, or system
+   * Search character sets by name, description, source, manufacturer, or system
    */
   async search(query: string): Promise<SerializedCharacterSet[]> {
     const all = await this.getAll();
@@ -323,7 +323,7 @@ class CharacterStorage {
         set.metadata.name.toLowerCase().includes(lowerQuery) ||
         set.metadata.description.toLowerCase().includes(lowerQuery) ||
         set.metadata.source.toLowerCase().includes(lowerQuery) ||
-        set.metadata.maker.toLowerCase().includes(lowerQuery) ||
+        set.metadata.manufacturer.toLowerCase().includes(lowerQuery) ||
         set.metadata.system.toLowerCase().includes(lowerQuery)
     );
   }
@@ -345,16 +345,16 @@ class CharacterStorage {
   }
 
   /**
-   * Filter character sets by makers (OR logic)
+   * Filter character sets by manufacturers (OR logic)
    */
-  async filterByMakers(makers: string[]): Promise<SerializedCharacterSet[]> {
-    if (makers.length === 0) {
+  async filterByManufacturers(manufacturers: string[]): Promise<SerializedCharacterSet[]> {
+    if (manufacturers.length === 0) {
       return this.getAll();
     }
     const all = await this.getAll();
-    const lowerMakers = makers.map((m) => m.toLowerCase());
+    const lowerManufacturers = manufacturers.map((m) => m.toLowerCase());
     return all.filter((set) =>
-      lowerMakers.includes(set.metadata.maker.toLowerCase())
+      lowerManufacturers.includes(set.metadata.manufacturer.toLowerCase())
     );
   }
 
@@ -373,17 +373,17 @@ class CharacterStorage {
   }
 
   /**
-   * Get unique makers available in the library
+   * Get unique manufacturers available in the library
    */
-  async getAvailableMakers(): Promise<string[]> {
+  async getAvailableManufacturers(): Promise<string[]> {
     const all = await this.getAll();
-    const makers = new Set<string>();
+    const manufacturers = new Set<string>();
     for (const set of all) {
-      if (set.metadata.maker) {
-        makers.add(set.metadata.maker);
+      if (set.metadata.manufacturer) {
+        manufacturers.add(set.metadata.manufacturer);
       }
     }
-    return Array.from(makers).sort();
+    return Array.from(manufacturers).sort();
   }
 
   /**

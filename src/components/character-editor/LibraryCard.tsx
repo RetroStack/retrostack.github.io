@@ -99,16 +99,16 @@ export function LibraryCard({
   }, [onEdit, onRename, onExport, onDuplicate, onDelete, metadata.isBuiltIn]);
 
   return (
-    <div className="card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all">
+    <div className="card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all h-full">
       {/* Header with title and menu */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-retro-cyan truncate">
             {metadata.name}
           </h3>
-          {(metadata.maker || metadata.system) && (
+          {(metadata.manufacturer || metadata.system) && (
             <p className="text-[10px] text-gray-500 mt-0.5">
-              {metadata.maker}{metadata.maker && metadata.system ? " " : ""}{metadata.system}
+              {metadata.manufacturer}{metadata.manufacturer && metadata.system ? " " : ""}{metadata.system}
             </p>
           )}
           {metadata.description && (
@@ -136,8 +136,8 @@ export function LibraryCard({
         />
       </div>
 
-      {/* Footer with size, count, and actions */}
-      <div className="flex items-center justify-between pt-2 border-t border-retro-grid/30 text-[10px]">
+      {/* Footer with size, count, and actions - pushed to bottom */}
+      <div className="flex items-center justify-between pt-2 border-t border-retro-grid/30 text-[10px] mt-auto">
         <div className="flex items-center gap-2">
           {/* Size badge */}
           <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-pink rounded">

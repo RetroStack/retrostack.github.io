@@ -9,7 +9,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { NeonText } from "@/components/effects/NeonText";
 import {
-  MakerSystemSelect,
+  ManufacturerSystemSelect,
   ImportStepIndicator,
   LibraryCardCompact,
   SizePresetDropdown,
@@ -63,7 +63,7 @@ export function AddView() {
   // Step 1: Metadata state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [maker, setMaker] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
   const [source, setSource] = useState("");
 
@@ -233,7 +233,7 @@ export function AddView() {
           name: name.trim(),
           description: description.trim(),
           source: source.trim() || "yourself",
-          maker: maker.trim(),
+          manufacturer: manufacturer.trim(),
           system: system.trim(),
           createdAt: now,
           updatedAt: now,
@@ -254,7 +254,7 @@ export function AddView() {
     name,
     description,
     source,
-    maker,
+    manufacturer,
     system,
     config,
     sourceMode,
@@ -362,11 +362,11 @@ export function AddView() {
                     />
                   </div>
 
-                  {/* Maker and System */}
-                  <MakerSystemSelect
-                    maker={maker}
+                  {/* Manufacturer and System */}
+                  <ManufacturerSystemSelect
+                    manufacturer={manufacturer}
                     system={system}
-                    onMakerChange={setMaker}
+                    onManufacturerChange={setManufacturer}
                     onSystemChange={setSystem}
                   />
 
