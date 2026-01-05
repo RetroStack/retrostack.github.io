@@ -137,6 +137,7 @@ export function createEditorShortcuts(actions: {
   goToCharacter?: () => void;
   showAsciiMap?: () => void;
   showTextPreview?: () => void;
+  showSnapshots?: () => void;
 }): KeyboardShortcut[] {
   return [
     // Undo/Redo
@@ -355,6 +356,18 @@ export function createEditorShortcuts(actions: {
             action: actions.showTextPreview,
             description: "Text preview",
             context: "View",
+          },
+        ]
+      : []),
+    ...(actions.showSnapshots
+      ? [
+          {
+            key: "s",
+            ctrl: true,
+            shift: true,
+            action: actions.showSnapshots,
+            description: "Snapshots",
+            context: "Editor",
           },
         ]
       : []),

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/constants";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -56,8 +57,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         aria-modal="true"
         aria-label="Navigation menu"
       >
-        {/* Close button - 44px touch target */}
-        <div className="p-3 sm:p-4 border-b border-retro-grid flex justify-end">
+        {/* Close button and theme toggle */}
+        <div className="p-3 sm:p-4 border-b border-retro-grid flex justify-between items-center">
+          <ThemeToggle />
           <button
             onClick={onClose}
             className="touch-target flex items-center justify-center text-retro-pink hover:text-retro-cyan transition-colors rounded-md hover:bg-retro-purple/30"

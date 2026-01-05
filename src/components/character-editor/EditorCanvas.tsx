@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState } from "react";
+import { useMemo, useCallback, useRef, useState, useEffect } from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
 import { Character, CharacterSetConfig } from "@/lib/character-editor";
 
@@ -70,6 +70,7 @@ export function EditorCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragValue, setDragValue] = useState<boolean | null>(null);
+  const lastPinchDistanceRef = useRef<number | null>(null);
 
   // Calculate mixed pixels for batch editing display
   const mixedPixels = useMemo(() => {
@@ -141,6 +142,68 @@ export function EditorCanvas({
     [zoom, minZoom, maxZoom, onZoomChange]
   );
 
+  // Calculate distance between two touch points
+  const getTouchDistance = useCallback((touches: React.TouchList) => {
+    if (touches.length < 2) return null;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }, []);
+
+  // Handle pinch-to-zoom touch events
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (e.touches.length === 2) {
+        // Two-finger touch - start pinch zoom
+        e.preventDefault();
+        lastPinchDistanceRef.current = getTouchDistance(e.touches);
+      }
+    },
+    [getTouchDistance]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (e.touches.length === 2 && lastPinchDistanceRef.current !== null && onZoomChange) {
+        // Two-finger move - pinch zoom
+        e.preventDefault();
+        const currentDistance = getTouchDistance(e.touches);
+        if (currentDistance !== null) {
+          const delta = (currentDistance - lastPinchDistanceRef.current) / 20;
+          const newZoom = Math.min(maxZoom, Math.max(minZoom, zoom + delta));
+          if (Math.abs(newZoom - zoom) >= 1) {
+            onZoomChange(Math.round(newZoom));
+            lastPinchDistanceRef.current = currentDistance;
+          }
+        }
+      }
+    },
+    [getTouchDistance, zoom, minZoom, maxZoom, onZoomChange]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    lastPinchDistanceRef.current = null;
+  }, []);
+
+  // Set up passive: false for touch events to allow preventDefault
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const options = { passive: false };
+
+    const touchMoveHandler = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener("touchmove", touchMoveHandler, options);
+    return () => {
+      container.removeEventListener("touchmove", touchMoveHandler);
+    };
+  }, []);
+
   if (!character) {
     return (
       <div className={`flex items-center justify-center h-full ${className}`}>
@@ -170,6 +233,9 @@ export function EditorCanvas({
       className={`flex items-center justify-center h-full overflow-hidden bg-black/20 ${className}`}
       tabIndex={0}
       onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div
         className="inline-block"

@@ -23,12 +23,17 @@ import {
   TextPreviewModal,
   CharacterContextMenu,
   useContextMenu,
+  SnapshotsModal,
+  ChangeLogModal,
+  ShareModal,
 } from "@/components/character-editor";
 import {
   useCharacterLibrary,
   useAutoSave,
   useKeyboardShortcuts,
   createEditorShortcuts,
+  useSnapshots,
+  useChangeLog,
 } from "@/hooks/character-editor";
 import { useCharacterEditor } from "@/hooks/character-editor/useCharacterEditor";
 import {
@@ -105,6 +110,9 @@ export function EditView() {
   const [showGoToModal, setShowGoToModal] = useState(false);
   const [showAsciiMap, setShowAsciiMap] = useState(false);
   const [showTextPreview, setShowTextPreview] = useState(false);
+  const [showSnapshots, setShowSnapshots] = useState(false);
+  const [showChangeLog, setShowChangeLog] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   // Context menu state
   const { contextMenu, showContextMenu, hideContextMenu } = useContextMenu();
@@ -118,6 +126,44 @@ export function EditView() {
     isDirty: editor.isDirty,
     enabled: !!characterSet,
   });
+
+  // Snapshots
+  const snapshots = useSnapshots({
+    characterSetId: id,
+    enabled: !!characterSet,
+  });
+
+  // Change log
+  const changeLog = useChangeLog({
+    maxEntries: 100,
+    enabled: !!characterSet,
+  });
+
+  // Handle snapshot save
+  const handleSnapshotSave = useCallback(
+    async (name: string) => {
+      const success = await snapshots.saveNewSnapshot(name, editor.characters, editor.config);
+      if (success) {
+        toast.success("Snapshot saved");
+      }
+      return success;
+    },
+    [snapshots, editor.characters, editor.config, toast]
+  );
+
+  // Handle snapshot restore
+  const handleSnapshotRestore = useCallback(
+    (characters: import("@/lib/character-editor").Character[]) => {
+      if (characterSet) {
+        editor.reset({
+          ...characterSet,
+          characters,
+        });
+        toast.info("Snapshot restored");
+      }
+    },
+    [characterSet, editor, toast]
+  );
 
   // Load character set
   useEffect(() => {
@@ -387,6 +433,7 @@ export function EditView() {
         goToCharacter: () => setShowGoToModal(true),
         showAsciiMap: () => setShowAsciiMap(true),
         showTextPreview: () => setShowTextPreview(true),
+        showSnapshots: () => setShowSnapshots(true),
       }),
     [editor, handleSave, navigatePrev, navigateNext, navigatePageUp, navigatePageDown, navigateFirst, navigateLast]
   );
@@ -551,6 +598,16 @@ export function EditView() {
       onClick: handleExport,
     },
     {
+      id: "share",
+      label: "Share",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      ),
+      onClick: () => setShowShare(true),
+    },
+    {
       id: "reset",
       label: "Reset",
       icon: (
@@ -560,6 +617,26 @@ export function EditView() {
       ),
       onClick: handleReset,
       disabled: !editor.isDirty,
+    },
+    {
+      id: "snapshots",
+      label: `Snapshots (${snapshots.snapshots.length})`,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        </svg>
+      ),
+      onClick: () => setShowSnapshots(true),
+    },
+    {
+      id: "changelog",
+      label: `Log (${changeLog.count})`,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
+      onClick: () => setShowChangeLog(true),
     },
     { type: "separator", id: "sep-3" },
     {
@@ -854,6 +931,46 @@ export function EditView() {
         foregroundColor={colors.foreground}
         backgroundColor={colors.background}
       />
+
+      {/* Snapshots modal */}
+      <SnapshotsModal
+        isOpen={showSnapshots}
+        onClose={() => setShowSnapshots(false)}
+        snapshots={snapshots.snapshots}
+        loading={snapshots.loading}
+        isAtCapacity={snapshots.isAtCapacity}
+        maxSnapshots={snapshots.maxSnapshots}
+        currentCharacters={editor.characters}
+        currentConfig={editor.config}
+        foregroundColor={colors.foreground}
+        backgroundColor={colors.background}
+        onSave={handleSnapshotSave}
+        onRestore={snapshots.restore}
+        onDelete={snapshots.remove}
+        onRename={snapshots.rename}
+        onRestoreApply={handleSnapshotRestore}
+      />
+
+      {/* Change log modal */}
+      <ChangeLogModal
+        isOpen={showChangeLog}
+        onClose={() => setShowChangeLog(false)}
+        entries={changeLog.entries}
+        onClear={changeLog.clear}
+        onExport={changeLog.exportAsText}
+      />
+
+      {/* Share modal */}
+      {characterSet && (
+        <ShareModal
+          isOpen={showShare}
+          onClose={() => setShowShare(false)}
+          name={characterSet.metadata.name}
+          description={characterSet.metadata.description}
+          characters={editor.characters}
+          config={editor.config}
+        />
+      )}
 
       {/* Character context menu */}
       {contextMenu && (

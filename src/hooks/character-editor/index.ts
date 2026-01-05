@@ -27,3 +27,22 @@ export type {
   UseAutoSaveOptions,
   UseAutoSaveResult,
 } from "./useAutoSave";
+
+export { useSnapshots } from "./useSnapshots";
+export type {
+  UseSnapshotsOptions,
+  UseSnapshotsResult,
+} from "./useSnapshots";
+
+export {
+  useChangeLog,
+  getOperationDisplayName,
+  getOperationColor,
+  getOperationIcon,
+} from "./useChangeLog";
+export type {
+  ChangeOperationType,
+  ChangeLogEntry,
+  UseChangeLogOptions,
+  UseChangeLogResult,
+} from "./useChangeLog";

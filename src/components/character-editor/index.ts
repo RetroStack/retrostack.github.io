@@ -128,9 +128,22 @@ export type { ImportFromImageModalProps } from "./ImportFromImageModal";
 export { ImportFromFontModal } from "./ImportFromFontModal";
 export type { ImportFromFontModalProps } from "./ImportFromFontModal";
 
+export { SnapshotsModal } from "./SnapshotsModal";
+export type { SnapshotsModalProps } from "./SnapshotsModal";
+
+export { ChangeLogModal } from "./ChangeLogModal";
+export type { ChangeLogModalProps } from "./ChangeLogModal";
+
+export { ShareModal } from "./ShareModal";
+export type { ShareModalProps } from "./ShareModal";
+
 export { CharacterContextMenu, useContextMenu } from "./CharacterContextMenu";
 export type { CharacterContextMenuProps, ContextMenuItem } from "./CharacterContextMenu";
 
 // Import wizard
 export { ImportStepIndicator } from "./ImportStepIndicator";
 export type { ImportStepIndicatorProps } from "./ImportStepIndicator";
+
+// Onboarding
+export { OnboardingTour } from "./OnboardingTour";
+export type { OnboardingTourProps } from "./OnboardingTour";

@@ -155,6 +155,39 @@ export {
 } from "./fontImport";
 export type { FontImportOptions, FontParseResult } from "./fontImport";
 
+// Snapshots
+export {
+  createSnapshot,
+  restoreSnapshot,
+  saveSnapshot,
+  getSnapshotsForCharacterSet,
+  getSnapshotById,
+  deleteSnapshot,
+  deleteAllSnapshotsForCharacterSet,
+  renameSnapshot,
+  getSnapshotCount,
+  isAtSnapshotCapacity,
+  getMaxSnapshots,
+} from "./snapshots";
+export type { Snapshot } from "./snapshots";
+
+// Sharing
+export {
+  encodeCharacterSet,
+  decodeCharacterSet,
+  createShareUrl,
+  extractFromUrl,
+  getHashFromUrl,
+  isUrlWithinRecommendedLength,
+  isUrlWithinMaxLength,
+  getUrlLengthStatus,
+  estimateUrlLength,
+  canShare,
+  MAX_RECOMMENDED_URL_LENGTH,
+  MAX_URL_LENGTH,
+} from "./sharing";
+export type { SharedCharacterSet } from "./sharing";
+
 // Export formats
 export {
   EXPORT_FORMATS,

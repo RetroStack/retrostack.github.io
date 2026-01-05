@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Navigation, TabletNavigation } from "./Navigation";
 import { MobileMenu, HamburgerButton } from "./MobileMenu";
 import { Container } from "@/components/ui/Container";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export function Header() {
@@ -64,8 +65,11 @@ export function Header() {
             {/* Desktop Navigation - visible on large screens (lg+) */}
             <Navigation />
 
-            {/* Mobile Menu Button - visible on mobile only (below md) */}
-            <HamburgerButton onClick={() => setMobileMenuOpen(true)} />
+            {/* Theme toggle and Mobile Menu Button */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle className="hidden sm:block" />
+              <HamburgerButton onClick={() => setMobileMenuOpen(true)} />
+            </div>
           </div>
         </Container>
       </header>

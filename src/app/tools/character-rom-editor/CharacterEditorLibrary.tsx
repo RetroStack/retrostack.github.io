@@ -13,9 +13,11 @@ import {
   LibraryGridEmptyResults,
   LibraryGridError,
   LibraryFilters,
+  OnboardingTour,
 } from "@/components/character-editor";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import { useToast } from "@/hooks/useToast";
+import { useOnboarding, CHARACTER_EDITOR_ONBOARDING_STEPS } from "@/hooks";
 
 /**
  * Main library view for the Character ROM Editor
@@ -35,6 +37,12 @@ export function CharacterEditorLibrary() {
     availableSizes,
     getById,
   } = useCharacterLibrary();
+
+  // Onboarding tour
+  const onboarding = useOnboarding({
+    steps: CHARACTER_EDITOR_ONBOARDING_STEPS,
+    enabled: true,
+  });
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -290,6 +298,18 @@ export function CharacterEditorLibrary() {
             </div>
 
             <div className="flex gap-2">
+              {onboarding.hasCompleted || onboarding.hasDismissed ? (
+                <button
+                  onClick={onboarding.start}
+                  className="text-xs text-gray-500 hover:text-retro-cyan transition-colors flex items-center gap-1 mr-2"
+                  title="Restart onboarding tour"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Tour
+                </button>
+              ) : null}
               <Button href="/tools/character-rom-editor/add" variant="pink">
                 Add ROM
               </Button>
@@ -440,6 +460,19 @@ export function CharacterEditorLibrary() {
           </div>
         </div>
       )}
+
+      {/* Onboarding tour */}
+      <OnboardingTour
+        isActive={onboarding.isActive}
+        currentStep={onboarding.currentStepData}
+        stepIndex={onboarding.currentStep}
+        totalSteps={onboarding.totalSteps}
+        isFirstStep={onboarding.isFirstStep}
+        isLastStep={onboarding.isLastStep}
+        onNext={onboarding.next}
+        onPrev={onboarding.prev}
+        onSkip={onboarding.skip}
+      />
     </div>
   );
 }
