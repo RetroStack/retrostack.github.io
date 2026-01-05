@@ -11,6 +11,11 @@
 import { Character, AnchorPoint, createEmptyCharacter } from "./types";
 
 /**
+ * Scale algorithm type for scaling operations
+ */
+export type ScaleAlgorithm = "nearest" | "threshold";
+
+/**
  * Rotate character 90 degrees
  * Note: For non-square characters, maintains original dimensions by fitting rotated content
  */
@@ -320,4 +325,350 @@ export function batchTogglePixel(
     if (!indices.has(index)) return char;
     return setPixel(char, row, col, newValue);
   });
+}
+
+/**
+ * Bounding box result type
+ */
+export interface BoundingBox {
+  minRow: number;
+  maxRow: number;
+  minCol: number;
+  maxCol: number;
+}
+
+/**
+ * Get the bounding box of foreground pixels in a character
+ * Returns null if the character is empty (no foreground pixels)
+ */
+export function getBoundingBox(character: Character): BoundingBox | null {
+  const height = character.pixels.length;
+  const width = character.pixels[0]?.length || 0;
+
+  let minRow = height;
+  let maxRow = -1;
+  let minCol = width;
+  let maxCol = -1;
+
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      if (character.pixels[row][col]) {
+        minRow = Math.min(minRow, row);
+        maxRow = Math.max(maxRow, row);
+        minCol = Math.min(minCol, col);
+        maxCol = Math.max(maxCol, col);
+      }
+    }
+  }
+
+  // No foreground pixels found
+  if (maxRow === -1) {
+    return null;
+  }
+
+  return { minRow, maxRow, minCol, maxCol };
+}
+
+/**
+ * Center character content within its dimensions
+ * Calculates bounding box of foreground pixels and shifts to center
+ */
+export function centerCharacter(character: Character): Character {
+  const height = character.pixels.length;
+  const width = character.pixels[0]?.length || 0;
+
+  const bbox = getBoundingBox(character);
+
+  // Empty character, return unchanged
+  if (!bbox) {
+    return character;
+  }
+
+  // Calculate content dimensions
+  const contentWidth = bbox.maxCol - bbox.minCol + 1;
+  const contentHeight = bbox.maxRow - bbox.minRow + 1;
+
+  // Calculate target position (centered)
+  const targetCol = Math.floor((width - contentWidth) / 2);
+  const targetRow = Math.floor((height - contentHeight) / 2);
+
+  // Calculate shift offset
+  const shiftX = targetCol - bbox.minCol;
+  const shiftY = targetRow - bbox.minRow;
+
+  // No shift needed if already centered
+  if (shiftX === 0 && shiftY === 0) {
+    return character;
+  }
+
+  // Create new pixel array with shifted content
+  const newPixels: boolean[][] = [];
+
+  for (let row = 0; row < height; row++) {
+    const newRow: boolean[] = [];
+    for (let col = 0; col < width; col++) {
+      // Find source pixel (reverse the shift)
+      const srcRow = row - shiftY;
+      const srcCol = col - shiftX;
+
+      if (
+        srcRow >= 0 &&
+        srcRow < height &&
+        srcCol >= 0 &&
+        srcCol < width
+      ) {
+        newRow.push(character.pixels[srcRow][srcCol]);
+      } else {
+        newRow.push(false);
+      }
+    }
+    newPixels.push(newRow);
+  }
+
+  return { pixels: newPixels };
+}
+
+/**
+ * Scale character using nearest neighbor algorithm
+ * Maps each output pixel to the nearest source pixel
+ */
+function scaleNearestNeighbor(
+  character: Character,
+  scale: number,
+  anchor: AnchorPoint
+): Character {
+  const oldHeight = character.pixels.length;
+  const oldWidth = character.pixels[0]?.length || 0;
+
+  // Calculate scaled dimensions
+  const scaledWidth = Math.round(oldWidth * scale);
+  const scaledHeight = Math.round(oldHeight * scale);
+
+  // Create scaled content
+  const scaledPixels: boolean[][] = [];
+
+  for (let outRow = 0; outRow < scaledHeight; outRow++) {
+    const row: boolean[] = [];
+    for (let outCol = 0; outCol < scaledWidth; outCol++) {
+      // Find source pixel using inverse mapping
+      const srcRow = Math.min(Math.floor(outRow / scale), oldHeight - 1);
+      const srcCol = Math.min(Math.floor(outCol / scale), oldWidth - 1);
+
+      row.push(character.pixels[srcRow]?.[srcCol] || false);
+    }
+    scaledPixels.push(row);
+  }
+
+  // Calculate anchor offset to position within original bounds
+  const deltaWidth = oldWidth - scaledWidth;
+  const deltaHeight = oldHeight - scaledHeight;
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  // Horizontal offset based on anchor
+  if (anchor.endsWith("l")) {
+    offsetX = 0;
+  } else if (anchor.endsWith("c")) {
+    offsetX = Math.floor(deltaWidth / 2);
+  } else if (anchor.endsWith("r")) {
+    offsetX = deltaWidth;
+  }
+
+  // Vertical offset based on anchor
+  if (anchor.startsWith("t")) {
+    offsetY = 0;
+  } else if (anchor.startsWith("m")) {
+    offsetY = Math.floor(deltaHeight / 2);
+  } else if (anchor.startsWith("b")) {
+    offsetY = deltaHeight;
+  }
+
+  // Create output at original dimensions with anchor positioning
+  const newPixels: boolean[][] = [];
+
+  for (let row = 0; row < oldHeight; row++) {
+    const newRow: boolean[] = [];
+    for (let col = 0; col < oldWidth; col++) {
+      const srcRow = row - offsetY;
+      const srcCol = col - offsetX;
+
+      if (
+        srcRow >= 0 &&
+        srcRow < scaledHeight &&
+        srcCol >= 0 &&
+        srcCol < scaledWidth
+      ) {
+        newRow.push(scaledPixels[srcRow][srcCol]);
+      } else {
+        newRow.push(false);
+      }
+    }
+    newPixels.push(newRow);
+  }
+
+  return { pixels: newPixels };
+}
+
+/**
+ * Calculate coverage of foreground pixels in a source rectangle
+ */
+function calculateCoverage(
+  pixels: boolean[][],
+  rowStart: number,
+  rowEnd: number,
+  colStart: number,
+  colEnd: number
+): number {
+  const height = pixels.length;
+  const width = pixels[0]?.length || 0;
+
+  let totalArea = 0;
+  let foregroundArea = 0;
+
+  // Iterate over all pixels that overlap with the source rectangle
+  const startRow = Math.max(0, Math.floor(rowStart));
+  const endRow = Math.min(height - 1, Math.floor(rowEnd));
+  const startCol = Math.max(0, Math.floor(colStart));
+  const endCol = Math.min(width - 1, Math.floor(colEnd));
+
+  for (let row = startRow; row <= endRow; row++) {
+    for (let col = startCol; col <= endCol; col++) {
+      // Calculate overlap area for this pixel
+      const pixelRowStart = Math.max(row, rowStart);
+      const pixelRowEnd = Math.min(row + 1, rowEnd);
+      const pixelColStart = Math.max(col, colStart);
+      const pixelColEnd = Math.min(col + 1, colEnd);
+
+      const overlapArea =
+        (pixelRowEnd - pixelRowStart) * (pixelColEnd - pixelColStart);
+      totalArea += overlapArea;
+
+      if (pixels[row][col]) {
+        foregroundArea += overlapArea;
+      }
+    }
+  }
+
+  if (totalArea === 0) {
+    return 0;
+  }
+
+  return foregroundArea / totalArea;
+}
+
+/**
+ * Scale character using threshold-based area sampling algorithm
+ * Calculates coverage percentage and turns on if >= threshold
+ */
+function scaleThreshold(
+  character: Character,
+  scale: number,
+  anchor: AnchorPoint,
+  threshold: number = 0.5
+): Character {
+  const oldHeight = character.pixels.length;
+  const oldWidth = character.pixels[0]?.length || 0;
+
+  // Calculate scaled dimensions
+  const scaledWidth = Math.round(oldWidth * scale);
+  const scaledHeight = Math.round(oldHeight * scale);
+
+  // Create scaled content using area sampling
+  const scaledPixels: boolean[][] = [];
+
+  for (let outRow = 0; outRow < scaledHeight; outRow++) {
+    const row: boolean[] = [];
+    for (let outCol = 0; outCol < scaledWidth; outCol++) {
+      // Calculate the source rectangle this output pixel covers
+      const srcRowStart = outRow / scale;
+      const srcRowEnd = (outRow + 1) / scale;
+      const srcColStart = outCol / scale;
+      const srcColEnd = (outCol + 1) / scale;
+
+      // Calculate coverage of foreground pixels
+      const coverage = calculateCoverage(
+        character.pixels,
+        srcRowStart,
+        srcRowEnd,
+        srcColStart,
+        srcColEnd
+      );
+
+      // Apply threshold
+      row.push(coverage >= threshold);
+    }
+    scaledPixels.push(row);
+  }
+
+  // Calculate anchor offset to position within original bounds
+  const deltaWidth = oldWidth - scaledWidth;
+  const deltaHeight = oldHeight - scaledHeight;
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  // Horizontal offset based on anchor
+  if (anchor.endsWith("l")) {
+    offsetX = 0;
+  } else if (anchor.endsWith("c")) {
+    offsetX = Math.floor(deltaWidth / 2);
+  } else if (anchor.endsWith("r")) {
+    offsetX = deltaWidth;
+  }
+
+  // Vertical offset based on anchor
+  if (anchor.startsWith("t")) {
+    offsetY = 0;
+  } else if (anchor.startsWith("m")) {
+    offsetY = Math.floor(deltaHeight / 2);
+  } else if (anchor.startsWith("b")) {
+    offsetY = deltaHeight;
+  }
+
+  // Create output at original dimensions with anchor positioning
+  const newPixels: boolean[][] = [];
+
+  for (let row = 0; row < oldHeight; row++) {
+    const newRow: boolean[] = [];
+    for (let col = 0; col < oldWidth; col++) {
+      const srcRow = row - offsetY;
+      const srcCol = col - offsetX;
+
+      if (
+        srcRow >= 0 &&
+        srcRow < scaledHeight &&
+        srcCol >= 0 &&
+        srcCol < scaledWidth
+      ) {
+        newRow.push(scaledPixels[srcRow][srcCol]);
+      } else {
+        newRow.push(false);
+      }
+    }
+    newPixels.push(newRow);
+  }
+
+  return { pixels: newPixels };
+}
+
+/**
+ * Scale character with configurable algorithm and anchor positioning
+ * Clips content to fit within original character dimensions
+ */
+export function scaleCharacter(
+  character: Character,
+  scale: number,
+  anchor: AnchorPoint,
+  algorithm: ScaleAlgorithm
+): Character {
+  if (scale === 1) {
+    return character;
+  }
+
+  if (algorithm === "nearest") {
+    return scaleNearestNeighbor(character, scale, anchor);
+  } else {
+    return scaleThreshold(character, scale, anchor);
+  }
 }

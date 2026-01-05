@@ -17,6 +17,10 @@ export interface TransformToolbarProps {
   onClear: () => void;
   /** Callback for fill */
   onFill: () => void;
+  /** Callback for center content */
+  onCenter?: () => void;
+  /** Callback for scale */
+  onScale?: () => void;
   /** Callback for delete */
   onDelete?: () => void;
   /** Callback for copy from current set */
@@ -136,6 +140,28 @@ function CopyIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
+function CenterIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" strokeWidth={2} />
+      <path strokeLinecap="round" strokeWidth={2} d="M12 2v4m0 12v4M2 12h4m12 0h4" />
+    </svg>
+  );
+}
+
+function ScaleIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 4l4 4m0-4H4v4m16-4l-4 4m4 0V4h-4m-12 16l4-4m-4 0v4h4m12 0l-4-4m4 0v4h-4"
+      />
+    </svg>
+  );
+}
+
 /**
  * Toolbar button component
  */
@@ -201,6 +227,8 @@ export function TransformToolbar({
   onInvert,
   onClear,
   onFill,
+  onCenter,
+  onScale,
   onDelete,
   onCopy,
   disabled = false,
@@ -242,8 +270,14 @@ export function TransformToolbar({
             <ArrowLeftIcon />
           </ToolbarButton>
 
-          {/* Center spacer */}
-          <div className="w-8 h-8" />
+          {/* Center button */}
+          <ToolbarButton
+            onClick={onCenter || (() => {})}
+            disabled={disabled || !onCenter}
+            title="Center Content"
+          >
+            <CenterIcon />
+          </ToolbarButton>
 
           <ToolbarButton
             onClick={handleShiftRight}
@@ -335,6 +369,21 @@ export function TransformToolbar({
           </ToolbarButton>
         </div>
       </div>
+
+      {/* Scale section */}
+      {onScale && (
+        <>
+          <ToolbarDivider />
+          <ToolbarLabel>Scale</ToolbarLabel>
+          <ToolbarButton
+            onClick={onScale}
+            disabled={disabled}
+            title="Scale Character"
+          >
+            <ScaleIcon />
+          </ToolbarButton>
+        </>
+      )}
 
       {/* Character section */}
       {(onCopy || onDelete) && (

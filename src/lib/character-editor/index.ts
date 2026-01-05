@@ -47,7 +47,11 @@ export {
   batchTransform,
   getPixelState,
   batchTogglePixel,
+  getBoundingBox,
+  centerCharacter,
+  scaleCharacter,
 } from "./transforms";
+export type { ScaleAlgorithm, BoundingBox } from "./transforms";
 
 // Color presets
 export {

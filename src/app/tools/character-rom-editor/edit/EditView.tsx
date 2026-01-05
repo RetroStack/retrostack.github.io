@@ -17,6 +17,7 @@ import {
   ImportCharactersModal,
   CopyCharacterModal,
   ReorderModal,
+  ScaleModal,
 } from "@/components/character-editor";
 import {
   useCharacterLibrary,
@@ -88,6 +89,9 @@ export function EditView() {
 
   // Reorder modal state
   const [showReorderModal, setShowReorderModal] = useState(false);
+
+  // Scale modal state
+  const [showScaleModal, setShowScaleModal] = useState(false);
 
   // Auto-save
   const autoSave = useAutoSave({
@@ -541,6 +545,8 @@ export function EditView() {
             onInvert={editor.invertSelected}
             onClear={editor.clearSelected}
             onFill={editor.fillSelected}
+            onCenter={editor.centerSelected}
+            onScale={() => setShowScaleModal(true)}
             onDelete={editor.deleteSelected}
             onCopy={() => setShowCopyModal(true)}
             disabled={!selectedCharacter}
@@ -654,6 +660,21 @@ export function EditView() {
         onClose={() => setShowReorderModal(false)}
         characters={editor.characters}
         onReorder={editor.setCharacters}
+      />
+
+      {/* Scale modal */}
+      <ScaleModal
+        isOpen={showScaleModal}
+        onClose={() => setShowScaleModal(false)}
+        onScale={(scale, anchor, algorithm) => {
+          editor.scaleSelected(scale, anchor, algorithm);
+          setShowScaleModal(false);
+        }}
+        characters={editor.characters}
+        selectedIndices={editor.selectedIndices}
+        config={editor.config}
+        foregroundColor={colors.foreground}
+        backgroundColor={colors.background}
       />
 
       {/* Save As dialog */}

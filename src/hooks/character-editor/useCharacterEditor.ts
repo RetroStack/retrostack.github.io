@@ -21,6 +21,9 @@ import {
   getPixelState,
   batchTogglePixel,
   batchTransform,
+  centerCharacter,
+  scaleCharacter,
+  ScaleAlgorithm,
 } from "@/lib/character-editor/transforms";
 import { useUndoRedo, deepClone } from "./useUndoRedo";
 
@@ -66,6 +69,12 @@ export interface UseCharacterEditorResult {
   clearSelected: () => void;
   /** Fill selected character(s) */
   fillSelected: () => void;
+  /** Center selected character(s) content */
+  centerSelected: () => void;
+  /** Scale selected character(s) */
+  scaleSelected: (scale: number, anchor: AnchorPoint, algorithm: ScaleAlgorithm) => void;
+  /** Combined set of all selected indices (selectedIndex + batchSelection) */
+  selectedIndices: Set<number>;
   /** Add a new character at the end */
   addCharacter: () => void;
   /** Add multiple characters at the end */
@@ -351,6 +360,31 @@ export function useCharacterEditor(
     });
   }, [updateState, selectedIndices]);
 
+  const centerSelected = useCallback(() => {
+    updateState((state) => {
+      state.characters = batchTransform(
+        state.characters,
+        selectedIndices,
+        centerCharacter
+      );
+      return state;
+    });
+  }, [updateState, selectedIndices]);
+
+  const scaleSelected = useCallback(
+    (scale: number, anchor: AnchorPoint, algorithm: ScaleAlgorithm) => {
+      updateState((state) => {
+        state.characters = batchTransform(
+          state.characters,
+          selectedIndices,
+          (char) => scaleCharacter(char, scale, anchor, algorithm)
+        );
+        return state;
+      });
+    },
+    [updateState, selectedIndices]
+  );
+
   // Character management
   const addCharacter = useCallback(() => {
     updateState((state) => {
@@ -481,6 +515,9 @@ export function useCharacterEditor(
     flipSelectedVertical,
     clearSelected,
     fillSelected,
+    centerSelected,
+    scaleSelected,
+    selectedIndices,
     addCharacter,
     addCharacters,
     deleteSelected,

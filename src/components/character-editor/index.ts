@@ -110,6 +110,9 @@ export type { CopyCharacterModalProps } from "./CopyCharacterModal";
 export { ReorderModal } from "./ReorderModal";
 export type { ReorderModalProps } from "./ReorderModal";
 
+export { ScaleModal } from "./ScaleModal";
+export type { ScaleModalProps } from "./ScaleModal";
+
 // Import wizard
 export { ImportStepIndicator } from "./ImportStepIndicator";
 export type { ImportStepIndicatorProps } from "./ImportStepIndicator";
