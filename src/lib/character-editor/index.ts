@@ -136,11 +136,13 @@ export {
   exportToCHeader,
   exportToAssembly,
   exportToPng,
+  exportToReferenceSheet,
   getHexPreview,
   getBitLayoutVisualization,
   getDefaultCHeaderOptions,
   getDefaultAssemblyOptions,
   getDefaultPngOptions,
+  getDefaultReferenceSheetOptions,
 } from "./exports";
 export type {
   ExportFormat,
@@ -148,4 +150,5 @@ export type {
   CHeaderOptions,
   AssemblyOptions,
   PngOptions,
+  ReferenceSheetOptions,
 } from "./exports";

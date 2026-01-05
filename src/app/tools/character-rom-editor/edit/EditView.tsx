@@ -20,6 +20,7 @@ import {
   ScaleModal,
   GoToCharacterModal,
   AsciiMapModal,
+  TextPreviewModal,
   CharacterContextMenu,
   useContextMenu,
 } from "@/components/character-editor";
@@ -103,6 +104,7 @@ export function EditView() {
   const [showScaleModal, setShowScaleModal] = useState(false);
   const [showGoToModal, setShowGoToModal] = useState(false);
   const [showAsciiMap, setShowAsciiMap] = useState(false);
+  const [showTextPreview, setShowTextPreview] = useState(false);
 
   // Context menu state
   const { contextMenu, showContextMenu, hideContextMenu } = useContextMenu();
@@ -384,6 +386,7 @@ export function EditView() {
         navigateLast,
         goToCharacter: () => setShowGoToModal(true),
         showAsciiMap: () => setShowAsciiMap(true),
+        showTextPreview: () => setShowTextPreview(true),
       }),
     [editor, handleSave, navigatePrev, navigateNext, navigatePageUp, navigatePageDown, navigateFirst, navigateLast]
   );
@@ -838,6 +841,16 @@ export function EditView() {
         characters={editor.characters}
         selectedIndex={editor.selectedIndex}
         onSelect={(index) => editor.setSelectedIndex(index)}
+        foregroundColor={colors.foreground}
+        backgroundColor={colors.background}
+      />
+
+      {/* Text preview modal */}
+      <TextPreviewModal
+        isOpen={showTextPreview}
+        onClose={() => setShowTextPreview(false)}
+        characters={editor.characters}
+        config={editor.config}
         foregroundColor={colors.foreground}
         backgroundColor={colors.background}
       />

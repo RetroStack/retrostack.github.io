@@ -136,6 +136,7 @@ export function createEditorShortcuts(actions: {
   navigateLast?: () => void;
   goToCharacter?: () => void;
   showAsciiMap?: () => void;
+  showTextPreview?: () => void;
 }): KeyboardShortcut[] {
   return [
     // Undo/Redo
@@ -344,6 +345,16 @@ export function createEditorShortcuts(actions: {
             action: actions.showAsciiMap,
             description: "Show ASCII map",
             context: "Navigation",
+          },
+        ]
+      : []),
+    ...(actions.showTextPreview
+      ? [
+          {
+            key: "t",
+            action: actions.showTextPreview,
+            description: "Text preview",
+            context: "View",
           },
         ]
       : []),

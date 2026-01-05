@@ -119,6 +119,9 @@ export type { GoToCharacterModalProps } from "./GoToCharacterModal";
 export { AsciiMapModal } from "./AsciiMapModal";
 export type { AsciiMapModalProps } from "./AsciiMapModal";
 
+export { TextPreviewModal } from "./TextPreviewModal";
+export type { TextPreviewModalProps } from "./TextPreviewModal";
+
 export { CharacterContextMenu, useContextMenu } from "./CharacterContextMenu";
 export type { CharacterContextMenuProps, ContextMenuItem } from "./CharacterContextMenu";
 

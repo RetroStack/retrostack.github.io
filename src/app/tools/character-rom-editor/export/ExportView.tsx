@@ -24,12 +24,15 @@ import {
   CHeaderOptions,
   AssemblyOptions,
   PngOptions,
+  ReferenceSheetOptions,
   getDefaultCHeaderOptions,
   getDefaultAssemblyOptions,
   getDefaultPngOptions,
+  getDefaultReferenceSheetOptions,
   exportToCHeader,
   exportToAssembly,
   exportToPng,
+  exportToReferenceSheet,
   getHexPreview,
   getBitLayoutVisualization,
 } from "@/lib/character-editor";
@@ -70,6 +73,11 @@ export function ExportView() {
   // PNG options
   const [pngOptions, setPngOptions] = useState<PngOptions>(getDefaultPngOptions());
 
+  // Reference sheet options
+  const [referenceSheetOptions, setReferenceSheetOptions] = useState<ReferenceSheetOptions>(
+    getDefaultReferenceSheetOptions("")
+  );
+
   // Load character set
   useEffect(() => {
     async function loadCharacterSet() {
@@ -90,6 +98,7 @@ export function ExportView() {
           setBitDirection(loaded.config.bitDirection);
           setCHeaderOptions(getDefaultCHeaderOptions(loaded.metadata.name));
           setAssemblyOptions(getDefaultAssemblyOptions(loaded.metadata.name));
+          setReferenceSheetOptions(getDefaultReferenceSheetOptions(loaded.metadata.name));
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to load character set");
@@ -132,8 +141,14 @@ export function ExportView() {
     if (filename) {
       // Remove existing extension and add new one
       const baseName = filename.replace(/\.(bin|h|asm|inc|png)$/i, "");
-      const newExtension = EXPORT_FORMATS.find((f) => f.id === format)?.extension || ".bin";
-      setFilename(baseName + newExtension);
+      let newExtension = EXPORT_FORMATS.find((f) => f.id === format)?.extension || ".bin";
+      // For reference sheet, add -reference suffix
+      if (format === "reference-sheet") {
+        const cleanBase = baseName.replace(/-reference$/, "");
+        setFilename(cleanBase + "-reference" + newExtension);
+      } else {
+        setFilename(baseName + newExtension);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [format]);
@@ -201,6 +216,18 @@ export function ExportView() {
           break;
         }
 
+        case "reference-sheet": {
+          blob = await exportToReferenceSheet(
+            characterSet.characters,
+            characterSet.config,
+            referenceSheetOptions
+          );
+          if (!exportFilename.endsWith(".png")) {
+            exportFilename += ".png";
+          }
+          break;
+        }
+
         default:
           throw new Error(`Unknown export format: ${format}`);
       }
@@ -220,6 +247,7 @@ export function ExportView() {
     cHeaderOptions,
     assemblyOptions,
     pngOptions,
+    referenceSheetOptions,
   ]);
 
   if (loading) {
@@ -712,6 +740,143 @@ export function ExportView() {
                         />
                         Transparent background
                       </label>
+                    </div>
+                  </>
+                )}
+
+                {/* Reference Sheet options */}
+                {format === "reference-sheet" && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={referenceSheetOptions.title}
+                        onChange={(e) =>
+                          setReferenceSheetOptions({ ...referenceSheetOptions, title: e.target.value })
+                        }
+                        className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        placeholder="Character Set Title"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Columns
+                        </label>
+                        <select
+                          value={referenceSheetOptions.columns}
+                          onChange={(e) =>
+                            setReferenceSheetOptions({ ...referenceSheetOptions, columns: parseInt(e.target.value) })
+                          }
+                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        >
+                          <option value={8}>8</option>
+                          <option value={16}>16</option>
+                          <option value={32}>32</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Scale
+                        </label>
+                        <select
+                          value={referenceSheetOptions.scale}
+                          onChange={(e) =>
+                            setReferenceSheetOptions({ ...referenceSheetOptions, scale: parseInt(e.target.value) })
+                          }
+                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        >
+                          <option value={2}>2x</option>
+                          <option value={3}>3x</option>
+                          <option value={4}>4x</option>
+                          <option value={5}>5x</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Foreground
+                        </label>
+                        <input
+                          type="color"
+                          value={referenceSheetOptions.foregroundColor}
+                          onChange={(e) =>
+                            setReferenceSheetOptions({ ...referenceSheetOptions, foregroundColor: e.target.value })
+                          }
+                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Background
+                        </label>
+                        <input
+                          type="color"
+                          value={referenceSheetOptions.backgroundColor}
+                          onChange={(e) =>
+                            setReferenceSheetOptions({ ...referenceSheetOptions, backgroundColor: e.target.value })
+                          }
+                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">
+                        Show Labels
+                      </label>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={referenceSheetOptions.showTitle}
+                            onChange={(e) =>
+                              setReferenceSheetOptions({ ...referenceSheetOptions, showTitle: e.target.checked })
+                            }
+                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
+                          />
+                          Show title header
+                        </label>
+                        <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={referenceSheetOptions.showHex}
+                            onChange={(e) =>
+                              setReferenceSheetOptions({ ...referenceSheetOptions, showHex: e.target.checked })
+                            }
+                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
+                          />
+                          Hex codes ($00)
+                        </label>
+                        <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={referenceSheetOptions.showDecimal}
+                            onChange={(e) =>
+                              setReferenceSheetOptions({ ...referenceSheetOptions, showDecimal: e.target.checked })
+                            }
+                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
+                          />
+                          Decimal codes
+                        </label>
+                        <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={referenceSheetOptions.showAscii}
+                            onChange={(e) =>
+                              setReferenceSheetOptions({ ...referenceSheetOptions, showAscii: e.target.checked })
+                            }
+                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
+                          />
+                          ASCII characters
+                        </label>
+                      </div>
                     </div>
                   </>
                 )}

@@ -19,7 +19,7 @@ import { characterToBytes } from "./binary";
 /**
  * Export format types
  */
-export type ExportFormat = "binary" | "c-header" | "assembly" | "png";
+export type ExportFormat = "binary" | "c-header" | "assembly" | "png" | "reference-sheet";
 
 /**
  * Export format metadata
@@ -64,6 +64,13 @@ export const EXPORT_FORMATS: ExportFormatInfo[] = [
     extension: ".png",
     mimeType: "image/png",
   },
+  {
+    id: "reference-sheet",
+    name: "Reference Sheet",
+    description: "Printable reference with character codes",
+    extension: ".png",
+    mimeType: "image/png",
+  },
 ];
 
 /**
@@ -98,6 +105,22 @@ export interface PngOptions {
   foregroundColor: string;
   backgroundColor: string;
   transparent: boolean;
+}
+
+/**
+ * Reference sheet export options
+ */
+export interface ReferenceSheetOptions {
+  columns: number;
+  scale: number;
+  showHex: boolean;
+  showDecimal: boolean;
+  showAscii: boolean;
+  foregroundColor: string;
+  backgroundColor: string;
+  labelColor: string;
+  title: string;
+  showTitle: boolean;
 }
 
 /**
@@ -148,6 +171,24 @@ export function getDefaultPngOptions(): PngOptions {
     foregroundColor: "#ffffff",
     backgroundColor: "#000000",
     transparent: false,
+  };
+}
+
+/**
+ * Default Reference Sheet options
+ */
+export function getDefaultReferenceSheetOptions(name: string): ReferenceSheetOptions {
+  return {
+    columns: 16,
+    scale: 3,
+    showHex: true,
+    showDecimal: false,
+    showAscii: true,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#000000",
+    labelColor: "#888888",
+    title: name || "Character Set",
+    showTitle: true,
   };
 }
 
@@ -368,6 +409,210 @@ export async function exportToPng(
       }
     }
   }
+
+  // Convert to blob
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Failed to create PNG blob"));
+        }
+      },
+      "image/png"
+    );
+  });
+}
+
+/**
+ * Get printable ASCII character or control code name
+ */
+function getAsciiLabel(code: number): string {
+  if (code >= 32 && code <= 126) {
+    return String.fromCharCode(code);
+  }
+  // Control characters
+  const controlNames: Record<number, string> = {
+    0: "NUL", 1: "SOH", 2: "STX", 3: "ETX", 4: "EOT", 5: "ENQ", 6: "ACK", 7: "BEL",
+    8: "BS", 9: "TAB", 10: "LF", 11: "VT", 12: "FF", 13: "CR", 14: "SO", 15: "SI",
+    16: "DLE", 17: "DC1", 18: "DC2", 19: "DC3", 20: "DC4", 21: "NAK", 22: "SYN", 23: "ETB",
+    24: "CAN", 25: "EM", 26: "SUB", 27: "ESC", 28: "FS", 29: "GS", 30: "RS", 31: "US",
+    127: "DEL",
+  };
+  return controlNames[code] || "";
+}
+
+/**
+ * Generate Reference Sheet PNG
+ * Creates a printable reference with character codes
+ */
+export async function exportToReferenceSheet(
+  characters: Character[],
+  config: CharacterSetConfig,
+  options: ReferenceSheetOptions
+): Promise<Blob> {
+  const {
+    columns,
+    scale,
+    showHex,
+    showDecimal,
+    showAscii,
+    foregroundColor,
+    backgroundColor,
+    labelColor,
+    title,
+    showTitle,
+  } = options;
+
+  const rows = Math.ceil(characters.length / columns);
+  const charWidth = config.width;
+  const charHeight = config.height;
+
+  // Calculate dimensions
+  const cellPadding = 4;
+  const labelHeight = 14; // Height for labels below character
+  const labelLines = (showHex ? 1 : 0) + (showDecimal ? 1 : 0) + (showAscii ? 1 : 0);
+  const totalLabelHeight = labelHeight * Math.max(1, labelLines);
+
+  const cellWidth = charWidth * scale + cellPadding * 2;
+  const cellHeight = charHeight * scale + cellPadding * 2 + totalLabelHeight;
+
+  // Header dimensions
+  const headerHeight = showTitle ? 40 : 0;
+  const rowHeaderWidth = 40; // For row numbers (hex)
+  const colHeaderHeight = 20; // For column numbers (hex)
+
+  const canvasWidth = rowHeaderWidth + columns * cellWidth + cellPadding;
+  const canvasHeight = headerHeight + colHeaderHeight + rows * cellHeight + cellPadding;
+
+  // Create canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Could not create canvas context");
+  }
+
+  // Fill background
+  ctx.fillStyle = "#1a1a2e"; // Dark retro background
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  // Draw title
+  if (showTitle && title) {
+    ctx.fillStyle = foregroundColor;
+    ctx.font = "bold 16px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(title, canvasWidth / 2, 26);
+
+    // Subtitle with dimensions
+    ctx.fillStyle = labelColor;
+    ctx.font = "10px monospace";
+    ctx.fillText(
+      `${characters.length} characters, ${charWidth}x${charHeight} pixels`,
+      canvasWidth / 2,
+      38
+    );
+  }
+
+  // Draw column headers
+  ctx.fillStyle = labelColor;
+  ctx.font = "10px monospace";
+  ctx.textAlign = "center";
+  for (let col = 0; col < columns; col++) {
+    const x = rowHeaderWidth + col * cellWidth + cellWidth / 2;
+    const y = headerHeight + colHeaderHeight - 6;
+    ctx.fillText(col.toString(16).toUpperCase(), x, y);
+  }
+
+  // Draw row headers
+  ctx.textAlign = "right";
+  for (let row = 0; row < rows; row++) {
+    const x = rowHeaderWidth - 8;
+    const y = headerHeight + colHeaderHeight + row * cellHeight + cellHeight / 2;
+    const rowValue = row * columns;
+    ctx.fillText(rowValue.toString(16).toUpperCase().padStart(2, "0") + "_", x, y);
+  }
+
+  // Draw characters
+  for (let i = 0; i < characters.length; i++) {
+    const character = characters[i];
+    const col = i % columns;
+    const row = Math.floor(i / columns);
+
+    const cellX = rowHeaderWidth + col * cellWidth;
+    const cellY = headerHeight + colHeaderHeight + row * cellHeight;
+
+    // Draw cell background
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(
+      cellX + 1,
+      cellY + 1,
+      cellWidth - 2,
+      charHeight * scale + cellPadding * 2 - 2
+    );
+
+    // Draw character pixels
+    const charX = cellX + cellPadding;
+    const charY = cellY + cellPadding;
+
+    for (let py = 0; py < charHeight; py++) {
+      for (let px = 0; px < charWidth; px++) {
+        const isOn = character.pixels[py]?.[px] || false;
+        if (isOn) {
+          ctx.fillStyle = foregroundColor;
+          ctx.fillRect(charX + px * scale, charY + py * scale, scale, scale);
+        }
+      }
+    }
+
+    // Draw labels
+    ctx.fillStyle = labelColor;
+    ctx.font = "9px monospace";
+    ctx.textAlign = "center";
+
+    let labelY = cellY + cellPadding + charHeight * scale + 12;
+    const labelX = cellX + cellWidth / 2;
+
+    if (showHex) {
+      ctx.fillText(
+        "$" + i.toString(16).toUpperCase().padStart(2, "0"),
+        labelX,
+        labelY
+      );
+      labelY += 10;
+    }
+
+    if (showDecimal) {
+      ctx.fillText(i.toString(), labelX, labelY);
+      labelY += 10;
+    }
+
+    if (showAscii) {
+      const asciiLabel = getAsciiLabel(i);
+      if (asciiLabel) {
+        ctx.fillStyle = i >= 32 && i <= 126 ? foregroundColor : "#666666";
+        ctx.fillText(asciiLabel, labelX, labelY);
+      }
+    }
+  }
+
+  // Draw border
+  ctx.strokeStyle = labelColor;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(0.5, 0.5, canvasWidth - 1, canvasHeight - 1);
+
+  // Add footer with generator info
+  ctx.fillStyle = "#444444";
+  ctx.font = "8px monospace";
+  ctx.textAlign = "right";
+  ctx.fillText(
+    "Generated by RetroStack Character ROM Editor",
+    canvasWidth - 8,
+    canvasHeight - 4
+  );
 
   // Convert to blob
   return new Promise((resolve, reject) => {
