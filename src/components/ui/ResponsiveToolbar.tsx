@@ -13,14 +13,26 @@ export interface ToolbarAction {
   hideLabel?: boolean;
 }
 
+export interface ToolbarSeparator {
+  type: "separator";
+  id: string;
+}
+
+export type ToolbarItem = ToolbarAction | ToolbarSeparator;
+
+function isSeparator(item: ToolbarItem): item is ToolbarSeparator {
+  return "type" in item && item.type === "separator";
+}
+
 interface ResponsiveToolbarProps {
-  actions: ToolbarAction[];
+  actions: ToolbarItem[];
   minVisibleItems?: number;
   className?: string;
   sticky?: boolean;
 }
 
 const ITEM_WIDTH = 80; // Approximate width of each action button in pixels
+const SEPARATOR_WIDTH = 16; // Width of separator element
 const OVERFLOW_BUTTON_WIDTH = 48;
 const TOOLBAR_PADDING = 16;
 
@@ -38,16 +50,22 @@ export function ResponsiveToolbar({
 
     const containerWidth = containerRef.current.offsetWidth;
     const availableWidth = containerWidth - TOOLBAR_PADDING - OVERFLOW_BUTTON_WIDTH;
-    const maxItems = Math.floor(availableWidth / ITEM_WIDTH);
 
-    // Clamp between minVisibleItems and total actions
-    const newVisibleCount = Math.max(
-      minVisibleItems,
-      Math.min(maxItems, actions.length)
-    );
+    // Calculate total width needed for items, accounting for separators
+    let totalWidth = 0;
+    let itemCount = 0;
 
-    setVisibleCount(newVisibleCount);
-  }, [actions.length, minVisibleItems]);
+    for (const item of actions) {
+      const itemWidth = isSeparator(item) ? SEPARATOR_WIDTH : ITEM_WIDTH;
+      if (totalWidth + itemWidth > availableWidth && itemCount >= minVisibleItems) {
+        break;
+      }
+      totalWidth += itemWidth;
+      itemCount++;
+    }
+
+    setVisibleCount(Math.max(minVisibleItems, itemCount));
+  }, [actions, minVisibleItems]);
 
   useEffect(() => {
     calculateVisibleItems();
@@ -66,13 +84,16 @@ export function ResponsiveToolbar({
   const visibleActions = actions.slice(0, visibleCount);
   const overflowActions = actions.slice(visibleCount);
 
-  const overflowItems: OverflowMenuItem[] = overflowActions.map((action) => ({
-    id: action.id,
-    label: action.label,
-    icon: action.icon,
-    onClick: action.onClick,
-    disabled: action.disabled,
-  }));
+  // Filter out separators from overflow menu
+  const overflowItems: OverflowMenuItem[] = overflowActions
+    .filter((action): action is ToolbarAction => !isSeparator(action))
+    .map((action) => ({
+      id: action.id,
+      label: action.label,
+      icon: action.icon,
+      onClick: action.onClick,
+      disabled: action.disabled,
+    }));
 
   return (
     <div
@@ -89,30 +110,38 @@ export function ResponsiveToolbar({
     >
       {/* Visible Actions */}
       <div className="flex items-center gap-1 sm:gap-2">
-        {visibleActions.map((action) => (
-          <button
-            key={action.id}
-            onClick={action.onClick}
-            disabled={action.disabled}
-            className={`
-              touch-target flex items-center gap-2 px-2 sm:px-3 py-2 rounded-md
-              text-sm font-ui transition-colors
-              ${
-                action.disabled
-                  ? "text-gray-600 cursor-not-allowed"
-                  : action.active
-                  ? "text-retro-cyan bg-retro-purple/40"
-                  : "text-gray-300 hover:text-retro-cyan hover:bg-retro-purple/30"
-              }
-            `}
-            title={action.label}
-          >
-            <span className="w-5 h-5 flex-shrink-0">{action.icon}</span>
-            {!action.hideLabel && (
-              <span className="hidden sm:inline">{action.label}</span>
-            )}
-          </button>
-        ))}
+        {visibleActions.map((item) =>
+          isSeparator(item) ? (
+            <div
+              key={item.id}
+              className="h-6 w-px bg-retro-grid/50 mx-1"
+              aria-hidden="true"
+            />
+          ) : (
+            <button
+              key={item.id}
+              onClick={item.onClick}
+              disabled={item.disabled}
+              className={`
+                touch-target flex items-center gap-2 px-2 sm:px-3 py-2 rounded-md
+                text-sm font-ui transition-colors
+                ${
+                  item.disabled
+                    ? "text-gray-600 cursor-not-allowed"
+                    : item.active
+                    ? "text-retro-cyan bg-retro-purple/40"
+                    : "text-gray-300 hover:text-retro-cyan hover:bg-retro-purple/30"
+                }
+              `}
+              title={item.label}
+            >
+              <span className="w-5 h-5 flex-shrink-0">{item.icon}</span>
+              {!item.hideLabel && (
+                <span className="hidden sm:inline">{item.label}</span>
+              )}
+            </button>
+          )
+        )}
       </div>
 
       {/* Overflow Menu */}

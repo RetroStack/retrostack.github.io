@@ -26,6 +26,8 @@ export interface UseCharacterLibraryResult {
   save: (characterSet: CharacterSet) => Promise<string>;
   /** Save as a new character set with new name */
   saveAs: (characterSet: CharacterSet, newName: string) => Promise<string>;
+  /** Rename a character set */
+  rename: (id: string, newName: string) => Promise<void>;
   /** Delete a character set */
   deleteSet: (id: string) => Promise<void>;
   /** Search character sets */
@@ -139,6 +141,28 @@ export function useCharacterLibrary(): UseCharacterLibraryResult {
     }
   }, [refresh]);
 
+  // Rename character set
+  const rename = useCallback(async (id: string, newName: string): Promise<void> => {
+    try {
+      const serialized = await characterStorage.getById(id);
+      if (!serialized) {
+        throw new Error("Character set not found");
+      }
+      const updated: SerializedCharacterSet = {
+        ...serialized,
+        metadata: {
+          ...serialized.metadata,
+          name: newName,
+          updatedAt: Date.now(),
+        },
+      };
+      await characterStorage.save(updated);
+      await refresh();
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Failed to rename character set");
+    }
+  }, [refresh]);
+
   // Delete character set
   const deleteSet = useCallback(async (id: string): Promise<void> => {
     try {
@@ -184,6 +208,7 @@ export function useCharacterLibrary(): UseCharacterLibraryResult {
     getById,
     save,
     saveAs,
+    rename,
     deleteSet,
     search: searchSets,
     filterBySize,

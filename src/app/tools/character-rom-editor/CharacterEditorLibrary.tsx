@@ -29,6 +29,7 @@ export function CharacterEditorLibrary() {
     refresh,
     deleteSet,
     saveAs,
+    rename,
     availableSizes,
     getById,
   } = useCharacterLibrary();
@@ -41,6 +42,11 @@ export function CharacterEditorLibrary() {
   // Delete confirmation state
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Rename state
+  const [renameId, setRenameId] = useState<string | null>(null);
+  const [renameName, setRenameName] = useState("");
+  const [isRenaming, setIsRenaming] = useState(false);
 
   // Filter character sets
   const filteredSets = useMemo(() => {
@@ -121,6 +127,29 @@ export function CharacterEditorLibrary() {
     router.push("/tools/character-rom-editor/import");
   }, [router]);
 
+  const handleRename = useCallback((id: string) => {
+    const set = characterSets.find((s) => s.metadata.id === id);
+    if (set) {
+      setRenameId(id);
+      setRenameName(set.metadata.name);
+    }
+  }, [characterSets]);
+
+  const confirmRename = useCallback(async () => {
+    if (!renameId || !renameName.trim()) return;
+
+    try {
+      setIsRenaming(true);
+      await rename(renameId, renameName.trim());
+    } catch (e) {
+      console.error("Failed to rename:", e);
+    } finally {
+      setIsRenaming(false);
+      setRenameId(null);
+      setRenameName("");
+    }
+  }, [renameId, renameName, rename]);
+
   const handleSizeFilterChange = useCallback(
     (width: number | null, height: number | null) => {
       setWidthFilter(width);
@@ -141,6 +170,11 @@ export function CharacterEditorLibrary() {
   // Find the set being deleted for confirmation
   const setToDelete = deleteId
     ? characterSets.find((s) => s.metadata.id === deleteId)
+    : null;
+
+  // Find the set being renamed
+  const setToRename = renameId
+    ? characterSets.find((s) => s.metadata.id === renameId)
     : null;
 
   return (
@@ -212,6 +246,7 @@ export function CharacterEditorLibrary() {
               onExport={handleExport}
               onDelete={handleDelete}
               onDuplicate={handleDuplicate}
+              onRename={handleRename}
               onImport={handleImport}
             />
           )}
@@ -253,6 +288,65 @@ export function CharacterEditorLibrary() {
                 disabled={isDeleting}
               >
                 {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rename modal */}
+      {renameId && setToRename && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => {
+              setRenameId(null);
+              setRenameName("");
+            }}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-retro-navy border border-retro-grid/50 rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-200 mb-4">
+              Rename Character Set
+            </h2>
+
+            <input
+              type="text"
+              value={renameName}
+              onChange={(e) => setRenameName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && renameName.trim()) {
+                  confirmRename();
+                } else if (e.key === "Escape") {
+                  setRenameId(null);
+                  setRenameName("");
+                }
+              }}
+              className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-gray-200 text-sm focus:outline-none focus:border-retro-cyan transition-colors"
+              placeholder="Enter new name..."
+              autoFocus
+              disabled={isRenaming}
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => {
+                  setRenameId(null);
+                  setRenameName("");
+                }}
+                className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors"
+                disabled={isRenaming}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRename}
+                className="px-4 py-2 text-sm bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors disabled:opacity-50"
+                disabled={isRenaming || !renameName.trim()}
+              >
+                {isRenaming ? "Renaming..." : "Rename"}
               </button>
             </div>
           </div>

@@ -43,8 +43,18 @@ export function Header() {
                   priority
                 />
               </div>
-              <span className="font-display text-[10px] sm:text-xs lg:text-sm text-retro-pink group-hover:text-retro-cyan transition-colors duration-300">
-                {SITE_CONFIG.name}
+              <span className="font-display text-[10px] sm:text-xs lg:text-sm group-hover:opacity-80 transition-opacity duration-300 neon-pink">
+                {/* RetroStack with selective letter flicker */}
+                <span>R</span>
+                <span>e</span>
+                <span>t</span>
+                <span className="neon-flicker-fast">r</span>
+                <span>o</span>
+                <span className="neon-flicker-slow">S</span>
+                <span>t</span>
+                <span className="neon-flicker-medium">a</span>
+                <span>c</span>
+                <span>k</span>
               </span>
             </Link>
 

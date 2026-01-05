@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ToolLayout, ToolContent } from "@/components/layout/ToolLayout";
-import { ToolbarAction } from "@/components/ui/ResponsiveToolbar";
+import { ToolbarItem } from "@/components/ui/ResponsiveToolbar";
 import {
   EditorCanvas,
   EditorSidebar,
@@ -183,8 +183,9 @@ export function EditView() {
 
   useKeyboardShortcuts(shortcuts, { enabled: !showShortcutsHelp });
 
-  // Toolbar actions
-  const toolbarActions: ToolbarAction[] = [
+  // Toolbar actions with separators
+  const toolbarActions: ToolbarItem[] = [
+    // Undo/Redo group
     {
       id: "undo",
       label: "Undo",
@@ -207,6 +208,8 @@ export function EditView() {
       onClick: editor.redo,
       disabled: !editor.canRedo,
     },
+    { type: "separator", id: "sep-1" },
+    // Transform group - Rotate
     {
       id: "rotate-left",
       label: "Rotate Left",
@@ -227,6 +230,49 @@ export function EditView() {
       ),
       onClick: () => editor.rotateSelected("right"),
     },
+    // Transform group - Shift
+    {
+      id: "shift-up",
+      label: "Shift Up",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      ),
+      onClick: () => editor.shiftSelected("up"),
+    },
+    {
+      id: "shift-down",
+      label: "Shift Down",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      ),
+      onClick: () => editor.shiftSelected("down"),
+    },
+    {
+      id: "shift-left",
+      label: "Shift Left",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      ),
+      onClick: () => editor.shiftSelected("left"),
+    },
+    {
+      id: "shift-right",
+      label: "Shift Right",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      ),
+      onClick: () => editor.shiftSelected("right"),
+    },
+    { type: "separator", id: "sep-2" },
+    // Transform group - Flip/Invert
     {
       id: "flip-h",
       label: "Flip H",
@@ -257,6 +303,8 @@ export function EditView() {
       ),
       onClick: editor.invertSelected,
     },
+    { type: "separator", id: "sep-3" },
+    // File operations group
     {
       id: "save",
       label: saving ? "Saving..." : "Save",

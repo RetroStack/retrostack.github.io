@@ -22,6 +22,8 @@ export interface LibraryCardProps {
   onDelete?: () => void;
   /** Callback when duplicate is clicked */
   onDuplicate?: () => void;
+  /** Callback when rename is clicked */
+  onRename?: () => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export function LibraryCard({
   onExport,
   onDelete,
   onDuplicate,
+  onRename,
 }: LibraryCardProps) {
   const { metadata, config } = characterSet;
 
@@ -57,6 +60,14 @@ export function LibraryCard({
         id: "edit",
         label: "Edit",
         onClick: onEdit,
+      });
+    }
+
+    if (onRename && !metadata.isBuiltIn) {
+      items.push({
+        id: "rename",
+        label: "Rename",
+        onClick: onRename,
       });
     }
 
@@ -86,7 +97,7 @@ export function LibraryCard({
     }
 
     return items;
-  }, [onEdit, onExport, onDuplicate, onDelete, metadata.isBuiltIn]);
+  }, [onEdit, onRename, onExport, onDuplicate, onDelete, metadata.isBuiltIn]);
 
   return (
     <div className="card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all">
@@ -113,9 +124,9 @@ export function LibraryCard({
         <CharacterPreview
           characters={characters}
           config={config}
-          maxCharacters={32}
-          maxWidth={160}
-          maxHeight={48}
+          maxCharacters={128}
+          maxWidth={256}
+          maxHeight={128}
         />
       </div>
 

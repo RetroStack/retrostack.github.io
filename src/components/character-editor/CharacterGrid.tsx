@@ -36,6 +36,8 @@ export interface CharacterGridProps {
   className?: string;
   /** Whether characters are interactive */
   interactive?: boolean;
+  /** Scale factor for small character display (default 2) */
+  smallScale?: number;
 }
 
 /**
@@ -63,13 +65,14 @@ export function CharacterGrid({
   gap = 4,
   className = "",
   interactive = true,
+  smallScale = 2,
 }: CharacterGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { size } = useResizeObserver<HTMLDivElement>();
 
-  // Calculate character display size (1:1 scale)
-  const charWidth = config.width;
-  const charHeight = config.height;
+  // Calculate character display size (scaled)
+  const charWidth = config.width * smallScale;
+  const charHeight = config.height * smallScale;
 
   // Calculate optimal number of columns based on container width
   const columns = useMemo(() => {
@@ -113,6 +116,7 @@ export function CharacterGrid({
             key={index}
             character={character}
             mode="small"
+            smallScale={smallScale}
             selected={selectedIndex === index}
             batchSelected={batchSelection?.has(index) && selectedIndex !== index}
             onClick={() => {
@@ -135,6 +139,7 @@ export function CharacterGrid({
             width={config.width}
             height={config.height}
             mode="small"
+            smallScale={smallScale}
             onClick={onAdd}
           />
         )}
@@ -170,6 +175,7 @@ export function CharacterPreviewGrid({
   maxCharacters = 16,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
+  smallScale = 1,
   className = "",
 }: {
   characters: Character[];
@@ -177,6 +183,7 @@ export function CharacterPreviewGrid({
   maxCharacters?: number;
   foregroundColor?: string;
   backgroundColor?: string;
+  smallScale?: number;
   className?: string;
 }) {
   const displayChars = characters.slice(0, maxCharacters);
@@ -184,7 +191,7 @@ export function CharacterPreviewGrid({
 
   // Calculate columns to show roughly 4 rows
   const columns = Math.ceil(Math.sqrt(maxCharacters));
-  const charWidth = config.width;
+  const charWidth = config.width * smallScale;
 
   return (
     <div className={`relative ${className}`}>
@@ -199,6 +206,7 @@ export function CharacterPreviewGrid({
             key={index}
             character={character}
             mode="small"
+            smallScale={smallScale}
             foregroundColor={foregroundColor}
             backgroundColor={backgroundColor}
             interactive={false}
@@ -234,16 +242,18 @@ export function InteractiveCharacterGrid({
   maxColumns = 32,
   gap = 4,
   className = "",
+  smallScale = 2,
 }: CharacterGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { size } = useResizeObserver<HTMLDivElement>();
 
-  const charWidth = config.width;
+  // Calculate character display size (scaled)
+  const charWidth = config.width * smallScale;
 
   const columns = useMemo(() => {
     if (!size.width) return minColumns;
 
-    const cellWidth = charWidth + gap + 4; // Account for selection ring
+    const cellWidth = charWidth + gap + 8; // Account for selection ring
     const availableWidth = size.width - gap;
     const cols = Math.floor(availableWidth / cellWidth);
 
@@ -282,6 +292,7 @@ export function InteractiveCharacterGrid({
             <CharacterDisplay
               character={character}
               mode="small"
+              smallScale={smallScale}
               selected={selectedIndex === index}
               batchSelected={batchSelection?.has(index) && selectedIndex !== index}
               foregroundColor={foregroundColor}
@@ -298,6 +309,7 @@ export function InteractiveCharacterGrid({
             width={config.width}
             height={config.height}
             mode="small"
+            smallScale={smallScale}
             onClick={onAdd}
           />
         )}

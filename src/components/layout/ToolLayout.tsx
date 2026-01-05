@@ -2,12 +2,12 @@
 
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { ResponsiveToolbar, ToolbarAction } from "@/components/ui/ResponsiveToolbar";
+import { ResponsiveToolbar, ToolbarItem } from "@/components/ui/ResponsiveToolbar";
 
 interface ToolLayoutProps {
   title: string;
   children: React.ReactNode;
-  toolbar?: ToolbarAction[];
+  toolbar?: ToolbarItem[];
   showFooter?: boolean;
   fullHeight?: boolean;
   className?: string;

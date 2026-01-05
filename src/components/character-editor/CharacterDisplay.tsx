@@ -7,10 +7,12 @@ import { Character } from "@/lib/character-editor";
 export interface CharacterDisplayProps {
   /** Character data to display */
   character: Character;
-  /** Display mode - small (1:1) or large (scaled with grid) */
+  /** Display mode - small (scaled, no grid) or large (scaled with grid) */
   mode?: "small" | "large";
   /** Scale factor for large mode */
   scale?: number;
+  /** Scale factor for small mode (default 2 for better visibility) */
+  smallScale?: number;
   /** Whether this character is selected */
   selected?: boolean;
   /** Whether this character is in a batch selection */
@@ -54,6 +56,7 @@ export function CharacterDisplay({
   character,
   mode = "small",
   scale = 20,
+  smallScale = 2,
   selected = false,
   batchSelected = false,
   onClick,
@@ -73,7 +76,7 @@ export function CharacterDisplay({
   const isLarge = mode === "large";
 
   // Calculate actual scale based on mode
-  const actualScale = isLarge ? scale : 1;
+  const actualScale = isLarge ? scale : smallScale;
 
   // Determine border styling based on selection state
   const borderClass = useMemo(() => {
@@ -174,6 +177,7 @@ export function EmptyCharacterDisplay({
   height,
   mode = "small",
   scale = 20,
+  smallScale = 2,
   onClick,
   className = "",
 }: {
@@ -181,11 +185,12 @@ export function EmptyCharacterDisplay({
   height: number;
   mode?: "small" | "large";
   scale?: number;
+  smallScale?: number;
   onClick?: () => void;
   className?: string;
 }) {
   const isLarge = mode === "large";
-  const actualScale = isLarge ? scale : 1;
+  const actualScale = isLarge ? scale : smallScale;
   const gridThickness = 1;
 
   const pixelWidth = width * actualScale + (isLarge ? (width + 1) * gridThickness : 0);

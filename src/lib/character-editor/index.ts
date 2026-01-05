@@ -84,3 +84,23 @@ export {
   formatTimestamp,
   charactersEqual,
 } from "./utils";
+
+// Export formats
+export {
+  EXPORT_FORMATS,
+  exportToCHeader,
+  exportToAssembly,
+  exportToPng,
+  getHexPreview,
+  getBitLayoutVisualization,
+  getDefaultCHeaderOptions,
+  getDefaultAssemblyOptions,
+  getDefaultPngOptions,
+} from "./exports";
+export type {
+  ExportFormat,
+  ExportFormatInfo,
+  CHeaderOptions,
+  AssemblyOptions,
+  PngOptions,
+} from "./exports";

@@ -145,27 +145,37 @@ export function useCharacterEditor(
     [editorState, setEditorState]
   );
 
+  // Track anchor point for range selection
+  const [selectionAnchor, setSelectionAnchor] = useState<number | null>(null);
+
   // Toggle batch selection
   const toggleBatchSelection = useCallback(
     (index: number, extend: boolean) => {
       if (extend) {
-        // Shift+click: toggle in batch
-        setBatchSelection((prev) => {
-          const next = new Set(prev);
-          if (next.has(index)) {
-            next.delete(index);
-          } else {
-            next.add(index);
-          }
-          return next;
-        });
-      } else {
-        // Normal click: select single
+        // Shift+click: select range from anchor (or current selection) to clicked index
+        const anchor = selectionAnchor ?? selectedIndex;
+        const start = Math.min(anchor, index);
+        const end = Math.max(anchor, index);
+
+        // Create new selection with range
+        const rangeSelection = new Set<number>();
+        for (let i = start; i <= end; i++) {
+          rangeSelection.add(i);
+        }
+
+        // Set the clicked index as the new selected index
+        // and add everything else (except clicked) to batch
         setSelectedIndex(index);
+        rangeSelection.delete(index);
+        setBatchSelection(rangeSelection);
+      } else {
+        // Normal click: select single and set as anchor for future range selections
+        setSelectedIndex(index);
+        setSelectionAnchor(index);
         setBatchSelection(new Set());
       }
     },
-    []
+    [selectedIndex, selectionAnchor]
   );
 
   const clearBatchSelection = useCallback(() => {
@@ -404,6 +414,7 @@ export function useCharacterEditor(
         config: { ...characterSet.config },
       });
       setSelectedIndex(0);
+      setSelectionAnchor(null);
       setBatchSelection(new Set());
       setIsDirty(false);
       setLastSavedState(null);

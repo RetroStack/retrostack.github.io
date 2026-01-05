@@ -16,6 +16,8 @@ export interface LibraryGridProps {
   onDelete?: (id: string) => void;
   /** Callback when duplicate is clicked */
   onDuplicate?: (id: string) => void;
+  /** Callback when rename is clicked */
+  onRename?: (id: string) => void;
   /** Callback when import is clicked (empty state) */
   onImport?: () => void;
   /** Callback when create is clicked (empty state) */
@@ -34,6 +36,7 @@ export function LibraryGrid({
   onExport,
   onDelete,
   onDuplicate,
+  onRename,
   onImport,
   onCreate,
   className = "",
@@ -66,6 +69,7 @@ export function LibraryGrid({
           onExport={onExport ? () => onExport(characterSet.metadata.id) : undefined}
           onDelete={onDelete ? () => onDelete(characterSet.metadata.id) : undefined}
           onDuplicate={onDuplicate ? () => onDuplicate(characterSet.metadata.id) : undefined}
+          onRename={onRename ? () => onRename(characterSet.metadata.id) : undefined}
         />
       ))}
 
