@@ -143,15 +143,15 @@ export function MetadataEditModal({
             <button
               type="button"
               onClick={() => setIsPinned(!isPinned)}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-retro-cyan focus:ring-offset-2 focus:ring-offset-retro-dark ${
-                isPinned ? "bg-retro-yellow" : "bg-retro-grid/50"
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-retro-cyan focus:ring-offset-2 focus:ring-offset-retro-dark ${
+                isPinned ? "bg-retro-pink border-retro-pink" : "bg-retro-purple/50 border-retro-purple"
               }`}
               role="switch"
               aria-checked={isPinned}
             >
               <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  isPinned ? "translate-x-5" : "translate-x-0"
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out ${
+                  isPinned ? "translate-x-5 bg-white" : "translate-x-0 bg-gray-400"
                 }`}
               />
             </button>

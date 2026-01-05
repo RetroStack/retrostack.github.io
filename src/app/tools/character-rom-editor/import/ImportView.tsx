@@ -31,6 +31,31 @@ type WizardStep = 1 | 2 | 3;
 
 const STEP_LABELS = ["Upload", "Metadata", "Configure"];
 
+// Example files available for quick import
+interface ExampleFile {
+  name: string;
+  description: string;
+  path: string;
+  suggestedName: string;
+  suggestedDescription: string;
+  suggestedWidth: number;
+  suggestedHeight: number;
+  characterCount: number;
+}
+
+const EXAMPLE_FILES: ExampleFile[] = [
+  {
+    name: "Cyber",
+    description: "128 characters, 8×8 pixels",
+    path: "/examples/cyber-8x8-128.bin",
+    suggestedName: "Cyber",
+    suggestedDescription: "Cyber-style character set",
+    suggestedWidth: 8,
+    suggestedHeight: 8,
+    characterCount: 128,
+  },
+];
+
 /**
  * Import view for the Character ROM Editor - Multi-step wizard
  */
@@ -139,6 +164,40 @@ export function ImportView() {
 
   const handlePresetClick = useCallback((width: number, height: number) => {
     setConfig((prev) => ({ ...prev, width, height }));
+  }, []);
+
+  const handleLoadExample = useCallback(async (example: ExampleFile) => {
+    try {
+      setUploadError(null);
+
+      // Fetch the example file
+      const response = await fetch(example.path);
+      if (!response.ok) {
+        throw new Error(`Failed to load example file: ${response.statusText}`);
+      }
+
+      const data = await response.arrayBuffer();
+
+      // Create a File object for consistency
+      const fileName = example.path.split("/").pop() || "example.bin";
+      const exampleFile = new File([data], fileName, { type: "application/octet-stream" });
+
+      setFile(exampleFile);
+      setFileData(data);
+
+      // Pre-fill metadata
+      setName(example.suggestedName);
+      setDescription(example.suggestedDescription);
+
+      // Pre-fill config with suggested dimensions
+      setConfig((prev) => ({
+        ...prev,
+        width: example.suggestedWidth,
+        height: example.suggestedHeight,
+      }));
+    } catch (e) {
+      setUploadError(e instanceof Error ? e.message : "Failed to load example file");
+    }
   }, []);
 
   const handleSave = useCallback(
@@ -252,6 +311,76 @@ export function ImportView() {
                     <span className="text-retro-cyan">{file.name}</span>
                     <span className="mx-2">-</span>
                     <span>{formatFileSize(file.size)}</span>
+                  </div>
+                )}
+
+                {/* Example files */}
+                {EXAMPLE_FILES.length > 0 && (
+                  <div className="card-retro p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg
+                        className="w-5 h-5 text-retro-cyan"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                      <h3 className="text-sm font-medium text-gray-200">
+                        Quick Start with Example Files
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      {EXAMPLE_FILES.map((example) => (
+                        <button
+                          key={example.path}
+                          onClick={() => handleLoadExample(example)}
+                          className="w-full flex items-center gap-4 p-3 bg-retro-dark/50 border border-retro-grid/50 rounded-lg hover:border-retro-cyan hover:bg-retro-cyan/5 transition-all group"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-retro-purple/20 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              className="w-5 h-5 text-retro-purple group-hover:text-retro-cyan transition-colors"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="text-sm font-medium text-gray-200 group-hover:text-retro-cyan transition-colors">
+                              {example.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {example.description}
+                            </div>
+                          </div>
+                          <svg
+                            className="w-5 h-5 text-gray-600 group-hover:text-retro-cyan transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 

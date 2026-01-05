@@ -109,7 +109,7 @@ export function LibraryCard({
   }, [onEdit, onRename, onExport, onDuplicate, onDelete, onTogglePinned, metadata.isBuiltIn, metadata.isPinned]);
 
   return (
-    <div className={`card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all h-full ${metadata.isPinned ? "ring-1 ring-retro-yellow/50" : ""}`}>
+    <div className={`card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all h-full relative has-[[aria-expanded=true]]:z-50 ${metadata.isPinned ? "ring-1 ring-retro-yellow/50" : ""}`}>
       {/* Header with title and menu */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
