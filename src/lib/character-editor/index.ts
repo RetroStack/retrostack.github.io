@@ -70,22 +70,30 @@ export {
 
 // Manufacturers and systems
 export {
+  // Central data source
+  SYSTEMS,
+  getSystemInfo,
+  getSystemsWithRomPresets,
+  // Derived constants
   KNOWN_MANUFACTURERS,
+  SYSTEM_PRESETS,
+  SYSTEM_CHARACTER_COUNT_PRESETS,
+  DIMENSION_PRESETS,
+  CHARACTER_COUNT_PRESETS,
+  // Helper functions
   getAllManufacturers,
   getSystemsForManufacturer,
   getAllSystems,
   isKnownManufacturer,
   isKnownSystem,
-  DIMENSION_PRESETS,
   getPresetsForSystem,
   findPresetByDimensions,
-  SYSTEM_PRESETS,
   getSystemPresetsByManufacturer,
-  CHARACTER_COUNT_PRESETS,
-  SYSTEM_CHARACTER_COUNT_PRESETS,
   getSystemCharacterCountPresetsByManufacturer,
 } from "./manufacturers";
 export type {
+  CharacterRomSpec,
+  SystemInfo,
   ManufacturerSystems,
   DimensionPreset,
   SystemDimensionPreset,
