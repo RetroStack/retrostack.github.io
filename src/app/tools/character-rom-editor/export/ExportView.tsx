@@ -34,6 +34,7 @@ import {
   exportToAssembly,
   exportToPng,
   exportToReferenceSheet,
+  exportToReferenceSheetPdf,
   getHexPreview,
   getBitLayoutVisualization,
 } from "@/lib/character-editor";
@@ -155,10 +156,10 @@ export function ExportView() {
   useEffect(() => {
     if (filename) {
       // Remove existing extension and add new one
-      const baseName = filename.replace(/\.(bin|h|asm|inc|png)$/i, "");
+      const baseName = filename.replace(/\.(bin|h|asm|inc|png|pdf)$/i, "");
       const newExtension = EXPORT_FORMATS.find((f) => f.id === format)?.extension || ".bin";
-      // For reference sheet, add -reference suffix
-      if (format === "reference-sheet") {
+      // For reference sheet formats, add -reference suffix
+      if (format === "reference-sheet" || format === "reference-sheet-pdf") {
         const cleanBase = baseName.replace(/-reference$/, "");
         setFilename(cleanBase + "-reference" + newExtension);
       } else {
@@ -239,6 +240,18 @@ export function ExportView() {
           );
           if (!exportFilename.endsWith(".png")) {
             exportFilename += ".png";
+          }
+          break;
+        }
+
+        case "reference-sheet-pdf": {
+          blob = await exportToReferenceSheetPdf(
+            characterSet.characters,
+            characterSet.config,
+            referenceSheetOptions
+          );
+          if (!exportFilename.endsWith(".pdf")) {
+            exportFilename += ".pdf";
           }
           break;
         }
@@ -663,7 +676,7 @@ export function ExportView() {
                 )}
 
                 {/* Reference Sheet options */}
-                {format === "reference-sheet" && (
+                {(format === "reference-sheet" || format === "reference-sheet-pdf") && (
                   <>
                     <div>
                       <label className="block text-xs font-medium text-gray-400 mb-1">
@@ -1134,7 +1147,7 @@ export function ExportView() {
                 )}
 
                 {/* Reference Sheet preview */}
-                {format === "reference-sheet" && characterSet && (
+                {(format === "reference-sheet" || format === "reference-sheet-pdf") && characterSet && (
                   <div className="relative">
                     <div
                       className="rounded-lg p-3 max-h-[320px] overflow-hidden"

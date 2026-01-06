@@ -195,6 +195,7 @@ export {
   exportToAssembly,
   exportToPng,
   exportToReferenceSheet,
+  exportToReferenceSheetPdf,
   getHexPreview,
   getBitLayoutVisualization,
   getDefaultCHeaderOptions,

@@ -15,11 +15,12 @@ import {
   bytesPerCharacter,
 } from "./types";
 import { characterToBytes } from "./binary";
+import { jsPDF } from "jspdf";
 
 /**
  * Export format types
  */
-export type ExportFormat = "binary" | "c-header" | "assembly" | "png" | "reference-sheet";
+export type ExportFormat = "binary" | "c-header" | "assembly" | "png" | "reference-sheet" | "reference-sheet-pdf";
 
 /**
  * Export format metadata
@@ -66,10 +67,17 @@ export const EXPORT_FORMATS: ExportFormatInfo[] = [
   },
   {
     id: "reference-sheet",
-    name: "Reference Sheet",
+    name: "Reference Sheet (PNG)",
     description: "Printable reference with character codes",
     extension: ".png",
     mimeType: "image/png",
+  },
+  {
+    id: "reference-sheet-pdf",
+    name: "Reference Sheet (PDF)",
+    description: "PDF reference for printing",
+    extension: ".pdf",
+    mimeType: "application/pdf",
   },
 ];
 
@@ -474,14 +482,14 @@ function getAsciiLabel(code: number): string {
 }
 
 /**
- * Generate Reference Sheet PNG
- * Creates a printable reference with character codes
+ * Generate Reference Sheet Canvas
+ * Creates a canvas with the printable reference
  */
-export async function exportToReferenceSheet(
+function generateReferenceSheetCanvas(
   characters: Character[],
   config: CharacterSetConfig,
   options: ReferenceSheetOptions
-): Promise<Blob> {
+): HTMLCanvasElement {
   const {
     columns,
     scale,
@@ -867,6 +875,20 @@ export async function exportToReferenceSheet(
     canvas.height - 8 * resMult
   );
 
+  return canvas;
+}
+
+/**
+ * Generate Reference Sheet PNG
+ * Creates a printable reference with character codes
+ */
+export async function exportToReferenceSheet(
+  characters: Character[],
+  config: CharacterSetConfig,
+  options: ReferenceSheetOptions
+): Promise<Blob> {
+  const canvas = generateReferenceSheetCanvas(characters, config, options);
+
   // Convert to blob
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -880,6 +902,61 @@ export async function exportToReferenceSheet(
       "image/png"
     );
   });
+}
+
+/**
+ * Generate Reference Sheet PDF
+ * Creates a PDF document with the reference sheet
+ */
+export async function exportToReferenceSheetPdf(
+  characters: Character[],
+  config: CharacterSetConfig,
+  options: ReferenceSheetOptions
+): Promise<Blob> {
+  const canvas = generateReferenceSheetCanvas(characters, config, options);
+
+  // Get canvas dimensions
+  const imgWidth = canvas.width;
+  const imgHeight = canvas.height;
+
+  // Determine PDF orientation and size
+  const isLandscape = imgWidth > imgHeight;
+  const orientation = isLandscape ? "landscape" : "portrait";
+
+  // Create PDF with appropriate size
+  // Use the image aspect ratio to determine page dimensions
+  const maxWidth = isLandscape ? 297 : 210; // A4 dimensions in mm
+  const maxHeight = isLandscape ? 210 : 297;
+
+  // Calculate scale to fit image on page with margins
+  const margin = 10; // mm
+  const availableWidth = maxWidth - 2 * margin;
+  const availableHeight = maxHeight - 2 * margin;
+
+  const scaleX = availableWidth / (imgWidth / 3.78); // Convert px to mm (assuming 96 DPI)
+  const scaleY = availableHeight / (imgHeight / 3.78);
+  const pdfScale = Math.min(scaleX, scaleY, 1); // Don't scale up
+
+  const pdfWidth = (imgWidth / 3.78) * pdfScale;
+  const pdfHeight = (imgHeight / 3.78) * pdfScale;
+
+  // Center the image on the page
+  const xOffset = margin + (availableWidth - pdfWidth) / 2;
+  const yOffset = margin + (availableHeight - pdfHeight) / 2;
+
+  // Create PDF
+  const pdf = new jsPDF({
+    orientation,
+    unit: "mm",
+    format: "a4",
+  });
+
+  // Add canvas as image
+  const imgData = canvas.toDataURL("image/png");
+  pdf.addImage(imgData, "PNG", xOffset, yOffset, pdfWidth, pdfHeight);
+
+  // Return as blob
+  return pdf.output("blob");
 }
 
 /**
