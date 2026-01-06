@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { CustomColors } from "@/lib/character-editor/colorPresets";
+import { ColorPresetSelector } from "./ColorPresetSelector";
 
 export interface TextPreviewModalProps {
   /** Whether the modal is open */
@@ -12,10 +14,8 @@ export interface TextPreviewModalProps {
   characters: Character[];
   /** Character set configuration */
   config: CharacterSetConfig;
-  /** Foreground color */
-  foregroundColor?: string;
-  /** Background color */
-  backgroundColor?: string;
+  /** Colors configuration */
+  colors: CustomColors;
 }
 
 /** Sample text presets */
@@ -102,20 +102,17 @@ export function TextPreviewModal({
   onClose,
   characters,
   config,
-  foregroundColor = "#ffffff",
-  backgroundColor = "#000000",
+  colors: initialColors,
 }: TextPreviewModalProps) {
   const [text, setText] = useState(SAMPLE_TEXTS[0].text);
   const [scale, setScale] = useState(2);
-  const [customFg, setCustomFg] = useState(foregroundColor);
-  const [customBg, setCustomBg] = useState(backgroundColor);
+  const [localColors, setLocalColors] = useState<CustomColors>(initialColors);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Update colors when props change
   useEffect(() => {
-    setCustomFg(foregroundColor);
-    setCustomBg(backgroundColor);
-  }, [foregroundColor, backgroundColor]);
+    setLocalColors(initialColors);
+  }, [initialColors]);
 
   // Focus textarea on open
   useEffect(() => {
@@ -254,43 +251,6 @@ export function TextPreviewModal({
                 </div>
               </div>
 
-              {/* Colors */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-300 mb-2">Foreground</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={customFg}
-                      onChange={(e) => setCustomFg(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent"
-                    />
-                    <input
-                      type="text"
-                      value={customFg}
-                      onChange={(e) => setCustomFg(e.target.value)}
-                      className="flex-1 px-2 py-1 text-xs bg-retro-dark border border-retro-grid/30 rounded text-gray-300 font-mono"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-300 mb-2">Background</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={customBg}
-                      onChange={(e) => setCustomBg(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent"
-                    />
-                    <input
-                      type="text"
-                      value={customBg}
-                      onChange={(e) => setCustomBg(e.target.value)}
-                      className="flex-1 px-2 py-1 text-xs bg-retro-dark border border-retro-grid/30 rounded text-gray-300 font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Right side - Preview */}
@@ -298,7 +258,7 @@ export function TextPreviewModal({
               <label className="block text-sm text-gray-300 mb-2">Preview</label>
               <div
                 className="p-4 rounded border border-retro-grid/30 overflow-auto max-h-[400px]"
-                style={{ backgroundColor: customBg }}
+                style={{ backgroundColor: localColors.background }}
               >
                 {renderedLines.length === 0 || (renderedLines.length === 1 && renderedLines[0].length === 0) ? (
                   <div className="text-xs text-gray-500 italic">
@@ -317,8 +277,8 @@ export function TextPreviewModal({
                               key={charIndex}
                               character={char}
                               scale={scale}
-                              foregroundColor={customFg}
-                              backgroundColor={customBg}
+                              foregroundColor={localColors.foreground}
+                              backgroundColor={localColors.background}
                             />
                           ))
                         )}
@@ -335,19 +295,29 @@ export function TextPreviewModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t border-retro-grid/30">
-          <button
-            onClick={() => setText("")}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            Clear
-          </button>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm bg-retro-cyan/20 border border-retro-cyan rounded text-retro-cyan hover:bg-retro-cyan/30 transition-colors"
-          >
-            Close
-          </button>
+        <div className="flex items-center justify-between gap-3 p-4 border-t border-retro-grid/30">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Colors:</span>
+            <ColorPresetSelector
+              colors={localColors}
+              onColorsChange={setLocalColors}
+              dropUp
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setText("")}
+              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Clear
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm bg-retro-cyan/20 border border-retro-cyan rounded text-retro-cyan hover:bg-retro-cyan/30 transition-colors"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

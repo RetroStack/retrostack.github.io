@@ -8,7 +8,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { NeonText } from "@/components/effects/NeonText";
-import { CharacterPreview } from "@/components/character-editor";
+import { CharacterPreview, ColorPresetSelector } from "@/components/character-editor";
+import { CustomColors } from "@/lib/character-editor/colorPresets";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
   CharacterSet,
@@ -688,33 +689,24 @@ export function ExportView() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Foreground
-                        </label>
-                        <input
-                          type="color"
-                          value={pngOptions.foregroundColor}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, foregroundColor: e.target.value })
-                          }
-                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Background
-                        </label>
-                        <input
-                          type="color"
-                          value={pngOptions.backgroundColor}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, backgroundColor: e.target.value })
-                          }
-                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                        Colors
+                      </label>
+                      <ColorPresetSelector
+                        colors={{
+                          foreground: pngOptions.foregroundColor,
+                          background: pngOptions.backgroundColor,
+                          gridColor: "#333333",
+                        }}
+                        onColorsChange={(colors: CustomColors) =>
+                          setPngOptions({
+                            ...pngOptions,
+                            foregroundColor: colors.foreground,
+                            backgroundColor: colors.background,
+                          })
+                        }
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -798,33 +790,24 @@ export function ExportView() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Foreground
-                        </label>
-                        <input
-                          type="color"
-                          value={referenceSheetOptions.foregroundColor}
-                          onChange={(e) =>
-                            setReferenceSheetOptions({ ...referenceSheetOptions, foregroundColor: e.target.value })
-                          }
-                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Background
-                        </label>
-                        <input
-                          type="color"
-                          value={referenceSheetOptions.backgroundColor}
-                          onChange={(e) =>
-                            setReferenceSheetOptions({ ...referenceSheetOptions, backgroundColor: e.target.value })
-                          }
-                          className="w-full h-8 bg-retro-navy/50 border border-retro-grid/50 rounded cursor-pointer"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">
+                        Colors
+                      </label>
+                      <ColorPresetSelector
+                        colors={{
+                          foreground: referenceSheetOptions.foregroundColor,
+                          background: referenceSheetOptions.backgroundColor,
+                          gridColor: "#333333",
+                        }}
+                        onColorsChange={(colors: CustomColors) =>
+                          setReferenceSheetOptions({
+                            ...referenceSheetOptions,
+                            foregroundColor: colors.foreground,
+                            backgroundColor: colors.background,
+                          })
+                        }
+                      />
                     </div>
 
                     <div>

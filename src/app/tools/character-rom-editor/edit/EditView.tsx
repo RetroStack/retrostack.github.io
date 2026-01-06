@@ -1144,8 +1144,7 @@ export function EditView() {
         onClose={() => setShowTextPreview(false)}
         characters={editor.characters}
         config={editor.config}
-        foregroundColor={colors.foreground}
-        backgroundColor={colors.background}
+        colors={colors}
       />
 
       {/* Snapshots modal */}

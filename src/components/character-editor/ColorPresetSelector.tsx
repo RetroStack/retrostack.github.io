@@ -20,6 +20,8 @@ export interface ColorPresetSelectorProps {
   onColorsChange: (colors: CustomColors) => void;
   /** Additional CSS classes */
   className?: string;
+  /** Open dropdown upward instead of downward */
+  dropUp?: boolean;
 }
 
 /**
@@ -29,6 +31,7 @@ export function ColorPresetSelector({
   colors,
   onColorsChange,
   className = "",
+  dropUp = false,
 }: ColorPresetSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState(() => getSavedPresetId());
@@ -112,7 +115,7 @@ export function ColorPresetSelector({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-64 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl z-50 overflow-hidden">
+        <div className={`absolute right-0 w-64 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl z-50 overflow-hidden ${dropUp ? "bottom-full mb-1" : "mt-1"}`}>
           {showCustomPicker ? (
             <div className="p-3 space-y-3">
               <div className="flex items-center justify-between">
