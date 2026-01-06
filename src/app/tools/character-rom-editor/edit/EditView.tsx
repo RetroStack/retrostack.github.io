@@ -148,7 +148,7 @@ export function EditView() {
       }
       return success;
     },
-    [snapshots, editor.characters, editor.config, toast]
+    [snapshots, editor.characters, editor.config, toast],
   );
 
   // Handle snapshot restore
@@ -162,7 +162,7 @@ export function EditView() {
         toast.info("Snapshot restored");
       }
     },
-    [characterSet, editor, toast]
+    [characterSet, editor, toast],
   );
 
   // Load character set
@@ -261,7 +261,7 @@ export function EditView() {
     (newWidth: number, newHeight: number, anchor: AnchorPoint) => {
       editor.resizeCharacters(newWidth, newHeight, anchor);
     },
-    [editor]
+    [editor],
   );
 
   // Handle recovery
@@ -361,7 +361,7 @@ export function EditView() {
         toast.error("Failed to update info");
       }
     },
-    [characterSet, save, toast]
+    [characterSet, save, toast],
   );
 
   // Open Save As dialog
@@ -435,7 +435,7 @@ export function EditView() {
         showTextPreview: () => setShowTextPreview(true),
         showSnapshots: () => setShowSnapshots(true),
       }),
-    [editor, handleSave, navigatePrev, navigateNext, navigatePageUp, navigatePageDown, navigateFirst, navigateLast]
+    [editor, handleSave, navigatePrev, navigateNext, navigatePageUp, navigatePageDown, navigateFirst, navigateLast],
   );
 
   useKeyboardShortcuts(shortcuts, { enabled: !showShortcutsHelp });
@@ -494,7 +494,12 @@ export function EditView() {
       label: "Undo",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+          />
         </svg>
       ),
       onClick: editor.undo,
@@ -505,7 +510,12 @@ export function EditView() {
       label: "Redo",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"
+          />
         </svg>
       ),
       onClick: editor.redo,
@@ -518,7 +528,12 @@ export function EditView() {
       label: saving ? "Saving..." : "Save",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          />
         </svg>
       ),
       onClick: handleSave,
@@ -530,7 +545,12 @@ export function EditView() {
       label: "Save As",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m0 0V4m0 0H9m3 0v3" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m0 0V4m0 0H9m3 0v3"
+          />
         </svg>
       ),
       onClick: openSaveAsDialog,
@@ -540,7 +560,12 @@ export function EditView() {
       label: "Delete",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
         </svg>
       ),
       onClick: () => setShowDeleteConfirm(true),
@@ -552,7 +577,12 @@ export function EditView() {
       label: "Edit Info",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+          />
         </svg>
       ),
       onClick: () => setShowMetadataModal(true),
@@ -562,7 +592,12 @@ export function EditView() {
       label: "Resize",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+          />
         </svg>
       ),
       onClick: () => setShowResizeModal(true),
@@ -572,7 +607,12 @@ export function EditView() {
       label: "Import",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+          />
         </svg>
       ),
       onClick: () => setShowImportModal(true),
@@ -592,7 +632,12 @@ export function EditView() {
       label: "Export",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
       ),
       onClick: handleExport,
@@ -602,7 +647,12 @@ export function EditView() {
       label: "Share",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+          />
         </svg>
       ),
       onClick: () => setShowShare(true),
@@ -612,7 +662,12 @@ export function EditView() {
       label: "Reset",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       ),
       onClick: handleReset,
@@ -623,7 +678,12 @@ export function EditView() {
       label: `Snapshots (${snapshots.snapshots.length})`,
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+          />
         </svg>
       ),
       onClick: () => setShowSnapshots(true),
@@ -633,7 +693,12 @@ export function EditView() {
       label: `Log (${changeLog.count})`,
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
         </svg>
       ),
       onClick: () => setShowChangeLog(true),
@@ -644,7 +709,12 @@ export function EditView() {
       label: "Shortcuts (?)",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       ),
       onClick: () => setShowShortcutsHelp(true),
@@ -666,12 +736,7 @@ export function EditView() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-retro-dark">
         <div className="flex flex-col items-center gap-4 text-center">
-          <svg
-            className="w-16 h-16 text-red-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-16 h-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -695,10 +760,7 @@ export function EditView() {
   const isBatchMode = editor.batchSelection.size > 0;
 
   return (
-    <ToolLayout
-      title={characterSet?.metadata.name || "Character Editor"}
-      toolbar={toolbarActions}
-    >
+    <ToolLayout title={characterSet?.metadata.name || "Character Editor"} toolbar={toolbarActions}>
       {/* Consolidated editor header */}
       <EditorHeader
         characterSetName={characterSet?.metadata.name || "Untitled"}
@@ -766,7 +828,7 @@ export function EditView() {
           gridColor={colors.gridColor}
           zoom={zoom}
           minZoom={8}
-          maxZoom={40}
+          maxZoom={100}
           onZoomChange={setZoom}
           onPixelHover={(row, col) => setHoverCoords({ x: col, y: row })}
           onPixelLeave={() => setHoverCoords(null)}
@@ -781,9 +843,7 @@ export function EditView() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6">
-            <h2 className="text-lg font-medium text-white mb-2">
-              Recover Unsaved Changes?
-            </h2>
+            <h2 className="text-lg font-medium text-white mb-2">Recover Unsaved Changes?</h2>
             <p className="text-sm text-gray-400 mb-4">
               We found unsaved changes from a previous session. Would you like to recover them?
             </p>
@@ -952,12 +1012,7 @@ export function EditView() {
 
       {/* Character context menu */}
       {contextMenu && (
-        <CharacterContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          items={contextMenuItems}
-          onClose={hideContextMenu}
-        />
+        <CharacterContextMenu x={contextMenu.x} y={contextMenu.y} items={contextMenuItems} onClose={hideContextMenu} />
       )}
 
       {/* Save As dialog */}
@@ -1038,7 +1093,8 @@ export function EditView() {
           <div className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6">
             <h2 className="text-lg font-medium text-white mb-2">Reset to Last Saved?</h2>
             <p className="text-sm text-gray-400 mb-4">
-              This will discard all unsaved changes and restore &quot;{characterSet?.metadata.name}&quot; to its last saved state. This action cannot be undone.
+              This will discard all unsaved changes and restore &quot;{characterSet?.metadata.name}&quot; to its last
+              saved state. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
