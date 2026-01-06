@@ -230,7 +230,7 @@ export function EditorCanvas({
   return (
     <div
       ref={containerRef}
-      className={`flex items-center justify-center h-full overflow-hidden bg-black/20 ${className}`}
+      className={`flex items-center justify-center w-full h-full overflow-hidden bg-black/20 ${className}`}
       tabIndex={0}
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
