@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
-type ButtonVariant = "pink" | "cyan" | "ghost";
+type ButtonVariant = "pink" | "cyan" | "violet" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -12,6 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantStyles: Record<ButtonVariant, string> = {
   pink: "btn-neon btn-neon-pink",
   cyan: "btn-neon btn-neon-cyan",
+  violet: "btn-neon btn-neon-violet",
   ghost: "bg-transparent text-retro-cyan hover:text-retro-pink transition-colors",
 };
 

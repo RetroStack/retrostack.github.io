@@ -16,6 +16,7 @@ import {
   SizePresetDropdown,
   ImportFromImageModal,
   ImportFromFontModal,
+  ImportFromTextModal,
 } from "@/components/character-editor";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
@@ -93,6 +94,9 @@ export function ImportView() {
 
   // Font import modal state
   const [showFontImport, setShowFontImport] = useState(false);
+
+  // Text/code import modal state
+  const [showTextImport, setShowTextImport] = useState(false);
 
   // State for imported characters from image (bypasses file parsing)
   const [importedCharacters, setImportedCharacters] = useState<Character[] | null>(null);
@@ -225,6 +229,31 @@ export function ImportView() {
 
       // Close modal and go to step 2
       setShowFontImport(false);
+      setStep(2);
+    },
+    []
+  );
+
+  // Handler for text/code import completion
+  const handleTextImport = useCallback(
+    (chars: Character[], importedConfig: CharacterSetConfig) => {
+      // Store imported characters directly
+      setImportedCharacters(chars);
+
+      // Update config to match imported dimensions
+      setConfig(importedConfig);
+
+      // Create a synthetic file for display
+      const blob = new Blob([new ArrayBuffer(0)], { type: "application/octet-stream" });
+      const syntheticFile = new File([blob], "imported-from-code.bin");
+      setFile(syntheticFile);
+      setFileData(new ArrayBuffer(0));
+
+      // Set a default name
+      setName("Imported Character Set");
+
+      // Close modal and go to step 2
+      setShowTextImport(false);
       setStep(2);
     },
     []
@@ -379,7 +408,7 @@ export function ImportView() {
                 )}
 
                 {/* Alternative import options */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Import from Image option */}
                   <div className="card-retro p-4">
                     <div className="flex items-center gap-2 mb-3">
@@ -443,6 +472,39 @@ export function ImportView() {
                       className="w-full"
                     >
                       Choose Font
+                    </Button>
+                  </div>
+
+                  {/* Import from Code option */}
+                  <div className="card-retro p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg
+                        className="w-5 h-5 text-retro-violet"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        />
+                      </svg>
+                      <h3 className="text-sm font-medium text-gray-200">
+                        From Code
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Paste byte arrays from C, JS, or Assembly.
+                    </p>
+                    <Button
+                      variant="violet"
+                      size="sm"
+                      onClick={() => setShowTextImport(true)}
+                      className="w-full"
+                    >
+                      Paste Code
                     </Button>
                   </div>
                 </div>
@@ -875,6 +937,13 @@ export function ImportView() {
         isOpen={showFontImport}
         onClose={() => setShowFontImport(false)}
         onImport={handleFontImport}
+      />
+
+      {/* Text/Code Import Modal */}
+      <ImportFromTextModal
+        isOpen={showTextImport}
+        onClose={() => setShowTextImport(false)}
+        onImport={handleTextImport}
       />
     </div>
   );

@@ -128,6 +128,9 @@ export type { ImportFromImageModalProps } from "./ImportFromImageModal";
 export { ImportFromFontModal } from "./ImportFromFontModal";
 export type { ImportFromFontModalProps } from "./ImportFromFontModal";
 
+export { ImportFromTextModal } from "./ImportFromTextModal";
+export type { ImportFromTextModalProps } from "./ImportFromTextModal";
+
 export { SnapshotsModal } from "./SnapshotsModal";
 export type { SnapshotsModalProps } from "./SnapshotsModal";
 

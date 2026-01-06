@@ -341,6 +341,22 @@ body {
     0 0 40px var(--retro-cyan);
 }
 
+.btn-neon-violet {
+  background: transparent;
+  color: var(--retro-violet);
+  border: 2px solid var(--retro-violet);
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
+}
+
+.btn-neon-violet:hover {
+  background: var(--retro-violet);
+  color: var(--retro-dark);
+  box-shadow:
+    0 0 10px var(--retro-violet),
+    0 0 20px var(--retro-violet),
+    0 0 40px var(--retro-violet);
+}
+
 /* Card Styles */
 .card-retro {
   background: linear-gradient(
