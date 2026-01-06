@@ -79,21 +79,35 @@ export function Toast({ id, message, variant = "info", duration = 4000, onDismis
 
   const handleDismiss = () => {
     setIsLeaving(true);
-    setTimeout(() => onDismiss(id), 200);
+    setTimeout(() => onDismiss(id), 300);
   };
 
   const styles = variantStyles[variant];
+
+  // Enter: slide in from right + fade in
+  // Leave: fade out only (no slide) for cleaner close animation
+  const getAnimationStyles = (): React.CSSProperties => {
+    if (isLeaving) {
+      return { transform: "translateX(0) scale(0.95)", opacity: 0 };
+    }
+    if (isVisible) {
+      return { transform: "translateX(0) scale(1)", opacity: 1 };
+    }
+    return { transform: "translateX(100%) scale(1)", opacity: 0 };
+  };
 
   return (
     <div
       className={`
         flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg backdrop-blur-sm
         ${styles.bg} ${styles.border}
-        transition-all duration-200 ease-out
-        ${isVisible && !isLeaving ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
         cursor-pointer hover:scale-[1.02]
         min-w-[280px] max-w-[400px]
       `}
+      style={{
+        ...getAnimationStyles(),
+        transition: "transform 300ms ease-out, opacity 300ms ease-out",
+      }}
       onClick={handleDismiss}
       role="alert"
     >
