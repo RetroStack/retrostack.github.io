@@ -907,91 +907,99 @@ export function EditView() {
 
   return (
     <ToolLayout title={characterSet?.metadata.name || "Character Editor"} toolbar={toolbarActions}>
-      {/* Consolidated editor header */}
-      <EditorHeader
-        characterSetName={characterSet?.metadata.name || "Untitled"}
-        isDirty={editor.isDirty}
-        characterIndex={editor.selectedIndex}
-        totalCharacters={editor.characters.length}
-        batchMode={isBatchMode}
-        zoom={zoom}
-        onZoomChange={setZoom}
-        colors={colors}
-        onColorsChange={setColors}
-        onBack={handleBack}
-      />
-
-      <ToolContent
-        leftSidebar={
-          <EditorSidebar
-            characters={editor.characters}
-            config={editor.config}
-            selectedIndex={editor.selectedIndex}
-            batchSelection={editor.batchSelection}
-            onSelect={editor.toggleBatchSelection}
-            onAddCharacter={editor.addCharacter}
-            onDeleteSelected={editor.deleteSelected}
-            onSelectAll={editor.selectAll}
-            onSelectNone={() => editor.toggleBatchSelection(editor.selectedIndex, false)}
-            onContextMenu={showContextMenu}
-            foregroundColor={colors.foreground}
-            backgroundColor={colors.background}
-          />
-        }
-        leftSidebarWidth="240px"
-        rightSidebar={
-          <TransformToolbar
-            character={selectedCharacter}
-            characterWidth={editor.config.width}
-            characterHeight={editor.config.height}
-            onShift={editor.shiftSelected}
-            onRotate={editor.rotateSelected}
-            onFlipHorizontal={editor.flipSelectedHorizontal}
-            onFlipVertical={editor.flipSelectedVertical}
-            onInvert={editor.invertSelected}
-            onClear={editor.clearSelected}
-            onFill={editor.fillSelected}
-            onCenter={editor.centerSelected}
-            onScale={() => setShowScaleModal(true)}
-            onDelete={editor.deleteSelected}
-            onCopy={() => setShowCopyModal(true)}
-            disabled={!selectedCharacter}
-            className="h-full"
-          />
-        }
-        rightSidebarWidth="120px"
-        rightSidebarCollapsible={false}
-      >
-        <EditorCanvas
-          character={selectedCharacter}
-          config={editor.config}
-          onPixelToggle={editor.toggleSelectedPixel}
-          onPixelSet={editor.setSelectedPixel}
-          getPixelState={editor.getSelectedPixelState}
+      {/* Main layout wrapper - flex column to keep bottom bars at bottom */}
+      <div className="h-full flex flex-col overflow-hidden">
+        {/* Consolidated editor header - fixed height */}
+        <EditorHeader
+          characterSetName={characterSet?.metadata.name || "Untitled"}
+          isDirty={editor.isDirty}
+          characterIndex={editor.selectedIndex}
+          totalCharacters={editor.characters.length}
           batchMode={isBatchMode}
-          foregroundColor={colors.foreground}
-          backgroundColor={colors.background}
-          gridColor={colors.gridColor}
           zoom={zoom}
-          minZoom={8}
-          maxZoom={100}
           onZoomChange={setZoom}
-          onPixelHover={(row, col) => setHoverCoords({ x: col, y: row })}
-          onPixelLeave={() => setHoverCoords(null)}
+          colors={colors}
+          onColorsChange={setColors}
+          onBack={handleBack}
+          className="flex-shrink-0"
         />
-      </ToolContent>
 
-      {/* History timeline slider */}
-      <HistorySlider
-        history={editor.history}
-        currentIndex={editor.historyIndex}
-        onJump={editor.jumpToHistory}
-        canRedo={editor.canRedo}
-        totalEntries={editor.totalHistoryEntries}
-      />
+        {/* Main content area - takes remaining space */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <ToolContent
+            leftSidebar={
+              <EditorSidebar
+                characters={editor.characters}
+                config={editor.config}
+                selectedIndex={editor.selectedIndex}
+                batchSelection={editor.batchSelection}
+                onSelect={editor.toggleBatchSelection}
+                onAddCharacter={editor.addCharacter}
+                onDeleteSelected={editor.deleteSelected}
+                onSelectAll={editor.selectAll}
+                onSelectNone={() => editor.toggleBatchSelection(editor.selectedIndex, false)}
+                onContextMenu={showContextMenu}
+                foregroundColor={colors.foreground}
+                backgroundColor={colors.background}
+              />
+            }
+            leftSidebarWidth="240px"
+            rightSidebar={
+              <TransformToolbar
+                character={selectedCharacter}
+                characterWidth={editor.config.width}
+                characterHeight={editor.config.height}
+                onShift={editor.shiftSelected}
+                onRotate={editor.rotateSelected}
+                onFlipHorizontal={editor.flipSelectedHorizontal}
+                onFlipVertical={editor.flipSelectedVertical}
+                onInvert={editor.invertSelected}
+                onClear={editor.clearSelected}
+                onFill={editor.fillSelected}
+                onCenter={editor.centerSelected}
+                onScale={() => setShowScaleModal(true)}
+                onDelete={editor.deleteSelected}
+                onCopy={() => setShowCopyModal(true)}
+                disabled={!selectedCharacter}
+                className="h-full"
+              />
+            }
+            rightSidebarWidth="120px"
+            rightSidebarCollapsible={false}
+          >
+            <EditorCanvas
+              character={selectedCharacter}
+              config={editor.config}
+              onPixelToggle={editor.toggleSelectedPixel}
+              onPixelSet={editor.setSelectedPixel}
+              getPixelState={editor.getSelectedPixelState}
+              batchMode={isBatchMode}
+              foregroundColor={colors.foreground}
+              backgroundColor={colors.background}
+              gridColor={colors.gridColor}
+              zoom={zoom}
+              minZoom={8}
+              maxZoom={100}
+              onZoomChange={setZoom}
+              onPixelHover={(row, col) => setHoverCoords({ x: col, y: row })}
+              onPixelLeave={() => setHoverCoords(null)}
+            />
+          </ToolContent>
+        </div>
 
-      {/* Keyboard shortcuts footer */}
-      <EditorFooter hoverCoords={hoverCoords} />
+        {/* Fixed bottom bars */}
+        {/* History timeline slider */}
+        <HistorySlider
+          history={editor.history}
+          currentIndex={editor.historyIndex}
+          onJump={editor.jumpToHistory}
+          canRedo={editor.canRedo}
+          totalEntries={editor.totalHistoryEntries}
+        />
+
+        {/* Keyboard shortcuts footer */}
+        <EditorFooter hoverCoords={hoverCoords} />
+      </div>
 
       {/* Recovery dialog */}
       {autoSave.hasRecoveryData && (

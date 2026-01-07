@@ -24,7 +24,7 @@ export function EditorFooter({ hoverCoords, className = "" }: EditorFooterProps)
 
   return (
     <div
-      className={`flex items-center px-4 py-1.5 bg-retro-navy/50 border-t border-retro-grid/50 ${className}`}
+      className={`flex-shrink-0 flex items-center px-4 py-1.5 bg-retro-navy/50 border-t border-retro-grid/50 ${className}`}
     >
       {/* Left spacer for balance */}
       <div className="w-24 flex-shrink-0" />

@@ -125,7 +125,7 @@ export function HistorySlider<T>({
   // Don't render if no history
   if (history.length <= 1 && !canRedo) {
     return (
-      <div className="h-10 bg-retro-navy/50 border-t border-retro-grid/30 flex items-center justify-center">
+      <div className="h-10 flex-shrink-0 bg-retro-navy/50 border-t border-retro-grid/30 flex items-center justify-center">
         <span className="text-[10px] text-gray-500">No history yet</span>
       </div>
     );
@@ -136,7 +136,7 @@ export function HistorySlider<T>({
   const currentLabel = getLabel(currentIndex);
 
   return (
-    <div className="h-10 bg-retro-navy/50 border-t border-retro-grid/30 flex items-center px-4 gap-3">
+    <div className="h-10 flex-shrink-0 bg-retro-navy/50 border-t border-retro-grid/30 flex items-center px-4 gap-3">
       {/* Position counter */}
       <div className="text-[10px] text-gray-400 w-12 flex-shrink-0 font-mono">
         {currentIndex + 1}/{total}

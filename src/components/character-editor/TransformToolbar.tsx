@@ -306,7 +306,7 @@ function ToolbarButton({
  * Section divider component
  */
 function ToolbarDivider() {
-  return <div className="w-full h-px bg-retro-grid/30 my-2" />;
+  return <div className="w-full h-px bg-retro-grid/30 my-1" />;
 }
 
 /**
@@ -455,7 +455,7 @@ export function TransformToolbar({
   return (
     <div
       className={`
-        flex flex-col items-center p-2 bg-retro-navy/50 border-l border-retro-grid/30 overflow-hidden
+        flex flex-col items-center py-1 px-2 bg-retro-navy/50 border-l border-retro-grid/30 overflow-hidden
         ${className}
       `}
     >

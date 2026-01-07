@@ -99,9 +99,9 @@ export function EditorSidebar({
   );
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden ${className}`} onKeyDown={handleKeyDown}>
+    <div className={`flex flex-col ${className}`} onKeyDown={handleKeyDown}>
       {/* Header */}
-      <div className="flex-shrink-0 p-3 border-b border-retro-grid/30">
+      <div className="p-3 border-b border-retro-grid/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-300">Characters</span>
@@ -113,8 +113,8 @@ export function EditorSidebar({
         )}
       </div>
 
-      {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+      {/* Content area - scrolling handled by parent */}
+      <div>
         {/* Character set overview - collapsible */}
         <div className="border-b border-retro-grid/30">
           <CharacterSetOverview
@@ -193,7 +193,6 @@ export function EditorSidebar({
                 minColumns={8}
                 maxColumns={10}
                 gap={4}
-                className="max-h-[400px] overflow-y-auto"
                 onContextMenu={onContextMenu}
               />
             </div>

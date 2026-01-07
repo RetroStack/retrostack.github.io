@@ -800,6 +800,18 @@ body {
   }
 }
 
+/* Fixed full viewport height (for tool layouts) */
+.viewport-height {
+  height: 100vh; /* fallback */
+  height: 100dvh;
+}
+
+@supports (height: 100dvh) {
+  .viewport-height {
+    height: 100dvh;
+  }
+}
+
 /* Full height minus header */
 .full-height {
   min-height: calc(100dvh - var(--header-height));
