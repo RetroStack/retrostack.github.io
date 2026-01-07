@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { AnchorPoint } from "@/lib/character-editor/types";
-import { getAnchorPositions, getAnchorPositionLabel } from "@/lib/character-editor/presets";
+import { AnchorPositionGrid } from "./AnchorPositionGrid";
 
 export interface ResizeModalProps {
   /** Whether the modal is open */
@@ -16,9 +16,6 @@ export interface ResizeModalProps {
   /** Callback when resize is applied */
   onResize: (width: number, height: number, anchor: AnchorPoint) => void;
 }
-
-// Get anchor positions from centralized presets
-const ANCHOR_POSITIONS = getAnchorPositions();
 
 /**
  * Modal for resizing character dimensions with anchor point selection
@@ -102,40 +99,11 @@ export function ResizeModal({
 
         {/* Anchor position grid */}
         <div className="mb-6">
-          <label className="block text-sm text-gray-300 mb-2">
-            Anchor Position
-          </label>
-          <p className="text-xs text-gray-500 mb-3">
-            Select where to anchor existing content when resizing
-          </p>
-          <div className="grid grid-cols-3 gap-1 w-32 mx-auto">
-            {ANCHOR_POSITIONS.map((pos) => {
-              const isSelected = anchor === pos;
-              return (
-                <button
-                  key={pos}
-                  type="button"
-                  onClick={() => setAnchor(pos)}
-                  className={`
-                    w-10 h-10 rounded border-2 transition-all
-                    flex items-center justify-center
-                    ${isSelected
-                      ? "border-retro-cyan bg-retro-cyan/20"
-                      : "border-retro-grid/50 bg-retro-dark hover:border-retro-grid"
-                    }
-                  `}
-                  title={getAnchorPositionLabel(pos)}
-                >
-                  <div
-                    className={`
-                      w-3 h-3 rounded-sm transition-colors
-                      ${isSelected ? "bg-retro-cyan" : "bg-gray-600"}
-                    `}
-                  />
-                </button>
-              );
-            })}
-          </div>
+          <AnchorPositionGrid
+            value={anchor}
+            onChange={setAnchor}
+            description="Select where to anchor existing content when resizing"
+          />
         </div>
 
         {/* Info text - always visible with consistent height */}

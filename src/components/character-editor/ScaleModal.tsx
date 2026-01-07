@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { AnchorPoint, Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { scaleCharacter, ScaleAlgorithm } from "@/lib/character-editor/transforms";
 import { CharacterDisplay } from "./CharacterDisplay";
+import { AnchorPositionGrid } from "./AnchorPositionGrid";
 
 export interface ScaleModalProps {
   /** Whether the modal is open */
@@ -34,25 +35,6 @@ const SCALE_PRESETS = [
   { label: "3x", value: 3 },
   { label: "4x", value: 4 },
 ];
-
-// 3x3 grid of anchor positions (row by row)
-const ANCHOR_POSITIONS: AnchorPoint[] = ["tl", "tc", "tr", "ml", "mc", "mr", "bl", "bc", "br"];
-
-// Human-readable labels for anchor positions
-function getAnchorLabel(anchor: AnchorPoint): string {
-  const labels: Record<AnchorPoint, string> = {
-    tl: "Top Left",
-    tc: "Top Center",
-    tr: "Top Right",
-    ml: "Middle Left",
-    mc: "Middle Center",
-    mr: "Middle Right",
-    bl: "Bottom Left",
-    bc: "Bottom Center",
-    br: "Bottom Right",
-  };
-  return labels[anchor];
-}
 
 // Algorithm options
 const ALGORITHM_OPTIONS: { id: ScaleAlgorithm; label: string; description: string }[] = [
@@ -199,7 +181,7 @@ export function ScaleModal({
                   px-3 py-1.5 text-sm rounded border transition-all
                   ${
                     scale === preset.value
-                      ? "border-retro-cyan bg-retro-cyan/20 text-retro-cyan"
+                      ? "border-retro-pink bg-retro-pink/20 text-retro-pink"
                       : "border-retro-grid/50 bg-retro-dark text-gray-400 hover:border-retro-grid hover:text-white"
                   }
                 `}
@@ -221,7 +203,7 @@ export function ScaleModal({
                     setScale(Math.round(value * 100) / 100); // Round to 2 decimal places
                   }
                 }}
-                className="w-20 px-2 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white text-center focus:outline-none focus:border-retro-cyan"
+                className="w-20 px-2 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white text-center focus:outline-none focus:border-retro-pink"
               />
               <span className="text-xs text-gray-500">x</span>
             </div>
@@ -230,37 +212,11 @@ export function ScaleModal({
 
         {/* Anchor position grid */}
         <div className="mb-4">
-          <label className="block text-sm text-gray-300 mb-2">Anchor Position</label>
-          <p className="text-xs text-gray-500 mb-3">Select where to anchor content when scaling</p>
-          <div className="grid grid-cols-3 gap-1 w-32 mx-auto">
-            {ANCHOR_POSITIONS.map((pos) => {
-              const isSelected = anchor === pos;
-              return (
-                <button
-                  key={pos}
-                  type="button"
-                  onClick={() => setAnchor(pos)}
-                  className={`
-                    w-10 h-10 rounded border-2 transition-all
-                    flex items-center justify-center
-                    ${
-                      isSelected
-                        ? "border-retro-cyan bg-retro-cyan/20"
-                        : "border-retro-grid/50 bg-retro-dark hover:border-retro-grid"
-                    }
-                  `}
-                  title={getAnchorLabel(pos)}
-                >
-                  <div
-                    className={`
-                      w-3 h-3 rounded-sm transition-colors
-                      ${isSelected ? "bg-retro-cyan" : "bg-gray-600"}
-                    `}
-                  />
-                </button>
-              );
-            })}
-          </div>
+          <AnchorPositionGrid
+            value={anchor}
+            onChange={setAnchor}
+            description="Select where to anchor content when scaling"
+          />
         </div>
 
         {/* Algorithm selection */}
