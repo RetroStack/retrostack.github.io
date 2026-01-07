@@ -59,6 +59,8 @@ export interface CharacterSetMetadata {
   manufacturer: string;
   /** Specific system (e.g., "C64", "Apple II") */
   system: string;
+  /** Locale/region where this character set is typically used (e.g., "English", "German") */
+  locale: string;
   /** Creation timestamp */
   createdAt: number;
   /** Last update timestamp */

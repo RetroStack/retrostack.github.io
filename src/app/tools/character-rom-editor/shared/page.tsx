@@ -74,6 +74,7 @@ function SharedPageContent() {
           updatedAt: now,
           manufacturer: "",
           system: "",
+          locale: "",
           isPinned: false,
         },
         config: decodedSet.config,

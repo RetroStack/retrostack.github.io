@@ -8,7 +8,7 @@
 import { SerializedCharacterSet, generateId } from "./types";
 
 const DB_NAME = "retrostack-character-editor";
-const DB_VERSION = 3; // Bumped for isPinned field migration
+const DB_VERSION = 4; // Bumped for locale field migration
 const STORE_NAME = "character-sets";
 const FALLBACK_KEY = "retrostack-character-sets";
 
@@ -82,6 +82,7 @@ class CharacterStorage {
           store.createIndex("by-size", "sizeKey", { unique: false });
           store.createIndex("by-manufacturer", "metadata.manufacturer", { unique: false });
           store.createIndex("by-system", "metadata.system", { unique: false });
+          store.createIndex("by-locale", "metadata.locale", { unique: false });
         } else {
           // Migration from v1 to v2: add manufacturer/system indexes and fields
           if (oldVersion < 2) {
@@ -133,6 +134,31 @@ class CharacterStorage {
               }
             };
           }
+
+          // Migration from v3 to v4: add locale field and index
+          if (oldVersion < 4) {
+            const store = transaction.objectStore(STORE_NAME);
+
+            // Add locale index if it doesn't exist
+            if (!store.indexNames.contains("by-locale")) {
+              store.createIndex("by-locale", "metadata.locale", { unique: false });
+            }
+
+            // Migrate existing records to add locale field
+            const cursorRequest = store.openCursor();
+            cursorRequest.onsuccess = (e) => {
+              const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
+              if (cursor) {
+                const record = cursor.value;
+                // Add locale field if missing
+                if (record.metadata && record.metadata.locale === undefined) {
+                  record.metadata.locale = "";
+                }
+                cursor.update(record);
+                cursor.continue();
+              }
+            };
+          }
         }
       };
     });
@@ -153,13 +179,14 @@ class CharacterStorage {
       const data = localStorage.getItem(FALLBACK_KEY);
       if (!data) return [];
       const sets = JSON.parse(data) as SerializedCharacterSet[];
-      // Ensure manufacturer/system/isPinned fields exist for migrated data
+      // Ensure manufacturer/system/locale/isPinned fields exist for migrated data
       return sets.map((set) => ({
         ...set,
         metadata: {
           ...set.metadata,
           manufacturer: set.metadata.manufacturer ?? "",
           system: set.metadata.system ?? "",
+          locale: set.metadata.locale ?? "",
           isPinned: set.metadata.isPinned ?? false,
         },
       }));
@@ -364,7 +391,7 @@ class CharacterStorage {
   }
 
   /**
-   * Search character sets by name, description, source, manufacturer, or system
+   * Search character sets by name, description, source, manufacturer, system, or locale
    */
   async search(query: string): Promise<SerializedCharacterSet[]> {
     const all = await this.getAll();
@@ -376,7 +403,8 @@ class CharacterStorage {
         set.metadata.description.toLowerCase().includes(lowerQuery) ||
         set.metadata.source.toLowerCase().includes(lowerQuery) ||
         set.metadata.manufacturer.toLowerCase().includes(lowerQuery) ||
-        set.metadata.system.toLowerCase().includes(lowerQuery)
+        set.metadata.system.toLowerCase().includes(lowerQuery) ||
+        set.metadata.locale.toLowerCase().includes(lowerQuery)
     );
   }
 

@@ -11,6 +11,8 @@ export interface MetadataStepProps {
   onManufacturerChange: (manufacturer: string) => void;
   system: string;
   onSystemChange: (system: string) => void;
+  locale: string;
+  onLocaleChange: (locale: string) => void;
   source: string;
   onSourceChange: (source: string) => void;
   title?: string;
@@ -30,6 +32,8 @@ export function MetadataStep({
   onManufacturerChange,
   system,
   onSystemChange,
+  locale,
+  onLocaleChange,
   source,
   onSourceChange,
   title = "Character Set Details",
@@ -86,6 +90,24 @@ export function MetadataStep({
           onManufacturerChange={onManufacturerChange}
           onSystemChange={onSystemChange}
         />
+
+        {/* Locale */}
+        <div>
+          <label
+            htmlFor="metadata-locale"
+            className="block text-sm font-medium text-gray-300 mb-1.5"
+          >
+            Locale
+          </label>
+          <input
+            type="text"
+            id="metadata-locale"
+            value={locale}
+            onChange={(e) => onLocaleChange(e.target.value)}
+            placeholder="e.g., English, German, Japanese"
+            className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+          />
+        </div>
 
         {/* Source */}
         <div>

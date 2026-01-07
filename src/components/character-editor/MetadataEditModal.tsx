@@ -29,6 +29,7 @@ export function MetadataEditModal({
   const [source, setSource] = useState(metadata.source);
   const [manufacturer, setManufacturer] = useState(metadata.manufacturer);
   const [system, setSystem] = useState(metadata.system);
+  const [locale, setLocale] = useState(metadata.locale);
   const [isPinned, setIsPinned] = useState(metadata.isPinned ?? false);
   const [saving, setSaving] = useState(false);
 
@@ -40,6 +41,7 @@ export function MetadataEditModal({
       setSource(metadata.source);
       setManufacturer(metadata.manufacturer);
       setSystem(metadata.system);
+      setLocale(metadata.locale);
       setIsPinned(metadata.isPinned ?? false);
     }
   }, [isOpen, metadata]);
@@ -55,6 +57,7 @@ export function MetadataEditModal({
         source: source.trim() || "yourself",
         manufacturer: manufacturer,
         system: system,
+        locale: locale.trim(),
         isPinned: isPinned,
       });
       onClose();
@@ -119,6 +122,18 @@ export function MetadataEditModal({
               system={system}
               onManufacturerChange={setManufacturer}
               onSystemChange={setSystem}
+            />
+          </div>
+
+          {/* Locale */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">Locale</label>
+            <input
+              type="text"
+              value={locale}
+              onChange={(e) => setLocale(e.target.value)}
+              placeholder="e.g., English, German, Japanese"
+              className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
             />
           </div>
 

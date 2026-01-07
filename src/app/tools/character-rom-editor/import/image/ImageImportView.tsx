@@ -65,6 +65,7 @@ export function ImageImportView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
   // Saving state
@@ -235,6 +236,7 @@ export function ImageImportView() {
             source: source.trim() || "yourself",
             manufacturer: manufacturer.trim(),
             system: system.trim(),
+            locale: locale.trim(),
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -256,7 +258,7 @@ export function ImageImportView() {
         setSaving(false);
       }
     },
-    [parseResult, name, description, source, manufacturer, system, config, save, router]
+    [parseResult, name, description, source, manufacturer, system, locale, config, save, router]
   );
 
   return (
@@ -697,6 +699,8 @@ export function ImageImportView() {
                   onManufacturerChange={setManufacturer}
                   system={system}
                   onSystemChange={setSystem}
+                  locale={locale}
+                  onLocaleChange={setLocale}
                   source={source}
                   onSourceChange={setSource}
                 />

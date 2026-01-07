@@ -79,6 +79,7 @@ export function ImportView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
   // Step 3: Config state
@@ -314,6 +315,7 @@ export function ImportView() {
             source: source.trim() || "yourself",
             manufacturer: manufacturer.trim(),
             system: system.trim(),
+            locale: locale.trim(),
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -335,7 +337,7 @@ export function ImportView() {
         setSaving(false);
       }
     },
-    [fileData, name, description, source, manufacturer, system, config, characters, save, router]
+    [fileData, name, description, source, manufacturer, system, locale, config, characters, save, router]
   );
 
   return (
@@ -647,6 +649,24 @@ export function ImportView() {
                     onManufacturerChange={setManufacturer}
                     onSystemChange={setSystem}
                   />
+
+                  {/* Locale */}
+                  <div>
+                    <label
+                      htmlFor="locale"
+                      className="block text-sm font-medium text-gray-300 mb-1.5"
+                    >
+                      Locale
+                    </label>
+                    <input
+                      type="text"
+                      id="locale"
+                      value={locale}
+                      onChange={(e) => setLocale(e.target.value)}
+                      placeholder="e.g., English, German, Japanese"
+                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+                    />
+                  </div>
 
                   {/* Source */}
                   <div>

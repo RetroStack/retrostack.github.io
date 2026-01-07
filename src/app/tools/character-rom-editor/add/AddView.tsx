@@ -48,6 +48,7 @@ export function AddView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
   // Step 2: Source mode
@@ -217,6 +218,7 @@ export function AddView() {
           source: source.trim() || "yourself",
           manufacturer: manufacturer.trim(),
           system: system.trim(),
+          locale: locale.trim(),
           createdAt: now,
           updatedAt: now,
           isBuiltIn: false,
@@ -238,6 +240,7 @@ export function AddView() {
     source,
     manufacturer,
     system,
+    locale,
     config,
     sourceMode,
     selectedSource,
@@ -346,6 +349,24 @@ export function AddView() {
                     onManufacturerChange={setManufacturer}
                     onSystemChange={setSystem}
                   />
+
+                  {/* Locale */}
+                  <div>
+                    <label
+                      htmlFor="locale"
+                      className="block text-sm font-medium text-gray-300 mb-1.5"
+                    >
+                      Locale
+                    </label>
+                    <input
+                      type="text"
+                      id="locale"
+                      value={locale}
+                      onChange={(e) => setLocale(e.target.value)}
+                      placeholder="e.g., English, German, Japanese"
+                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+                    />
+                  </div>
 
                   {/* Source */}
                   <div>

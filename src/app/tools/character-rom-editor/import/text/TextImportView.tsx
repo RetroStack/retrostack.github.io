@@ -52,6 +52,7 @@ export function TextImportView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
   // Saving state
@@ -150,6 +151,7 @@ export function TextImportView() {
             source: source.trim() || "yourself",
             manufacturer: manufacturer.trim(),
             system: system.trim(),
+            locale: locale.trim(),
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -171,7 +173,7 @@ export function TextImportView() {
         setSaving(false);
       }
     },
-    [parseResult, name, description, source, manufacturer, system, save, router]
+    [parseResult, name, description, source, manufacturer, system, locale, save, router]
   );
 
   return (
@@ -422,6 +424,8 @@ Examples:
                   onManufacturerChange={setManufacturer}
                   system={system}
                   onSystemChange={setSystem}
+                  locale={locale}
+                  onLocaleChange={setLocale}
                   source={source}
                   onSourceChange={setSource}
                 />
