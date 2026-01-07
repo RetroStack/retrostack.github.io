@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
-import { Character } from "@/lib/character-editor";
+import { Character } from "@/lib/character-editor/types";
 
 export interface CopyCharacterModalProps {
   /** Whether the modal is open */

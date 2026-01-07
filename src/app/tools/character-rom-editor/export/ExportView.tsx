@@ -16,15 +16,10 @@ import {
 } from "@/components/character-editor";
 import { CustomColors } from "@/lib/character-editor/colorPresets";
 import { useCharacterLibrary } from "@/hooks/character-editor";
+import { CharacterSet, PaddingDirection, BitDirection, bytesPerCharacter } from "@/lib/character-editor/types";
+import { createDownloadBlob, downloadBlob } from "@/lib/character-editor/binary";
+import { getSuggestedFilename, formatFileSize } from "@/lib/character-editor/utils";
 import {
-  CharacterSet,
-  PaddingDirection,
-  BitDirection,
-  createDownloadBlob,
-  downloadBlob,
-  getSuggestedFilename,
-  formatFileSize,
-  bytesPerCharacter,
   EXPORT_FORMATS,
   ExportFormat,
   CHeaderOptions,
@@ -42,7 +37,7 @@ import {
   exportToReferenceSheetPdf,
   getHexPreview,
   getBitLayoutVisualization,
-} from "@/lib/character-editor";
+} from "@/lib/character-editor/exports";
 
 /**
  * Export view for the Character ROM Editor

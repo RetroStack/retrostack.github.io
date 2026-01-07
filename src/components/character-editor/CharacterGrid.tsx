@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from "react";
 import { CharacterDisplay, EmptyCharacterDisplay } from "./CharacterDisplay";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 
 export interface CharacterGridProps {

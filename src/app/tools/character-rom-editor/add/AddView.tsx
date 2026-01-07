@@ -18,15 +18,14 @@ import {
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
   CharacterSetConfig,
-  createDefaultConfig,
-  generateId,
   AnchorPoint,
   SerializedCharacterSet,
-  deserializeCharacterSet,
-  resizeCharacter,
-  getAnchorPositions,
-  getAnchorPositionLabel,
-} from "@/lib/character-editor";
+  createDefaultConfig,
+  generateId,
+} from "@/lib/character-editor/types";
+import { deserializeCharacterSet } from "@/lib/character-editor/binary";
+import { resizeCharacter } from "@/lib/character-editor/transforms";
+import { getAnchorPositions, getAnchorPositionLabel } from "@/lib/character-editor/presets";
 
 type SourceMode = "copy" | "new";
 type WizardStep = 1 | 2 | 3 | 4;

@@ -8,7 +8,7 @@ import {
   AnchorPoint,
   cloneCharacter,
   createEmptyCharacter,
-} from "@/lib/character-editor";
+} from "@/lib/character-editor/types";
 import {
   togglePixel,
   setPixel,

@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { InteractiveCharacterGrid } from "./CharacterGrid";
 import { CharacterSetOverview } from "./CharacterSetOverview";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 
 export interface EditorSidebarProps {
   /** Array of characters */

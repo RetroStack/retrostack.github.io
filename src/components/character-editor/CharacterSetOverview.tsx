@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useCallback, useState } from "react";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 
 export interface CharacterSetOverviewProps {
   /** Array of characters to display */

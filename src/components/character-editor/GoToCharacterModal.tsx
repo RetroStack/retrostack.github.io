@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor";
+import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor/ascii";
 
 export interface GoToCharacterModalProps {
   /** Whether the modal is open */

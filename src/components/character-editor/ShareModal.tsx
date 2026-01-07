@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import {
   encodeCharacterSet,
   createShareUrl,

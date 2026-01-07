@@ -3,11 +3,9 @@
 import { useMemo } from "react";
 import { CharacterPreview } from "./CharacterPreview";
 import { OverflowMenu } from "@/components/ui/OverflowMenu";
-import {
-  SerializedCharacterSet,
-  deserializeCharacterSet,
-  formatSize,
-} from "@/lib/character-editor";
+import { SerializedCharacterSet } from "@/lib/character-editor/types";
+import { deserializeCharacterSet } from "@/lib/character-editor/binary";
+import { formatSize } from "@/lib/character-editor/utils";
 
 export interface LibraryCardProps {
   /** Serialized character set data */

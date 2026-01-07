@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import {
   Snapshot,
   createSnapshot,

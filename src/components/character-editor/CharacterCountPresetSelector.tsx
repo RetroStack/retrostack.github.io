@@ -5,7 +5,7 @@ import {
   CharacterCountPresetWithExamples,
   UNIFIED_CHARACTER_COUNT_PRESETS,
 } from "@/lib/character-editor/presets";
-import { getSystemCharacterCountPresetsByManufacturer } from "@/lib/character-editor";
+import { getSystemCharacterCountPresetsByManufacturer } from "@/lib/character-editor/manufacturers";
 
 const BUTTON_WIDTH = 48; // Approximate width of a preset button
 const DROPDOWN_BUTTON_WIDTH = 56; // Width of "More" button

@@ -21,7 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CharacterDisplay } from "./CharacterDisplay";
-import { Character } from "@/lib/character-editor";
+import { Character } from "@/lib/character-editor/types";
 
 export interface ReorderModalProps {
   /** Whether the modal is open */

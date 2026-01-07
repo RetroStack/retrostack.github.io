@@ -1,7 +1,8 @@
 "use client";
 
 import { ColorPresetSelector } from "./ColorPresetSelector";
-import { CustomColors, getCharacterDisplayName, isPrintableAscii } from "@/lib/character-editor";
+import { CustomColors } from "@/lib/character-editor/colorPresets";
+import { getCharacterDisplayName, isPrintableAscii } from "@/lib/character-editor/ascii";
 import { Tooltip } from "@/components/ui/Tooltip";
 
 export interface EditorHeaderProps {

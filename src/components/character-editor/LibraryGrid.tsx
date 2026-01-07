@@ -1,7 +1,7 @@
 "use client";
 
 import { LibraryCard, LibraryCardEmpty } from "./LibraryCard";
-import { SerializedCharacterSet } from "@/lib/character-editor";
+import { SerializedCharacterSet } from "@/lib/character-editor/types";
 
 export interface LibraryGridProps {
   /** Character sets to display */

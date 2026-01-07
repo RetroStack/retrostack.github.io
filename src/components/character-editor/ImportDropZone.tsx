@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { isValidBinaryFile, formatFileSize } from "@/lib/character-editor";
+import { isValidBinaryFile, formatFileSize } from "@/lib/character-editor/utils";
 
 export interface ImportDropZoneProps {
   /** Callback when a file is selected */

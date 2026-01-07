@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { Character } from "@/lib/character-editor";
-import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor";
+import { Character } from "@/lib/character-editor/types";
+import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor/ascii";
 
 export interface AsciiMapModalProps {
   /** Whether the modal is open */

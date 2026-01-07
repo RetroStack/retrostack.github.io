@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor";
+import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/manufacturers";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 
 export interface LibraryFiltersProps {

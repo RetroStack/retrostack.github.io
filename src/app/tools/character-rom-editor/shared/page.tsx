@@ -12,9 +12,9 @@ import {
 import {
   Character,
   CharacterSetConfig,
-  generateId,
   CharacterSet,
-} from "@/lib/character-editor";
+  generateId,
+} from "@/lib/character-editor/types";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 
 interface DecodedSet {

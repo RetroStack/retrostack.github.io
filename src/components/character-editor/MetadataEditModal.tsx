@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CharacterSetMetadata } from "@/lib/character-editor";
+import { CharacterSetMetadata } from "@/lib/character-editor/types";
 import { ManufacturerSystemSelect } from "./ManufacturerSystemSelect";
 
 export interface MetadataEditModalProps {

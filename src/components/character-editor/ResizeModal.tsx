@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import {
-  AnchorPoint,
-  getAnchorPositions,
-  getAnchorPositionLabel,
-} from "@/lib/character-editor";
+import { AnchorPoint } from "@/lib/character-editor/types";
+import { getAnchorPositions, getAnchorPositionLabel } from "@/lib/character-editor/presets";
 
 export interface ResizeModalProps {
   /** Whether the modal is open */

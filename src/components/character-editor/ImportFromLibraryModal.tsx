@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { CharacterSet } from "@/lib/character-editor";
+import { CharacterSet } from "@/lib/character-editor/types";
 import { CharacterPreview } from "./CharacterPreview";
 
 export interface ImportFromLibraryModalProps {

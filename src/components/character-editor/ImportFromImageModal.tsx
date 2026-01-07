@@ -12,7 +12,7 @@ import {
   isValidImageFile,
   getSupportedImageExtensions,
 } from "@/lib/character-editor/imageImport";
-import { CharacterSetConfig, Character } from "@/lib/character-editor";
+import { CharacterSetConfig, Character } from "@/lib/character-editor/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 import { DimensionPresetSelector } from "./DimensionPresetSelector";
 

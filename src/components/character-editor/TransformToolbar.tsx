@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, ReactNode } from "react";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { Character } from "@/lib/character-editor";
+import { Character } from "@/lib/character-editor/types";
 import {
   rotateCharacter,
   shiftCharacter,

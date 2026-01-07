@@ -1,15 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  SerializedCharacterSet,
-  CharacterSet,
-  characterStorage,
-  deserializeCharacterSet,
-  serializeCharacterSet,
-  getDefaultCharacterSets,
-  generateId,
-} from "@/lib/character-editor";
+import { SerializedCharacterSet, CharacterSet, generateId } from "@/lib/character-editor/types";
+import { characterStorage } from "@/lib/character-editor/storage";
+import { deserializeCharacterSet, serializeCharacterSet } from "@/lib/character-editor/binary";
+import { getDefaultCharacterSets } from "@/lib/character-editor/defaults";
 
 export interface UseCharacterLibraryResult {
   /** All character sets in the library */

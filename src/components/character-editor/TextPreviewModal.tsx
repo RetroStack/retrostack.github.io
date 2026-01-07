@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { CustomColors } from "@/lib/character-editor/colorPresets";
 import { ColorPresetSelector } from "./ColorPresetSelector";
 

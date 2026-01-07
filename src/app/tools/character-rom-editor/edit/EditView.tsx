@@ -36,14 +36,9 @@ import {
   useChangeLog,
 } from "@/hooks/character-editor";
 import { useCharacterEditor } from "@/hooks/character-editor/useCharacterEditor";
-import {
-  CharacterSet,
-  getActiveColors,
-  CustomColors,
-  base64ToBinary,
-  parseCharacterRom,
-  AnchorPoint,
-} from "@/lib/character-editor";
+import { CharacterSet, AnchorPoint } from "@/lib/character-editor/types";
+import { getActiveColors, CustomColors } from "@/lib/character-editor/colorPresets";
+import { base64ToBinary, parseCharacterRom } from "@/lib/character-editor/binary";
 import { useToast } from "@/hooks/useToast";
 
 /**
@@ -153,7 +148,7 @@ export function EditView() {
 
   // Handle snapshot restore
   const handleSnapshotRestore = useCallback(
-    (characters: import("@/lib/character-editor").Character[]) => {
+    (characters: import("@/lib/character-editor/types").Character[]) => {
       if (characterSet) {
         editor.reset({
           ...characterSet,

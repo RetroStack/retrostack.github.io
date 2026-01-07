@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor";
+import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/manufacturers";
 
 export interface ManufacturerSystemSelectProps {
   /** Currently selected manufacturer */

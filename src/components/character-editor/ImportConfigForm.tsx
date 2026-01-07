@@ -1,11 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  CharacterSetConfig,
-  calculateCharacterCount,
-  formatFileSize,
-} from "@/lib/character-editor";
+import { CharacterSetConfig } from "@/lib/character-editor/types";
+import { calculateCharacterCount, formatFileSize } from "@/lib/character-editor/utils";
 import { DimensionPresetSelector } from "./DimensionPresetSelector";
 import { PaddingDirectionSelector } from "./PaddingDirectionSelector";
 import { BitDirectionSelector } from "./BitDirectionSelector";

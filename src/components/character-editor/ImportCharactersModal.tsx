@@ -9,10 +9,10 @@ import {
   CharacterSetConfig,
   Character,
   AnchorPoint,
-  deserializeCharacterSet,
-  resizeCharacter,
-  formatSize,
-} from "@/lib/character-editor";
+} from "@/lib/character-editor/types";
+import { deserializeCharacterSet } from "@/lib/character-editor/binary";
+import { resizeCharacter } from "@/lib/character-editor/transforms";
+import { formatSize } from "@/lib/character-editor/utils";
 
 // 3x3 anchor grid
 const ANCHOR_POSITIONS: AnchorPoint[] = [

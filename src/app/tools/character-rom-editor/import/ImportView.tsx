@@ -21,15 +21,14 @@ import {
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import {
   CharacterSetConfig,
-  createDefaultConfig,
-  parseCharacterRom,
-  generateId,
   PaddingDirection,
   BitDirection,
-  calculateCharacterCount,
-  formatFileSize,
   Character,
-} from "@/lib/character-editor";
+  createDefaultConfig,
+  generateId,
+} from "@/lib/character-editor/types";
+import { parseCharacterRom } from "@/lib/character-editor/binary";
+import { calculateCharacterCount, formatFileSize } from "@/lib/character-editor/utils";
 
 type WizardStep = 1 | 2 | 3;
 

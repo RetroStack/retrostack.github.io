@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback, useRef, useState, useEffect } from "react";
 import { CharacterDisplay } from "./CharacterDisplay";
-import { Character, CharacterSetConfig } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 
 export interface EditorCanvasProps {
   /** Character being edited */

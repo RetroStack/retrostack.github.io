@@ -9,7 +9,7 @@ import {
   parseTextToCharacters,
   getParseResultSummary,
 } from "@/lib/character-editor/textImport";
-import { CharacterSetConfig, Character } from "@/lib/character-editor";
+import { CharacterSetConfig, Character } from "@/lib/character-editor/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 import { DimensionPresetSelector } from "./DimensionPresetSelector";
 import { PaddingDirectionSelector } from "./PaddingDirectionSelector";

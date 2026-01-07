@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { Character, CharacterSetConfig, formatTimestamp } from "@/lib/character-editor";
+import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
+import { formatTimestamp } from "@/lib/character-editor/utils";
 import { Snapshot } from "@/lib/character-editor/snapshots";
 import { CharacterPreviewGrid } from "./CharacterGrid";
 

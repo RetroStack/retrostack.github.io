@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { AnchorPoint, Character, CharacterSetConfig, scaleCharacter, ScaleAlgorithm } from "@/lib/character-editor";
+import { AnchorPoint, Character, CharacterSetConfig } from "@/lib/character-editor/types";
+import { scaleCharacter, ScaleAlgorithm } from "@/lib/character-editor/transforms";
 import { CharacterDisplay } from "./CharacterDisplay";
 
 export interface ScaleModalProps {

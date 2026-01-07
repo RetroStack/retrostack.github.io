@@ -12,11 +12,8 @@ import {
   FontParseResult,
   FontParseController,
 } from "@/lib/character-editor/fontImport";
-import {
-  CharacterSetConfig,
-  Character,
-  CHARACTER_RANGE_PRESETS,
-} from "@/lib/character-editor";
+import { CharacterSetConfig, Character } from "@/lib/character-editor/types";
+import { CHARACTER_RANGE_PRESETS } from "@/lib/character-editor/presets";
 import { DimensionPresetSelector } from "./DimensionPresetSelector";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 

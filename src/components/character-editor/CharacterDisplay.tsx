@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { PixelGrid } from "./PixelGrid";
-import { Character } from "@/lib/character-editor";
+import { Character } from "@/lib/character-editor/types";
 
 export interface CharacterDisplayProps {
   /** Character data to display */
