@@ -234,7 +234,7 @@ export function CharacterCountPresetSelector({
                             px-2 py-1 text-xs rounded transition-colors
                             ${
                               isCurrentCount(systemPreset.count)
-                                ? "bg-retro-pink/20 text-retro-pink"
+                                ? "bg-retro-amber/20 text-retro-amber"
                                 : "text-gray-400 hover:bg-retro-grid/20"
                             }
                             disabled:opacity-50
