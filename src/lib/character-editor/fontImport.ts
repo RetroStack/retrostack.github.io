@@ -4,10 +4,16 @@
  * Functions for importing character sets from TTF/OTF/WOFF font files
  * using opentype.js for font parsing
  *
+ * Supports:
+ * - Web Worker rendering for non-blocking UI
+ * - Chunked main-thread fallback with requestIdleCallback
+ * - Cancellation of in-flight operations
+ *
  * Note: Requires opentype.js to be installed: npm install opentype.js
  */
 
 import { Character } from "./types";
+import type { WorkerRequest, WorkerResponse } from "./fontImportWorker";
 
 // Type definitions for opentype.js (optional dependency)
 interface OpenTypeFont {
@@ -321,4 +327,439 @@ export function getCharacterRangePreview(
   }
 
   return preview;
+}
+
+// ============================================================================
+// Web Worker-based Font Parsing
+// ============================================================================
+
+/**
+ * Singleton worker manager for font parsing
+ */
+class FontWorkerManager {
+  private worker: Worker | null = null;
+  private pendingRequests = new Map<
+    string,
+    {
+      resolve: (result: FontParseResult) => void;
+      reject: (error: Error) => void;
+      onProgress?: (processed: number, total: number) => void;
+    }
+  >();
+  private workerSupported: boolean | null = null;
+
+  /**
+   * Check if Web Workers with OffscreenCanvas are supported
+   */
+  isSupported(): boolean {
+    if (this.workerSupported !== null) {
+      return this.workerSupported;
+    }
+
+    try {
+      // Check for Worker and OffscreenCanvas support
+      this.workerSupported =
+        typeof Worker !== "undefined" &&
+        typeof OffscreenCanvas !== "undefined" &&
+        typeof window !== "undefined";
+    } catch {
+      this.workerSupported = false;
+    }
+
+    return this.workerSupported;
+  }
+
+  /**
+   * Get or create the worker instance
+   */
+  private getWorker(): Worker {
+    if (!this.worker) {
+      // Create worker from the worker file
+      this.worker = new Worker(
+        new URL("./fontImportWorker.ts", import.meta.url),
+        { type: "module" }
+      );
+
+      this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+        const message = event.data;
+        const pending = this.pendingRequests.get(message.id);
+
+        if (!pending) return;
+
+        switch (message.type) {
+          case "progress":
+            pending.onProgress?.(message.processed, message.total);
+            break;
+
+          case "result":
+            this.pendingRequests.delete(message.id);
+            pending.resolve({
+              characters: message.characters,
+              fontFamily: message.fontFamily,
+              importedCount: message.importedCount,
+              missingCount: message.missingCount,
+            });
+            break;
+
+          case "error":
+            this.pendingRequests.delete(message.id);
+            pending.reject(new Error(message.error));
+            break;
+
+          case "cancelled":
+            this.pendingRequests.delete(message.id);
+            pending.reject(new Error("Cancelled"));
+            break;
+        }
+      };
+
+      this.worker.onerror = (error) => {
+        // Reject all pending requests
+        for (const [id, pending] of this.pendingRequests) {
+          pending.reject(new Error(`Worker error: ${error.message}`));
+          this.pendingRequests.delete(id);
+        }
+        // Reset worker to force recreation on next use
+        this.worker = null;
+        this.workerSupported = false;
+      };
+    }
+
+    return this.worker;
+  }
+
+  /**
+   * Parse font using the worker
+   */
+  parse(
+    fontData: ArrayBuffer,
+    options: FontImportOptions,
+    onProgress?: (processed: number, total: number) => void
+  ): { promise: Promise<FontParseResult>; cancel: () => void } {
+    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    const promise = new Promise<FontParseResult>((resolve, reject) => {
+      this.pendingRequests.set(id, { resolve, reject, onProgress });
+
+      const worker = this.getWorker();
+      const request: WorkerRequest = {
+        type: "parse",
+        id,
+        fontData,
+        options: {
+          charWidth: options.charWidth,
+          charHeight: options.charHeight,
+          startCode: options.startCode,
+          endCode: options.endCode,
+          fontSize: options.fontSize,
+          threshold: options.threshold,
+          centerGlyphs: options.centerGlyphs,
+          baselineOffset: options.baselineOffset,
+        },
+      };
+
+      worker.postMessage(request, [fontData]);
+    });
+
+    const cancel = () => {
+      const pending = this.pendingRequests.get(id);
+      if (pending) {
+        this.pendingRequests.delete(id);
+        this.worker?.postMessage({ type: "cancel", id });
+        pending.reject(new Error("Cancelled"));
+      }
+    };
+
+    return { promise, cancel };
+  }
+
+  /**
+   * Terminate the worker
+   */
+  terminate(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+    this.pendingRequests.clear();
+  }
+}
+
+// Singleton instance
+const workerManager = new FontWorkerManager();
+
+// ============================================================================
+// Chunked Main-Thread Fallback
+// ============================================================================
+
+/**
+ * Parse font with chunked rendering on main thread
+ * Uses requestIdleCallback for non-blocking execution
+ */
+async function parseFontChunked(
+  file: File,
+  options: FontImportOptions,
+  signal: AbortSignal,
+  onProgress?: (processed: number, total: number) => void
+): Promise<FontParseResult> {
+  const font = await loadFontFile(file);
+
+  if (signal.aborted) {
+    throw new Error("Cancelled");
+  }
+
+  const fontFamily =
+    font.names?.fontFamily?.en || font.names?.fullName?.en || "Unknown Font";
+
+  const characters: Character[] = [];
+  let importedCount = 0;
+  let missingCount = 0;
+
+  const totalChars = options.endCode - options.startCode + 1;
+  const CHUNK_SIZE = 8; // Process 8 characters per idle callback
+
+  // Use requestIdleCallback if available, otherwise use setTimeout
+  const scheduleChunk = (callback: () => void): number => {
+    if (typeof requestIdleCallback !== "undefined") {
+      return requestIdleCallback(callback, { timeout: 50 });
+    }
+    return window.setTimeout(callback, 0);
+  };
+
+  const cancelChunk = (id: number): void => {
+    if (typeof cancelIdleCallback !== "undefined") {
+      cancelIdleCallback(id);
+    } else {
+      clearTimeout(id);
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    let currentCode = options.startCode;
+    let callbackId: number;
+
+    const processChunk = () => {
+      if (signal.aborted) {
+        reject(new Error("Cancelled"));
+        return;
+      }
+
+      const chunkEnd = Math.min(currentCode + CHUNK_SIZE, options.endCode + 1);
+
+      for (let code = currentCode; code < chunkEnd; code++) {
+        const char = renderGlyphToCharacter(font, code, options);
+        characters.push(char);
+
+        const hasPixels = char.pixels.some((row) => row.some((p) => p));
+        if (hasPixels) {
+          importedCount++;
+        } else if (code >= 33) {
+          missingCount++;
+        }
+      }
+
+      currentCode = chunkEnd;
+      const processed = currentCode - options.startCode;
+      onProgress?.(processed, totalChars);
+
+      if (currentCode <= options.endCode) {
+        callbackId = scheduleChunk(processChunk);
+      } else {
+        resolve({
+          characters,
+          fontFamily,
+          importedCount,
+          missingCount,
+        });
+      }
+    };
+
+    // Start processing
+    callbackId = scheduleChunk(processChunk);
+
+    // Handle abort
+    signal.addEventListener("abort", () => {
+      cancelChunk(callbackId);
+      reject(new Error("Cancelled"));
+    });
+  });
+}
+
+// ============================================================================
+// Font Parse Controller (Main API)
+// ============================================================================
+
+/**
+ * Controller for managing font parsing with cancellation support
+ */
+export class FontParseController {
+  private abortController: AbortController | null = null;
+  private workerCancel: (() => void) | null = null;
+  private cancelled = false;
+  private fileReader: FileReader | null = null;
+
+  /**
+   * Parse a font file with cancellation support
+   * Automatically uses Web Worker if available, falls back to chunked main-thread
+   */
+  async parse(
+    file: File,
+    options: FontImportOptions,
+    onProgress?: (processed: number, total: number) => void
+  ): Promise<FontParseResult> {
+    // Reset cancelled state for new parse
+    this.cancelled = false;
+
+    // Try worker-based parsing first
+    if (workerManager.isSupported()) {
+      try {
+        const arrayBuffer = await this.readFileAsArrayBuffer(file);
+
+        // Check if cancelled during file read
+        if (this.cancelled) {
+          throw new Error("Cancelled");
+        }
+
+        const { promise, cancel } = workerManager.parse(
+          arrayBuffer,
+          options,
+          onProgress
+        );
+        this.workerCancel = cancel;
+
+        const result = await promise;
+        this.workerCancel = null;
+        return result;
+      } catch (error) {
+        // If worker fails (not cancelled), fall back to main thread
+        if (error instanceof Error && error.message !== "Cancelled") {
+          console.warn("Worker parsing failed, falling back to main thread:", error);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Check if cancelled before starting fallback
+    if (this.cancelled) {
+      throw new Error("Cancelled");
+    }
+
+    // Fall back to chunked main-thread parsing
+    this.abortController = new AbortController();
+    const result = await parseFontChunked(
+      file,
+      options,
+      this.abortController.signal,
+      onProgress
+    );
+    this.abortController = null;
+    return result;
+  }
+
+  /**
+   * Cancel any in-progress parsing operation
+   */
+  cancel(): void {
+    this.cancelled = true;
+
+    // Cancel file reading if in progress
+    if (this.fileReader) {
+      this.fileReader.abort();
+      this.fileReader = null;
+    }
+
+    if (this.workerCancel) {
+      this.workerCancel();
+      this.workerCancel = null;
+    }
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * Check if this controller has been cancelled
+   */
+  isCancelled(): boolean {
+    return this.cancelled;
+  }
+
+  /**
+   * Check if an operation is currently in progress
+   */
+  isActive(): boolean {
+    return (
+      this.fileReader !== null ||
+      this.workerCancel !== null ||
+      this.abortController !== null
+    );
+  }
+
+  /**
+   * Read file as ArrayBuffer with cancellation support
+   */
+  private readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      // Check if already cancelled
+      if (this.cancelled) {
+        reject(new Error("Cancelled"));
+        return;
+      }
+
+      const reader = new FileReader();
+      this.fileReader = reader;
+
+      reader.onload = (e) => {
+        this.fileReader = null;
+        if (this.cancelled) {
+          reject(new Error("Cancelled"));
+        } else {
+          resolve(e.target?.result as ArrayBuffer);
+        }
+      };
+
+      reader.onerror = () => {
+        this.fileReader = null;
+        reject(new Error("Failed to read file"));
+      };
+
+      reader.onabort = () => {
+        this.fileReader = null;
+        reject(new Error("Cancelled"));
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  }
+}
+
+/**
+ * Create a debounced version of a function
+ */
+export function debounce<T extends (...args: Parameters<T>) => void>(
+  fn: T,
+  delay: number
+): { call: (...args: Parameters<T>) => void; cancel: () => void } {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const call = (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args);
+      timeoutId = null;
+    }, delay);
+  };
+
+  const cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
+
+  return { call, cancel };
 }

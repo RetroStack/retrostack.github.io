@@ -6,12 +6,12 @@ import { CharacterPreview } from "./CharacterPreview";
 import {
   FontImportOptions,
   getDefaultFontImportOptions,
-  parseFontToCharacters,
   isValidFontFile,
   getSupportedFontExtensions,
   CHARACTER_RANGES,
   getCharacterRangePreview,
   FontParseResult,
+  FontParseController,
 } from "@/lib/character-editor/fontImport";
 import { CharacterSetConfig, Character } from "@/lib/character-editor";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
@@ -28,6 +28,9 @@ export interface ImportFromFontModalProps {
 /**
  * Modal for importing characters from a TTF/OTF/WOFF font file
  */
+// Debounce delay for option changes (ms)
+const DEBOUNCE_DELAY = 200;
+
 export function ImportFromFontModal({
   isOpen,
   onClose,
@@ -36,11 +39,16 @@ export function ImportFromFontModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { ref: previewContainerRef, size: previewSize } = useResizeObserver<HTMLDivElement>();
 
+  // Font parse controller for cancellation support
+  const parseControllerRef = useRef<FontParseController | null>(null);
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // File state
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [parseResult, setParseResult] = useState<FontParseResult | null>(null);
+  const [progress, setProgress] = useState<{ processed: number; total: number } | null>(null);
 
   // Import options
   const [options, setOptions] = useState<FontImportOptions>(
@@ -89,31 +97,72 @@ export function ImportFromFontModal({
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
+      // Cancel any pending debounce
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
+      }
+      // Cancel any in-progress parsing
+      parseControllerRef.current?.cancel();
+
       setFile(null);
       setError(null);
       setParseResult(null);
+      setProgress(null);
       setOptions(getDefaultFontImportOptions());
     }
   }, [isOpen]);
 
-  // Parse font when file or options change
+  // Parse font when file or options change (with debouncing)
   useEffect(() => {
     if (!file) return;
 
-    let cancelled = false;
+    // Cancel any pending debounce
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
 
-    const parseFont = async () => {
-      setLoading(true);
-      setError(null);
+    // Cancel any in-progress parsing
+    parseControllerRef.current?.cancel();
 
-      try {
-        const result = await parseFontToCharacters(file, options);
-        if (!cancelled) {
-          setParseResult(result);
-        }
-      } catch (e) {
-        if (!cancelled) {
+    // Debounce the parsing to avoid rapid re-parses when dragging sliders
+    debounceTimeoutRef.current = setTimeout(() => {
+      const parseFont = async () => {
+        // Create a new controller for this parse operation
+        const controller = new FontParseController();
+        parseControllerRef.current = controller;
+
+        setLoading(true);
+        setError(null);
+        setProgress(null);
+
+        try {
+          const result = await controller.parse(file, options, (processed, total) => {
+            // Only update progress if not cancelled
+            if (!controller.isCancelled()) {
+              setProgress({ processed, total });
+            }
+          });
+
+          // Only update state if not cancelled
+          if (!controller.isCancelled()) {
+            setParseResult(result);
+            setProgress(null);
+            setLoading(false);
+          }
+        } catch (e) {
+          // Ignore if cancelled
+          if (controller.isCancelled()) {
+            return;
+          }
+
           const message = e instanceof Error ? e.message : "Failed to parse font";
+
+          // Ignore cancellation errors (belt and suspenders)
+          if (message === "Cancelled") {
+            return;
+          }
+
           // Check if it's a missing dependency error
           if (message.includes("opentype") || message.includes("Cannot find module")) {
             setError(
@@ -123,18 +172,21 @@ export function ImportFromFontModal({
             setError(message);
           }
           setParseResult(null);
-        }
-      } finally {
-        if (!cancelled) {
+          setProgress(null);
           setLoading(false);
         }
-      }
-    };
+      };
 
-    parseFont();
+      parseFont();
+    }, DEBOUNCE_DELAY);
 
     return () => {
-      cancelled = true;
+      // Cleanup: cancel debounce and parsing on unmount or dependency change
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
+      }
+      parseControllerRef.current?.cancel();
     };
   }, [file, options]);
 
@@ -548,7 +600,19 @@ export function ImportFromFontModal({
                   ) : loading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <div className="w-10 h-10 border-2 border-retro-cyan border-t-transparent rounded-full animate-spin mb-3" />
-                      <p className="text-sm text-gray-400">Rendering font...</p>
+                      <p className="text-sm text-gray-400">
+                        {progress
+                          ? `Rendering ${progress.processed} of ${progress.total} characters...`
+                          : "Preparing font..."}
+                      </p>
+                      {progress && (
+                        <div className="w-48 h-1 bg-retro-navy/50 rounded-full mt-2 overflow-hidden">
+                          <div
+                            className="h-full bg-retro-cyan transition-all duration-150"
+                            style={{ width: `${(progress.processed / progress.total) * 100}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
                   ) : parseResult && parseResult.characters.length > 0 ? (
                     <div

@@ -23,28 +23,30 @@ export interface ImportFromTextModalProps {
 
 /** Preset dimension options */
 const DIMENSION_PRESETS = [
+  { width: 5, height: 8, label: "5x8" },
   { width: 8, height: 8, label: "8x8" },
+  { width: 5, height: 10, label: "5x10" },
+  { width: 6, height: 10, label: "6x10" },
+  { width: 5, height: 12, label: "5x12" },
+  { width: 7, height: 12, label: "7x12" },
+  { width: 8, height: 12, label: "8x12" },
+  { width: 5, height: 16, label: "5x16" },
   { width: 8, height: 16, label: "8x16" },
   { width: 16, height: 16, label: "16x16" },
+  { width: 32, height: 32, label: "32x32" },
 ];
 
 /**
  * Modal for importing characters from pasted text/code
  */
-export function ImportFromTextModal({
-  isOpen,
-  onClose,
-  onImport,
-}: ImportFromTextModalProps) {
+export function ImportFromTextModal({ isOpen, onClose, onImport }: ImportFromTextModalProps) {
   const { ref: previewContainerRef, size: previewSize } = useResizeObserver<HTMLDivElement>();
 
   // Text input state
   const [textInput, setTextInput] = useState("");
 
   // Import options
-  const [options, setOptions] = useState<TextImportOptions>(
-    getDefaultTextImportOptions()
-  );
+  const [options, setOptions] = useState<TextImportOptions>(getDefaultTextImportOptions());
 
   // Parse result (memoized to update on text/options change)
   const parseResult = useMemo(() => {
@@ -99,12 +101,9 @@ export function ImportFromTextModal({
   }, [parseResult, onImport, onClose]);
 
   // Update option handlers
-  const updateOption = useCallback(
-    <K extends keyof TextImportOptions>(key: K, value: TextImportOptions[K]) => {
-      setOptions((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
+  const updateOption = useCallback(<K extends keyof TextImportOptions>(key: K, value: TextImportOptions[K]) => {
+    setOptions((prev) => ({ ...prev, [key]: value }));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -114,22 +113,14 @@ export function ImportFromTextModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-retro-dark border border-retro-grid/50 rounded-lg shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-retro-grid/30">
-          <h2 className="text-lg font-display text-gray-200">
-            Import from Code
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 text-gray-500 hover:text-gray-300 transition-colors"
-          >
+          <h2 className="text-lg font-display text-gray-200">Import from Code</h2>
+          <button onClick={onClose} className="p-1 text-gray-500 hover:text-gray-300 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -143,9 +134,7 @@ export function ImportFromTextModal({
             <div className="space-y-4 lg:w-80 lg:flex-shrink-0">
               {/* Text input */}
               <div className="card-retro p-4 space-y-3">
-                <label className="block text-sm font-medium text-gray-300">
-                  Paste Byte Data
-                </label>
+                <label className="block text-sm font-medium text-gray-300">Paste Byte Data</label>
                 <textarea
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
@@ -173,9 +162,7 @@ Examples:
 
                 {/* Dimension presets */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-2">
-                    Character Size
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-2">Character Size</label>
                   <div className="flex flex-wrap gap-2">
                     {DIMENSION_PRESETS.map((preset) => (
                       <button
@@ -203,7 +190,9 @@ Examples:
                       className={`
                         px-3 py-1.5 text-xs rounded border transition-colors
                         ${
-                          !DIMENSION_PRESETS.some(p => p.width === options.charWidth && p.height === options.charHeight)
+                          !DIMENSION_PRESETS.some(
+                            (p) => p.width === options.charWidth && p.height === options.charHeight,
+                          )
                             ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
                             : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
                         }
@@ -217,9 +206,7 @@ Examples:
                 {/* Manual dimensions */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      Width
-                    </label>
+                    <label className="block text-xs text-gray-500 mb-1">Width</label>
                     <input
                       type="number"
                       min={1}
@@ -230,9 +217,7 @@ Examples:
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      Height
-                    </label>
+                    <label className="block text-xs text-gray-500 mb-1">Height</label>
                     <input
                       type="number"
                       min={1}
@@ -246,9 +231,7 @@ Examples:
 
                 {/* Padding direction */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-2">
-                    Padding Direction
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-2">Padding Direction</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => updateOption("padding", "right")}
@@ -281,9 +264,7 @@ Examples:
 
                 {/* Bit direction */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-2">
-                    Bit Direction
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-2">Bit Direction</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => updateOption("bitDirection", "ltr")}
@@ -317,11 +298,19 @@ Examples:
 
               {/* Tips */}
               <div className="text-xs text-gray-500 space-y-1">
-                <p><strong>Supported formats:</strong></p>
+                <p>
+                  <strong>Supported formats:</strong>
+                </p>
                 <ul className="list-disc list-inside space-y-0.5 text-gray-600">
-                  <li>Hex: <code className="text-retro-cyan">0x00</code>, <code className="text-retro-cyan">$FF</code></li>
-                  <li>Decimal: <code className="text-retro-cyan">0</code>, <code className="text-retro-cyan">255</code></li>
-                  <li>Binary: <code className="text-retro-cyan">0b00000000</code></li>
+                  <li>
+                    Hex: <code className="text-retro-cyan">0x00</code>, <code className="text-retro-cyan">$FF</code>
+                  </li>
+                  <li>
+                    Decimal: <code className="text-retro-cyan">0</code>, <code className="text-retro-cyan">255</code>
+                  </li>
+                  <li>
+                    Binary: <code className="text-retro-cyan">0b00000000</code>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -363,12 +352,15 @@ Examples:
                     className="flex-1 flex flex-col items-center justify-center text-center text-gray-500"
                   >
                     <svg className="w-12 h-12 mb-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                     <p className="text-sm">
-                      {hasText && parseResult?.error
-                        ? parseResult.error
-                        : "Paste byte data to preview characters"}
+                      {hasText && parseResult?.error ? parseResult.error : "Paste byte data to preview characters"}
                     </p>
                   </div>
                 )}
@@ -379,9 +371,7 @@ Examples:
                   <p>
                     Characters will be imported at {options.charWidth}x{options.charHeight} pixels.
                   </p>
-                  <p>
-                    If characters look wrong, try changing the bit direction or padding.
-                  </p>
+                  <p>If characters look wrong, try changing the bit direction or padding.</p>
                 </div>
               )}
             </div>
@@ -393,11 +383,7 @@ Examples:
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            variant="cyan"
-            onClick={handleImport}
-            disabled={!hasCharacters}
-          >
+          <Button variant="cyan" onClick={handleImport} disabled={!hasCharacters}>
             Import {parseResult?.characters.length || 0} Characters
           </Button>
         </div>
