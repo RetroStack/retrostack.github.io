@@ -236,6 +236,7 @@ export function ImageImportView() {
             source: source.trim() || "yourself",
             manufacturer: manufacturer.trim(),
             system: system.trim(),
+            chip: "",
             locale: locale.trim(),
             createdAt: now,
             updatedAt: now,

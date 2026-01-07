@@ -34,6 +34,12 @@ export interface LibraryFiltersProps {
   onManufacturerFilterChange?: (manufacturers: string[]) => void;
   /** Callback when system filters change */
   onSystemFilterChange?: (systems: string[]) => void;
+  /** Available chips from library */
+  availableChips?: string[];
+  /** Current chip filters (multi-select) */
+  chipFilters?: string[];
+  /** Callback when chip filters change */
+  onChipFilterChange?: (chips: string[]) => void;
   /** Available locales from library */
   availableLocales?: string[];
   /** Current locale filters (multi-select) */
@@ -65,6 +71,9 @@ export function LibraryFilters({
   systemFilters = [],
   onManufacturerFilterChange,
   onSystemFilterChange,
+  availableChips = [],
+  chipFilters = [],
+  onChipFilterChange,
   availableLocales = [],
   localeFilters = [],
   onLocaleFilterChange,
@@ -97,8 +106,9 @@ export function LibraryFilters({
     onCharacterCountFilterChange?.([]);
     onManufacturerFilterChange?.([]);
     onSystemFilterChange?.([]);
+    onChipFilterChange?.([]);
     onLocaleFilterChange?.([]);
-  }, [onSearchChange, onSizeFilterChange, onCharacterCountFilterChange, onManufacturerFilterChange, onSystemFilterChange, onLocaleFilterChange]);
+  }, [onSearchChange, onSizeFilterChange, onCharacterCountFilterChange, onManufacturerFilterChange, onSystemFilterChange, onChipFilterChange, onLocaleFilterChange]);
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
@@ -107,6 +117,7 @@ export function LibraryFilters({
     characterCountFilters.length > 0 ||
     manufacturerFilters.length > 0 ||
     systemFilters.length > 0 ||
+    chipFilters.length > 0 ||
     localeFilters.length > 0;
 
   return (
@@ -155,7 +166,7 @@ export function LibraryFilters({
         </div>
 
       {/* Filter dropdowns */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
         {/* Width filter */}
         <MultiSelectDropdown
           label="Width"
@@ -209,6 +220,18 @@ export function LibraryFilters({
             onChange={onSystemFilterChange}
             placeholder="System"
             allOptionLabel="Any system"
+          />
+        )}
+
+        {/* Chip filter */}
+        {onChipFilterChange && (
+          <MultiSelectDropdown
+            label="Chip"
+            options={availableChips.map((c) => ({ value: c, label: c }))}
+            selected={chipFilters}
+            onChange={onChipFilterChange}
+            placeholder="Chip"
+            allOptionLabel="Any chip"
           />
         )}
 

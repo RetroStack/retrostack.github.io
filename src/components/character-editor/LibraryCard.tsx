@@ -123,10 +123,12 @@ export function LibraryCard({
             )}
             {metadata.name}
           </h3>
-          {(metadata.manufacturer || metadata.system || metadata.locale) && (
+          {(metadata.manufacturer || metadata.system || metadata.chip || metadata.locale) && (
             <p className="text-[10px] text-gray-500 mt-0.5">
               {metadata.manufacturer}{metadata.manufacturer && metadata.system ? " " : ""}{metadata.system}
-              {metadata.locale && (metadata.manufacturer || metadata.system) ? " · " : ""}
+              {metadata.chip && (metadata.manufacturer || metadata.system) ? " · " : ""}
+              {metadata.chip}
+              {metadata.locale && (metadata.manufacturer || metadata.system || metadata.chip) ? " · " : ""}
               {metadata.locale}
             </p>
           )}

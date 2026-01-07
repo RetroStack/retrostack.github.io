@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CharacterSetMetadata } from "@/lib/character-editor/types";
 import { ManufacturerSystemSelect } from "./ManufacturerSystemSelect";
+import { ROM_CHIPS, getRomChipsForSystem } from "@/lib/character-editor/manufacturers";
 
 export interface MetadataEditModalProps {
   /** Whether the modal is open */
@@ -29,9 +30,22 @@ export function MetadataEditModal({
   const [source, setSource] = useState(metadata.source);
   const [manufacturer, setManufacturer] = useState(metadata.manufacturer);
   const [system, setSystem] = useState(metadata.system);
+  const [chip, setChip] = useState(metadata.chip);
   const [locale, setLocale] = useState(metadata.locale);
   const [isPinned, setIsPinned] = useState(metadata.isPinned ?? false);
   const [saving, setSaving] = useState(false);
+
+  // Get available chips based on selected system
+  const availableChips = useMemo(() => {
+    if (system) {
+      const systemChips = getRomChipsForSystem(system);
+      if (systemChips.length > 0) {
+        return systemChips;
+      }
+    }
+    // Fall back to all chips if no system selected or system has no specific chips
+    return ROM_CHIPS;
+  }, [system]);
 
   // Reset form when modal opens with new metadata
   useEffect(() => {
@@ -41,6 +55,7 @@ export function MetadataEditModal({
       setSource(metadata.source);
       setManufacturer(metadata.manufacturer);
       setSystem(metadata.system);
+      setChip(metadata.chip);
       setLocale(metadata.locale);
       setIsPinned(metadata.isPinned ?? false);
     }
@@ -57,6 +72,7 @@ export function MetadataEditModal({
         source: source.trim() || "yourself",
         manufacturer: manufacturer,
         system: system,
+        chip: chip,
         locale: locale.trim(),
         isPinned: isPinned,
       });
@@ -123,6 +139,28 @@ export function MetadataEditModal({
               onManufacturerChange={setManufacturer}
               onSystemChange={setSystem}
             />
+          </div>
+
+          {/* Chip */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">ROM Chip (IC)</label>
+            <select
+              value={chip}
+              onChange={(e) => setChip(e.target.value)}
+              className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
+            >
+              <option value="">Select a chip...</option>
+              {availableChips.map((c) => (
+                <option key={c.id} value={c.partNumber}>
+                  {c.partNumber} ({c.manufacturer})
+                </option>
+              ))}
+            </select>
+            {system && availableChips.length < ROM_CHIPS.length && (
+              <p className="text-[10px] text-gray-500 mt-1">
+                Showing chips compatible with {system}
+              </p>
+            )}
           </div>
 
           {/* Locale */}

@@ -59,6 +59,8 @@ export interface CharacterSetMetadata {
   manufacturer: string;
   /** Specific system (e.g., "C64", "Apple II") */
   system: string;
+  /** Character ROM IC chip used (e.g., "901225-01", "2513") */
+  chip: string;
   /** Locale/region where this character set is typically used (e.g., "English", "German") */
   locale: string;
   /** Creation timestamp */
@@ -142,6 +144,8 @@ export interface LibraryFilter {
   manufacturerFilters: string[];
   /** Multi-select filter for systems (OR logic) */
   systemFilters: string[];
+  /** Multi-select filter for chips (OR logic) */
+  chipFilters: string[];
   /** Multi-select filter for locales (OR logic) */
   localeFilters: string[];
 }

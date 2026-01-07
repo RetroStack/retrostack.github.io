@@ -214,6 +214,12 @@ function CharacterSetListItem({
               <span className="truncate">{meta.system}</span>
             </>
           )}
+          {meta.chip && (
+            <>
+              <span>·</span>
+              <span className="truncate">{meta.chip}</span>
+            </>
+          )}
         </div>
       </div>
 

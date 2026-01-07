@@ -53,6 +53,7 @@ export function CharacterEditorLibrary() {
   const [characterCountFilters, setCharacterCountFilters] = useState<number[]>([]);
   const [manufacturerFilters, setManufacturerFilters] = useState<string[]>([]);
   const [systemFilters, setSystemFilters] = useState<string[]>([]);
+  const [chipFilters, setChipFilters] = useState<string[]>([]);
   const [localeFilters, setLocaleFilters] = useState<string[]>([]);
 
   // Get available manufacturers and systems from character sets
@@ -75,6 +76,14 @@ export function CharacterEditorLibrary() {
     });
     return Array.from(systems).sort();
   }, [characterSets, manufacturerFilters]);
+
+  const availableChips = useMemo(() => {
+    const chips = new Set<string>();
+    characterSets.forEach((set) => {
+      if (set.metadata.chip) chips.add(set.metadata.chip);
+    });
+    return Array.from(chips).sort();
+  }, [characterSets]);
 
   const availableLocales = useMemo(() => {
     const locales = new Set<string>();
@@ -140,6 +149,13 @@ export function CharacterEditorLibrary() {
       );
     }
 
+    // Apply chip filter (OR logic)
+    if (chipFilters.length > 0) {
+      result = result.filter(
+        (set) => set.metadata.chip && chipFilters.includes(set.metadata.chip)
+      );
+    }
+
     // Apply locale filter (OR logic)
     if (localeFilters.length > 0) {
       result = result.filter(
@@ -161,7 +177,7 @@ export function CharacterEditorLibrary() {
       if (aPinned !== bPinned) return bPinned - aPinned;
       return b.metadata.updatedAt - a.metadata.updatedAt;
     });
-  }, [characterSets, searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, localeFilters]);
+  }, [characterSets, searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, chipFilters, localeFilters]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -283,6 +299,10 @@ export function CharacterEditorLibrary() {
     setSystemFilters(systems);
   }, []);
 
+  const handleChipFilterChange = useCallback((chips: string[]) => {
+    setChipFilters(chips);
+  }, []);
+
   const handleLocaleFilterChange = useCallback((locales: string[]) => {
     setLocaleFilters(locales);
   }, []);
@@ -298,6 +318,7 @@ export function CharacterEditorLibrary() {
     setCharacterCountFilters([]);
     setManufacturerFilters([]);
     setSystemFilters([]);
+    setChipFilters([]);
     setLocaleFilters([]);
   }, []);
 
@@ -308,6 +329,7 @@ export function CharacterEditorLibrary() {
     characterCountFilters.length > 0 ||
     manufacturerFilters.length > 0 ||
     systemFilters.length > 0 ||
+    chipFilters.length > 0 ||
     localeFilters.length > 0;
 
   // Find the set being deleted for confirmation
@@ -408,6 +430,9 @@ export function CharacterEditorLibrary() {
               systemFilters={systemFilters}
               onManufacturerFilterChange={handleManufacturerFilterChange}
               onSystemFilterChange={handleSystemFilterChange}
+              availableChips={availableChips}
+              chipFilters={chipFilters}
+              onChipFilterChange={handleChipFilterChange}
               availableLocales={availableLocales}
               localeFilters={localeFilters}
               onLocaleFilterChange={handleLocaleFilterChange}

@@ -74,6 +74,7 @@ function SharedPageContent() {
           updatedAt: now,
           manufacturer: "",
           system: "",
+          chip: "",
           locale: "",
           isPinned: false,
         },
