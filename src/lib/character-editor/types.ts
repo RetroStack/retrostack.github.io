@@ -136,10 +136,14 @@ export interface LibraryFilter {
   searchQuery: string;
   widthFilter: number | null;
   heightFilter: number | null;
+  /** Multi-select filter for character counts (OR logic) */
+  characterCountFilters: number[];
   /** Multi-select filter for manufacturers (OR logic) */
   manufacturerFilters: string[];
   /** Multi-select filter for systems (OR logic) */
   systemFilters: string[];
+  /** Multi-select filter for locales (OR logic) */
+  localeFilters: string[];
 }
 
 /**
@@ -185,6 +189,21 @@ export function bytesPerLine(width: number): number {
  */
 export function bytesPerCharacter(config: CharacterSetConfig): number {
   return bytesPerLine(config.width) * config.height;
+}
+
+/**
+ * Calculate character count from a serialized character set
+ */
+export function getCharacterCount(serialized: SerializedCharacterSet): number {
+  // Calculate the binary data size from base64 (accounting for padding)
+  const base64 = serialized.binaryData;
+  let padding = 0;
+  if (base64.endsWith("==")) padding = 2;
+  else if (base64.endsWith("=")) padding = 1;
+  const binaryLength = (base64.length * 3) / 4 - padding;
+
+  const bpc = bytesPerCharacter(serialized.config);
+  return bpc > 0 ? Math.floor(binaryLength / bpc) : 0;
 }
 
 /**

@@ -19,6 +19,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { useCharacterLibrary } from "@/hooks/character-editor";
 import { useToast } from "@/hooks/useToast";
 import { useOnboarding, CHARACTER_EDITOR_ONBOARDING_STEPS } from "@/hooks";
+import { getCharacterCount } from "@/lib/character-editor/types";
 
 /**
  * Main library view for the Character ROM Editor
@@ -49,8 +50,10 @@ export function CharacterEditorLibrary() {
   const [searchQuery, setSearchQuery] = useState("");
   const [widthFilters, setWidthFilters] = useState<number[]>([]);
   const [heightFilters, setHeightFilters] = useState<number[]>([]);
+  const [characterCountFilters, setCharacterCountFilters] = useState<number[]>([]);
   const [manufacturerFilters, setManufacturerFilters] = useState<string[]>([]);
   const [systemFilters, setSystemFilters] = useState<string[]>([]);
+  const [localeFilters, setLocaleFilters] = useState<string[]>([]);
 
   // Get available manufacturers and systems from character sets
   const availableManufacturers = useMemo(() => {
@@ -67,6 +70,22 @@ export function CharacterEditorLibrary() {
       if (set.metadata.system) systems.add(set.metadata.system);
     });
     return Array.from(systems).sort();
+  }, [characterSets]);
+
+  const availableLocales = useMemo(() => {
+    const locales = new Set<string>();
+    characterSets.forEach((set) => {
+      if (set.metadata.locale) locales.add(set.metadata.locale);
+    });
+    return Array.from(locales).sort();
+  }, [characterSets]);
+
+  const availableCharacterCounts = useMemo(() => {
+    const counts = new Set<number>();
+    characterSets.forEach((set) => {
+      counts.add(getCharacterCount(set));
+    });
+    return Array.from(counts).sort((a, b) => a - b);
   }, [characterSets]);
 
   // Delete confirmation state
@@ -117,6 +136,20 @@ export function CharacterEditorLibrary() {
       );
     }
 
+    // Apply locale filter (OR logic)
+    if (localeFilters.length > 0) {
+      result = result.filter(
+        (set) => set.metadata.locale && localeFilters.includes(set.metadata.locale)
+      );
+    }
+
+    // Apply character count filter (OR logic)
+    if (characterCountFilters.length > 0) {
+      result = result.filter(
+        (set) => characterCountFilters.includes(getCharacterCount(set))
+      );
+    }
+
     // Sort with pinned items first, then by updated date
     return [...result].sort((a, b) => {
       const aPinned = a.metadata.isPinned ? 1 : 0;
@@ -124,7 +157,7 @@ export function CharacterEditorLibrary() {
       if (aPinned !== bPinned) return bPinned - aPinned;
       return b.metadata.updatedAt - a.metadata.updatedAt;
     });
-  }, [characterSets, searchQuery, widthFilters, heightFilters, manufacturerFilters, systemFilters]);
+  }, [characterSets, searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, localeFilters]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -236,20 +269,32 @@ export function CharacterEditorLibrary() {
     setSystemFilters(systems);
   }, []);
 
+  const handleLocaleFilterChange = useCallback((locales: string[]) => {
+    setLocaleFilters(locales);
+  }, []);
+
+  const handleCharacterCountFilterChange = useCallback((counts: number[]) => {
+    setCharacterCountFilters(counts);
+  }, []);
+
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setWidthFilters([]);
     setHeightFilters([]);
+    setCharacterCountFilters([]);
     setManufacturerFilters([]);
     setSystemFilters([]);
+    setLocaleFilters([]);
   }, []);
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
     widthFilters.length > 0 ||
     heightFilters.length > 0 ||
+    characterCountFilters.length > 0 ||
     manufacturerFilters.length > 0 ||
-    systemFilters.length > 0;
+    systemFilters.length > 0 ||
+    localeFilters.length > 0;
 
   // Find the set being deleted for confirmation
   const setToDelete = deleteId
@@ -340,12 +385,18 @@ export function CharacterEditorLibrary() {
               widthFilters={widthFilters}
               heightFilters={heightFilters}
               onSizeFilterChange={handleSizeFilterChange}
+              availableCharacterCounts={availableCharacterCounts}
+              characterCountFilters={characterCountFilters}
+              onCharacterCountFilterChange={handleCharacterCountFilterChange}
               availableManufacturers={availableManufacturers}
               availableSystems={availableSystems}
               manufacturerFilters={manufacturerFilters}
               systemFilters={systemFilters}
               onManufacturerFilterChange={handleManufacturerFilterChange}
               onSystemFilterChange={handleSystemFilterChange}
+              availableLocales={availableLocales}
+              localeFilters={localeFilters}
+              onLocaleFilterChange={handleLocaleFilterChange}
               totalCount={characterSets.length}
               filteredCount={filteredSets.length}
             />

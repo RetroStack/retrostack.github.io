@@ -17,6 +17,12 @@ export interface LibraryFiltersProps {
   heightFilters: number[];
   /** Callback when size filters change */
   onSizeFilterChange: (widths: number[], heights: number[]) => void;
+  /** Available character counts from library */
+  availableCharacterCounts?: number[];
+  /** Current character count filters (multi-select) */
+  characterCountFilters?: number[];
+  /** Callback when character count filters change */
+  onCharacterCountFilterChange?: (counts: number[]) => void;
   /** Available manufacturers from library */
   availableManufacturers?: string[];
   /** Available systems from library */
@@ -29,6 +35,12 @@ export interface LibraryFiltersProps {
   onManufacturerFilterChange?: (manufacturers: string[]) => void;
   /** Callback when system filters change */
   onSystemFilterChange?: (systems: string[]) => void;
+  /** Available locales from library */
+  availableLocales?: string[];
+  /** Current locale filters (multi-select) */
+  localeFilters?: string[];
+  /** Callback when locale filters change */
+  onLocaleFilterChange?: (locales: string[]) => void;
   /** Total count of items */
   totalCount: number;
   /** Filtered count of items */
@@ -45,12 +57,18 @@ export function LibraryFilters({
   widthFilters,
   heightFilters,
   onSizeFilterChange,
+  availableCharacterCounts = [],
+  characterCountFilters = [],
+  onCharacterCountFilterChange,
   availableManufacturers = [],
   availableSystems = [],
   manufacturerFilters = [],
   systemFilters = [],
   onManufacturerFilterChange,
   onSystemFilterChange,
+  availableLocales = [],
+  localeFilters = [],
+  onLocaleFilterChange,
   totalCount,
   filteredCount,
 }: LibraryFiltersProps) {
@@ -92,16 +110,20 @@ export function LibraryFilters({
   const handleClearFilters = useCallback(() => {
     onSearchChange("");
     onSizeFilterChange([], []);
+    onCharacterCountFilterChange?.([]);
     onManufacturerFilterChange?.([]);
     onSystemFilterChange?.([]);
-  }, [onSearchChange, onSizeFilterChange, onManufacturerFilterChange, onSystemFilterChange]);
+    onLocaleFilterChange?.([]);
+  }, [onSearchChange, onSizeFilterChange, onCharacterCountFilterChange, onManufacturerFilterChange, onSystemFilterChange, onLocaleFilterChange]);
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
     widthFilters.length > 0 ||
     heightFilters.length > 0 ||
+    characterCountFilters.length > 0 ||
     manufacturerFilters.length > 0 ||
-    systemFilters.length > 0;
+    systemFilters.length > 0 ||
+    localeFilters.length > 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -149,7 +171,7 @@ export function LibraryFilters({
         </div>
 
       {/* Filter dropdowns */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Width filter */}
         <MultiSelectDropdown
           label="Width"
@@ -169,6 +191,18 @@ export function LibraryFilters({
           placeholder="Height"
           allOptionLabel="Any height"
         />
+
+        {/* Character count filter */}
+        {onCharacterCountFilterChange && (
+          <MultiSelectDropdown
+            label="Characters"
+            options={availableCharacterCounts.map((c) => ({ value: c, label: `${c} chars` }))}
+            selected={characterCountFilters}
+            onChange={onCharacterCountFilterChange}
+            placeholder="Characters"
+            allOptionLabel="Any count"
+          />
+        )}
 
         {/* Manufacturer filter */}
         {onManufacturerFilterChange && (
@@ -191,6 +225,18 @@ export function LibraryFilters({
             onChange={onSystemFilterChange}
             placeholder="System"
             allOptionLabel="Any system"
+          />
+        )}
+
+        {/* Locale filter */}
+        {onLocaleFilterChange && (
+          <MultiSelectDropdown
+            label="Locale"
+            options={availableLocales.map((l) => ({ value: l, label: l }))}
+            selected={localeFilters}
+            onChange={onLocaleFilterChange}
+            placeholder="Locale"
+            allOptionLabel="Any locale"
           />
         )}
       </div>
