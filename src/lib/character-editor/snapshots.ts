@@ -62,7 +62,14 @@ function getDatabase(): Promise<IDBDatabase> {
     };
 
     request.onsuccess = () => {
-      resolve(request.result);
+      const db = request.result;
+      // Verify the snapshots store exists (may not if upgrade was blocked by another tab)
+      if (!db.objectStoreNames.contains(SNAPSHOTS_STORE)) {
+        db.close();
+        reject(new Error("Database upgrade required - please close other tabs and refresh"));
+        return;
+      }
+      resolve(db);
     };
 
     request.onupgradeneeded = (event) => {
