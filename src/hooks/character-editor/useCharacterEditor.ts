@@ -111,6 +111,10 @@ export interface UseCharacterEditorResult {
   jumpToHistory: (index: number) => void;
   /** Total number of history entries */
   totalHistoryEntries: number;
+  /** Start batching changes (for drag operations) */
+  startBatch: () => void;
+  /** End batching and commit as single history entry */
+  endBatch: (label?: string) => void;
 }
 
 /**
@@ -143,6 +147,8 @@ export function useCharacterEditor(
     historyIndex,
     jumpToHistory,
     totalHistoryEntries,
+    startBatch,
+    endBatch,
   } = useUndoRedo<EditorState>(initialState);
 
   // Selection state (not undoable)
@@ -548,5 +554,7 @@ export function useCharacterEditor(
     historyIndex,
     jumpToHistory,
     totalHistoryEntries,
+    startBatch,
+    endBatch,
   };
 }

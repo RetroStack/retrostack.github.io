@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 
 /**
  * A single entry in the history timeline
@@ -41,6 +41,12 @@ export interface UseUndoRedoResult<T> {
   jumpToHistory: (index: number) => void;
   /** Total number of entries in history */
   totalHistoryEntries: number;
+  /** Start batching changes - they won't create history entries until endBatch is called */
+  startBatch: () => void;
+  /** End batching and commit all changes as a single history entry */
+  endBatch: (label?: string) => void;
+  /** Whether currently in batch mode */
+  isBatching: boolean;
 }
 
 /**
@@ -64,8 +70,23 @@ export function useUndoRedo<T>(
     timestamp: Date.now(),
   });
 
+  // Batching support - accumulate changes without creating history entries
+  // Use ref for immediate synchronous access (setState is async)
+  const isBatchingRef = useRef(false);
+  const batchStartEntryRef = useRef<HistoryEntry<T> | null>(null);
+
   const setState = useCallback(
     (newState: T, label?: string) => {
+      if (isBatchingRef.current) {
+        // When batching, just update present without recording to history
+        setPresentEntry({
+          state: newState,
+          label,
+          timestamp: Date.now(),
+        });
+        return;
+      }
+
       setPast((prevPast) => {
         // Add current entry to past
         let newPast = [...prevPast, presentEntry];
@@ -83,6 +104,46 @@ export function useUndoRedo<T>(
         label,
         timestamp: Date.now(),
       });
+    },
+    [presentEntry, maxHistory]
+  );
+
+  const startBatch = useCallback(() => {
+    if (!isBatchingRef.current) {
+      // Save the current entry so we can add it to history when batch ends
+      batchStartEntryRef.current = presentEntry;
+      isBatchingRef.current = true;
+    }
+  }, [presentEntry]);
+
+  const endBatch = useCallback(
+    (label?: string) => {
+      if (isBatchingRef.current && batchStartEntryRef.current) {
+        // Only create history entry if state actually changed
+        const startState = JSON.stringify(batchStartEntryRef.current.state);
+        const currentState = JSON.stringify(presentEntry.state);
+
+        if (startState !== currentState) {
+          // Add the batch start entry to past
+          setPast((prevPast) => {
+            let newPast = [...prevPast, batchStartEntryRef.current!];
+            if (newPast.length > maxHistory) {
+              newPast = newPast.slice(-maxHistory);
+            }
+            return newPast;
+          });
+          // Clear future (new branch in history)
+          setFuture([]);
+          // Update present with the batch label
+          setPresentEntry((prev) => ({
+            ...prev,
+            label: label || prev.label,
+          }));
+        }
+
+        batchStartEntryRef.current = null;
+        isBatchingRef.current = false;
+      }
     },
     [presentEntry, maxHistory]
   );
@@ -183,6 +244,9 @@ export function useUndoRedo<T>(
     historyIndex,
     jumpToHistory,
     totalHistoryEntries,
+    startBatch,
+    endBatch,
+    isBatching: isBatchingRef.current,
   };
 }
 

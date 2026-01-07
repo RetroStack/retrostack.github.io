@@ -13,6 +13,8 @@ export interface EditorCanvasProps {
   onPixelToggle?: (row: number, col: number) => void;
   /** Callback when a pixel is set (during drag) */
   onPixelSet?: (row: number, col: number, value: boolean) => void;
+  /** Callback when drag starts */
+  onDragStart?: () => void;
   /** Callback when drag ends */
   onDragEnd?: () => void;
   /** Get pixel state for batch editing */
@@ -52,6 +54,7 @@ export function EditorCanvas({
   config,
   onPixelToggle,
   onPixelSet,
+  onDragStart,
   onDragEnd,
   getPixelState,
   batchMode = false,
@@ -90,6 +93,8 @@ export function EditorCanvas({
   const handlePixelClick = useCallback(
     (row: number, col: number, isRightClick?: boolean) => {
       if (!isDragging) {
+        // Start batch mode before any pixel changes
+        onDragStart?.();
         if (isRightClick) {
           // Right-click: paint background (turn pixel off)
           onPixelSet?.(row, col, false);
@@ -104,7 +109,7 @@ export function EditorCanvas({
         setIsDragging(true);
       }
     },
-    [isDragging, onPixelToggle, onPixelSet, character]
+    [isDragging, onPixelToggle, onPixelSet, onDragStart, character]
   );
 
   const handlePixelDrag = useCallback(

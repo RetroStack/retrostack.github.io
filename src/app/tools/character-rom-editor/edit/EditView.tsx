@@ -972,6 +972,8 @@ export function EditView() {
               config={editor.config}
               onPixelToggle={editor.toggleSelectedPixel}
               onPixelSet={editor.setSelectedPixel}
+              onDragStart={editor.startBatch}
+              onDragEnd={() => editor.endBatch("Paint pixels")}
               getPixelState={editor.getSelectedPixelState}
               batchMode={isBatchMode}
               foregroundColor={colors.foreground}
