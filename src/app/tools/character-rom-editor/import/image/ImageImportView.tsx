@@ -473,7 +473,7 @@ export function ImageImportView() {
                               max={32}
                               value={options.charWidth}
                               onChange={(e) => updateOption("charWidth", parseInt(e.target.value) || 8)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                           <div>
@@ -486,7 +486,7 @@ export function ImageImportView() {
                               max={32}
                               value={options.charHeight}
                               onChange={(e) => updateOption("charHeight", parseInt(e.target.value) || 8)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                         </div>
@@ -503,7 +503,7 @@ export function ImageImportView() {
                               max={imageData.width - 1}
                               value={options.offsetX}
                               onChange={(e) => updateOption("offsetX", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                           <div>
@@ -516,7 +516,7 @@ export function ImageImportView() {
                               max={imageData.height - 1}
                               value={options.offsetY}
                               onChange={(e) => updateOption("offsetY", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                         </div>
@@ -533,7 +533,7 @@ export function ImageImportView() {
                               max={32}
                               value={options.gapX}
                               onChange={(e) => updateOption("gapX", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                           <div>
@@ -546,7 +546,7 @@ export function ImageImportView() {
                               max={32}
                               value={options.gapY}
                               onChange={(e) => updateOption("gapY", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                         </div>
@@ -563,7 +563,7 @@ export function ImageImportView() {
                               max={256}
                               value={options.forceColumns}
                               onChange={(e) => updateOption("forceColumns", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                           <div>
@@ -576,7 +576,7 @@ export function ImageImportView() {
                               max={256}
                               value={options.forceRows}
                               onChange={(e) => updateOption("forceRows", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                              className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                             />
                           </div>
                         </div>

@@ -77,13 +77,13 @@ export function MultiSelectDropdown<T extends string | number>({
         onClick={() => setIsOpen(!isOpen)}
         className={`
           flex items-center justify-between gap-2 w-full px-3 py-1.5
-          bg-retro-dark border rounded text-sm text-left
+          bg-retro-navy/50 border rounded text-sm text-left
           transition-colors
           ${isOpen
             ? "border-retro-cyan"
             : "border-retro-grid/50 hover:border-retro-grid"
           }
-          ${hasSelection ? "text-white" : "text-gray-400"}
+          ${hasSelection ? "text-gray-200" : "text-gray-400"}
         `}
         aria-expanded={isOpen}
         aria-haspopup="listbox"

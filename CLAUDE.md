@@ -54,3 +54,29 @@ npm run deploy           # Deploy to GitHub Pages
 ## Coding Conventions
 
 - **No barrel files**: Do not create index.ts files that re-export from other files. Import directly from the source file instead of using barrel exports. This keeps the dependency graph explicit and avoids circular import issues.
+
+## Form Input Design
+
+All form inputs should follow these consistent styling patterns:
+
+### Editable Text Inputs (input, textarea)
+```
+bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan
+```
+- Dark solid background (`bg-retro-dark`)
+- White text (`text-white`)
+- Cyan focus border (`focus:border-retro-cyan`)
+
+### Non-editable Dropdowns (select, MultiSelectDropdown)
+```
+bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan
+```
+- Semi-transparent navy background (`bg-retro-navy/50`)
+- Gray text (`text-gray-200`)
+- Cyan focus border (`focus:border-retro-cyan`)
+
+### Shared Metadata Form
+Use the `MetadataStep` component (`src/components/character-editor/import/MetadataStep.tsx`) for all character set metadata forms. It includes:
+- Name, Description, Manufacturer/System, Chip, Locale, Source fields
+- Auto-fill chip when system is selected
+- Consistent styling with the design system

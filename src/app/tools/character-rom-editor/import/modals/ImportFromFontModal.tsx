@@ -413,7 +413,7 @@ export function ImportFromFontModal({
                         max={32}
                         value={options.charWidth}
                         onChange={(e) => updateOption("charWidth", parseInt(e.target.value) || 8)}
-                        className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       />
                     </div>
                     <div>
@@ -426,7 +426,7 @@ export function ImportFromFontModal({
                         max={32}
                         value={options.charHeight}
                         onChange={(e) => updateOption("charHeight", parseInt(e.target.value) || 8)}
-                        className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       />
                     </div>
                     <div>
@@ -439,7 +439,7 @@ export function ImportFromFontModal({
                         max={48}
                         value={options.fontSize}
                         onChange={(e) => updateOption("fontSize", parseInt(e.target.value) || 8)}
-                        className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       />
                     </div>
                   </div>
@@ -482,7 +482,7 @@ export function ImportFromFontModal({
                         max={65535}
                         value={options.startCode}
                         onChange={(e) => updateOption("startCode", parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       />
                     </div>
                     <div>
@@ -495,7 +495,7 @@ export function ImportFromFontModal({
                         max={65535}
                         value={options.endCode}
                         onChange={(e) => updateOption("endCode", parseInt(e.target.value) || 255)}
-                        className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       />
                     </div>
                   </div>

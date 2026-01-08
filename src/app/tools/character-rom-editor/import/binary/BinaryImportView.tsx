@@ -470,7 +470,7 @@ export function BinaryImportView() {
                           max={16}
                           value={config.width}
                           onChange={handleWidthChange}
-                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                         />
                       </div>
                       <div>
@@ -487,7 +487,7 @@ export function BinaryImportView() {
                           max={16}
                           value={config.height}
                           onChange={handleHeightChange}
-                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                         />
                       </div>
                     </div>

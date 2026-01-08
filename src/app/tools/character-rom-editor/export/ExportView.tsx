@@ -403,7 +403,7 @@ export function ExportView() {
                     id="filename"
                     value={filename}
                     onChange={(e) => setFilename(e.target.value)}
-                    className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                    className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
                     placeholder={`charset${getExtension()}`}
                   />
                 </div>
@@ -446,7 +446,7 @@ export function ExportView() {
                         onChange={(e) =>
                           setCHeaderOptions({ ...cHeaderOptions, arrayName: e.target.value })
                         }
-                        className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 font-mono"
+                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
                       />
                     </div>
 
@@ -496,7 +496,7 @@ export function ExportView() {
                         onChange={(e) =>
                           setAssemblyOptions({ ...assemblyOptions, labelName: e.target.value })
                         }
-                        className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 font-mono"
+                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
                       />
                     </div>
 
@@ -512,7 +512,7 @@ export function ExportView() {
                             directive: e.target.value as AssemblyOptions["directive"],
                           })
                         }
-                        className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                       >
                         <option value=".byte">.byte (ca65, DASM)</option>
                         <option value="db">db (NASM, z80)</option>
@@ -564,7 +564,7 @@ export function ExportView() {
                           onChange={(e) =>
                             setPngOptions({ ...pngOptions, columns: parseInt(e.target.value) })
                           }
-                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                         >
                           <option value={8}>8</option>
                           <option value={16}>16</option>
@@ -580,7 +580,7 @@ export function ExportView() {
                           onChange={(e) =>
                             setPngOptions({ ...pngOptions, scale: parseInt(e.target.value) })
                           }
-                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                         >
                           <option value={1}>1x</option>
                           <option value={2}>2x</option>
@@ -650,7 +650,7 @@ export function ExportView() {
                         onChange={(e) =>
                           setReferenceSheetOptions({ ...referenceSheetOptions, title: e.target.value })
                         }
-                        className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
                         placeholder="Character Set Title"
                       />
                     </div>
@@ -694,7 +694,7 @@ export function ExportView() {
                             onChange={(e) =>
                               setReferenceSheetOptions({ ...referenceSheetOptions, columns: parseInt(e.target.value) })
                             }
-                            className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                           >
                             <option value={8}>8</option>
                             <option value={16}>16</option>
@@ -711,7 +711,7 @@ export function ExportView() {
                           onChange={(e) =>
                             setReferenceSheetOptions({ ...referenceSheetOptions, scale: parseInt(e.target.value) })
                           }
-                          className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                         >
                           <option value={3}>3x</option>
                           <option value={4}>4x</option>

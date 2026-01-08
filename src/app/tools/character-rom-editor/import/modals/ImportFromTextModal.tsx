@@ -133,7 +133,7 @@ Examples:
   { 0x00, 0x18, 0x24, 0x42 }
   $00, $18, $24, $FF
   0, 24, 36, 66, 255`}
-                  className="w-full h-40 px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 font-mono placeholder:text-gray-600 focus:outline-none focus:border-retro-cyan/50 resize-none"
+                  className="w-full h-40 px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white font-mono placeholder:text-gray-600 focus:outline-none focus:border-retro-cyan resize-none"
                 />
 
                 {/* Parse status */}
@@ -171,7 +171,7 @@ Examples:
                       max={16}
                       value={options.charWidth}
                       onChange={(e) => updateOption("charWidth", parseInt(e.target.value) || 8)}
-                      className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                      className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                     />
                   </div>
                   <div>
@@ -182,7 +182,7 @@ Examples:
                       max={16}
                       value={options.charHeight}
                       onChange={(e) => updateOption("charHeight", parseInt(e.target.value) || 8)}
-                      className="w-full px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50"
+                      className="w-full px-3 py-1.5 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
                     />
                   </div>
                 </div>

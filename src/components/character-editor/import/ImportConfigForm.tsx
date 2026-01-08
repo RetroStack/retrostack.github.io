@@ -83,7 +83,7 @@ export function ImportConfigForm({
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="My Character Set"
             disabled={disabled}
-            className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 disabled:opacity-50"
+            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan disabled:opacity-50"
           />
         </div>
 
@@ -101,7 +101,7 @@ export function ImportConfigForm({
             placeholder="Optional description..."
             rows={2}
             disabled={disabled}
-            className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 resize-none disabled:opacity-50"
+            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan resize-none disabled:opacity-50"
           />
         </div>
       </div>
@@ -127,7 +127,7 @@ export function ImportConfigForm({
               value={config.width}
               onChange={handleWidthChange}
               disabled={disabled}
-              className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 disabled:opacity-50"
+              className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan disabled:opacity-50"
             />
           </div>
           <div>
@@ -145,7 +145,7 @@ export function ImportConfigForm({
               value={config.height}
               onChange={handleHeightChange}
               disabled={disabled}
-              className="w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 disabled:opacity-50"
+              className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan disabled:opacity-50"
             />
           </div>
         </div>

@@ -182,7 +182,7 @@ export function LibraryFilters({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search character sets..."
-            className="w-full px-4 py-2 pl-10 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 transition-colors"
+            className="w-full px-3 py-2 pl-10 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan transition-colors"
             aria-label="Search character sets"
           />
           <svg
@@ -220,7 +220,7 @@ export function LibraryFilters({
             <select
               value={sortField}
               onChange={(e) => onSortFieldChange(e.target.value as SortField)}
-              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 transition-colors cursor-pointer"
+              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan transition-colors cursor-pointer"
               aria-label="Sort by"
             >
               {SORT_OPTIONS.map((option) => (
@@ -369,7 +369,7 @@ export function LibraryFiltersCompact({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search..."
-          className="w-full px-3 py-1.5 pl-8 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+          className="w-full px-3 py-1.5 pl-8 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
         />
         <svg
           className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"
