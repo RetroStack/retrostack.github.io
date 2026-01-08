@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/data/manufacturers";
 
 export interface ManufacturerSystemSelectProps {
@@ -19,8 +19,7 @@ export interface ManufacturerSystemSelectProps {
 }
 
 /**
- * Paired dropdown selects for manufacturer and system
- * Supports both known manufacturers/systems and custom values
+ * Display manufacturer and system as two editable inputs with a picker dropdown
  */
 export function ManufacturerSystemSelect({
   manufacturer,
@@ -30,265 +29,141 @@ export function ManufacturerSystemSelect({
   disabled = false,
   className = "",
 }: ManufacturerSystemSelectProps) {
-  const [showCustomManufacturer, setShowCustomManufacturer] = useState(false);
-  const [showCustomSystem, setShowCustomSystem] = useState(false);
-  const [customManufacturerInput, setCustomManufacturerInput] = useState("");
-  const [customSystemInput, setCustomSystemInput] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get all known manufacturers
-  const allManufacturers = useMemo(() => KNOWN_MANUFACTURERS.map((m) => m.manufacturer), []);
-
-  // Get systems for the selected manufacturer
-  const availableSystems = useMemo(() => {
-    if (!manufacturer) return [];
-    return getSystemsForManufacturer(manufacturer);
-  }, [manufacturer]);
-
-  // Check if current manufacturer is custom (not in known list)
-  const isCustomManufacturer = manufacturer && !allManufacturers.includes(manufacturer);
-
-  // Check if current system is custom (not in available systems for this manufacturer)
-  const isCustomSystem = system && !availableSystems.includes(system);
-
-  // Handle manufacturer select change
-  const handleManufacturerSelectChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value;
-      if (value === "__custom__") {
-        setShowCustomManufacturer(true);
-        setCustomManufacturerInput("");
-      } else {
-        onManufacturerChange(value);
-        // Reset system when manufacturer changes
-        onSystemChange("");
-        setShowCustomManufacturer(false);
-      }
-    },
-    [onManufacturerChange, onSystemChange]
-  );
-
-  // Handle custom manufacturer submit
-  const handleCustomManufacturerSubmit = useCallback(() => {
-    if (customManufacturerInput.trim()) {
-      onManufacturerChange(customManufacturerInput.trim());
-      onSystemChange("");
-      setShowCustomManufacturer(false);
-      setCustomManufacturerInput("");
-    }
-  }, [customManufacturerInput, onManufacturerChange, onSystemChange]);
-
-  // Handle custom manufacturer cancel
-  const handleCustomManufacturerCancel = useCallback(() => {
-    setShowCustomManufacturer(false);
-    setCustomManufacturerInput("");
+  // Sort manufacturers alphabetically
+  const sortedManufacturers = useMemo(() => {
+    return [...KNOWN_MANUFACTURERS].sort((a, b) =>
+      a.manufacturer.localeCompare(b.manufacturer)
+    );
   }, []);
 
-  // Handle system select change
-  const handleSystemSelectChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value;
-      if (value === "__custom__") {
-        setShowCustomSystem(true);
-        setCustomSystemInput("");
-      } else {
-        onSystemChange(value);
-        setShowCustomSystem(false);
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
       }
-    },
-    [onSystemChange]
-  );
-
-  // Handle custom system submit
-  const handleCustomSystemSubmit = useCallback(() => {
-    if (customSystemInput.trim()) {
-      onSystemChange(customSystemInput.trim());
-      setShowCustomSystem(false);
-      setCustomSystemInput("");
     }
-  }, [customSystemInput, onSystemChange]);
-
-  // Handle custom system cancel
-  const handleCustomSystemCancel = useCallback(() => {
-    setShowCustomSystem(false);
-    setCustomSystemInput("");
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle key press for custom inputs
-  const handleKeyPress = useCallback(
-    (e: React.KeyboardEvent, submitFn: () => void) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        submitFn();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        if (showCustomManufacturer) handleCustomManufacturerCancel();
-        if (showCustomSystem) handleCustomSystemCancel();
-      }
-    },
-    [showCustomManufacturer, showCustomSystem, handleCustomManufacturerCancel, handleCustomSystemCancel]
-  );
+  const handleManufacturerClick = (mfr: string) => {
+    onManufacturerChange(mfr);
+    onSystemChange("");
+    setIsDropdownOpen(false);
+  };
 
-  const selectClasses = `
-    w-full px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg
-    text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50
-    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-  `;
+  const handleSystemClick = (mfr: string, sys: string) => {
+    onManufacturerChange(mfr);
+    onSystemChange(sys);
+    setIsDropdownOpen(false);
+  };
+
+  const handleClear = () => {
+    onManufacturerChange("");
+    onSystemChange("");
+    setIsDropdownOpen(false);
+  };
 
   const inputClasses = `
-    flex-1 px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg
-    text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50
-    transition-colors
-  `;
-
-  const buttonClasses = `
-    px-3 py-2 text-sm rounded-lg transition-colors
+    flex-1 min-w-0 px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white
+    placeholder-gray-500 focus:outline-none focus:border-retro-cyan
+    disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Manufacturer field */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          Manufacturer
-        </label>
+    <div className={`flex gap-2 ${className}`}>
+      {/* Manufacturer input */}
+      <input
+        type="text"
+        value={manufacturer}
+        onChange={(e) => onManufacturerChange(e.target.value)}
+        placeholder="Manufacturer"
+        disabled={disabled}
+        className={inputClasses}
+      />
 
-        {showCustomManufacturer ? (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={customManufacturerInput}
-              onChange={(e) => setCustomManufacturerInput(e.target.value)}
-              onKeyDown={(e) => handleKeyPress(e, handleCustomManufacturerSubmit)}
-              placeholder="Enter manufacturer name..."
-              className={inputClasses}
-              autoFocus
-              disabled={disabled}
-            />
-            <button
-              onClick={handleCustomManufacturerSubmit}
-              disabled={disabled || !customManufacturerInput.trim()}
-              className={`${buttonClasses} bg-retro-cyan/20 text-retro-cyan hover:bg-retro-cyan/30 disabled:opacity-50`}
-            >
-              Add
-            </button>
-            <button
-              onClick={handleCustomManufacturerCancel}
-              disabled={disabled}
-              className={`${buttonClasses} bg-retro-grid/20 text-gray-400 hover:bg-retro-grid/30`}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <select
-            value={isCustomManufacturer ? "" : manufacturer}
-            onChange={handleManufacturerSelectChange}
-            disabled={disabled}
-            className={selectClasses}
+      {/* System input */}
+      <input
+        type="text"
+        value={system}
+        onChange={(e) => onSystemChange(e.target.value)}
+        placeholder="System"
+        disabled={disabled}
+        className={inputClasses}
+      />
+
+      {/* Picker dropdown */}
+      <div ref={dropdownRef} className="relative flex-shrink-0">
+        <button
+          type="button"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          disabled={disabled}
+          className="px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-gray-400 hover:text-white hover:border-retro-grid transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Select manufacturer and system"
+        >
+          ...
+        </button>
+
+        {/* Dropdown panel */}
+        {isDropdownOpen && (
+          <div
+            className="absolute z-50 top-full mt-1 max-h-80 overflow-y-auto bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl"
+            style={{ width: '240px', right: 0 }}
           >
-            <option value="">Select manufacturer...</option>
-            {allManufacturers.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-            <option value="__custom__">Other (custom)...</option>
-            {isCustomManufacturer && (
-              <option value={manufacturer} disabled>
-                {manufacturer} (custom)
-              </option>
+            {/* Clear option */}
+            {(manufacturer || system) && (
+              <div className="p-2 border-b border-retro-grid/30">
+                <button
+                  onClick={handleClear}
+                  className="w-full text-left px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-retro-grid/20 rounded transition-colors"
+                >
+                  Clear selection
+                </button>
+              </div>
             )}
-          </select>
-        )}
 
-        {isCustomManufacturer && !showCustomManufacturer && (
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="text-xs text-gray-500">
-              Custom: <span className="text-retro-cyan">{manufacturer}</span>
-            </span>
-            <button
-              onClick={() => {
-                onManufacturerChange("");
-                onSystemChange("");
-              }}
-              className="text-xs text-gray-500 hover:text-retro-pink"
-              disabled={disabled}
-            >
-              Clear
-            </button>
-          </div>
-        )}
-      </div>
+            {/* Manufacturers and systems */}
+            <div className="p-2">
+              {sortedManufacturers.map((mfr) => (
+                <div key={mfr.manufacturer} className="mb-3 last:mb-0">
+                  {/* Manufacturer header - clickable */}
+                  <button
+                    onClick={() => handleManufacturerClick(mfr.manufacturer)}
+                    className={`w-full text-left px-2 py-1 text-xs font-medium rounded transition-all ${
+                      manufacturer === mfr.manufacturer && !system
+                        ? "text-retro-cyan bg-retro-cyan/30 ring-1 ring-retro-cyan"
+                        : "text-retro-cyan bg-retro-cyan/10 hover:bg-retro-cyan/20 hover:text-white"
+                    }`}
+                  >
+                    {mfr.manufacturer}
+                  </button>
 
-      {/* System field */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          System
-        </label>
-
-        {showCustomSystem ? (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={customSystemInput}
-              onChange={(e) => setCustomSystemInput(e.target.value)}
-              onKeyDown={(e) => handleKeyPress(e, handleCustomSystemSubmit)}
-              placeholder="Enter system name..."
-              className={inputClasses}
-              autoFocus
-              disabled={disabled}
-            />
-            <button
-              onClick={handleCustomSystemSubmit}
-              disabled={disabled || !customSystemInput.trim()}
-              className={`${buttonClasses} bg-retro-cyan/20 text-retro-cyan hover:bg-retro-cyan/30 disabled:opacity-50`}
-            >
-              Add
-            </button>
-            <button
-              onClick={handleCustomSystemCancel}
-              disabled={disabled}
-              className={`${buttonClasses} bg-retro-grid/20 text-gray-400 hover:bg-retro-grid/30`}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <select
-            value={isCustomSystem ? "" : system}
-            onChange={handleSystemSelectChange}
-            disabled={disabled || !manufacturer}
-            className={selectClasses}
-          >
-            <option value="">
-              {manufacturer ? "Select system..." : "Select a manufacturer first..."}
-            </option>
-            {availableSystems.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-            {manufacturer && <option value="__custom__">Other (custom)...</option>}
-            {isCustomSystem && (
-              <option value={system} disabled>
-                {system} (custom)
-              </option>
-            )}
-          </select>
-        )}
-
-        {isCustomSystem && !showCustomSystem && (
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="text-xs text-gray-500">
-              Custom: <span className="text-retro-cyan">{system}</span>
-            </span>
-            <button
-              onClick={() => onSystemChange("")}
-              className="text-xs text-gray-500 hover:text-retro-pink"
-              disabled={disabled}
-            >
-              Clear
-            </button>
+                  {/* Systems for this manufacturer */}
+                  <div className="ml-3 mt-1 flex flex-wrap gap-1">
+                    {mfr.systems.map((sys) => (
+                      <button
+                        key={sys}
+                        onClick={() => handleSystemClick(mfr.manufacturer, sys)}
+                        className={`px-2 py-0.5 text-xs rounded transition-all ${
+                          manufacturer === mfr.manufacturer && system === sys
+                            ? "bg-retro-amber/40 text-retro-amber ring-1 ring-retro-amber"
+                            : "bg-retro-amber/15 text-retro-amber hover:bg-retro-amber/30 hover:text-white"
+                        }`}
+                      >
+                        {sys}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
