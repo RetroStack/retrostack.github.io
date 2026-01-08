@@ -75,6 +75,7 @@ export function BinaryImportView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [chip, setChip] = useState("");
   const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
@@ -222,7 +223,7 @@ export function BinaryImportView() {
             source: source.trim() || "yourself",
             manufacturer: manufacturer.trim(),
             system: system.trim(),
-            chip: "",
+            chip: chip.trim(),
             locale: locale.trim(),
             createdAt: now,
             updatedAt: now,
@@ -245,7 +246,7 @@ export function BinaryImportView() {
         setSaving(false);
       }
     },
-    [fileData, name, description, source, manufacturer, system, locale, config, characters, save, router]
+    [fileData, name, description, source, manufacturer, system, chip, locale, config, characters, save, router]
   );
 
   return (
@@ -411,6 +412,8 @@ export function BinaryImportView() {
                   onManufacturerChange={setManufacturer}
                   system={system}
                   onSystemChange={setSystem}
+                  chip={chip}
+                  onChipChange={setChip}
                   locale={locale}
                   onLocaleChange={setLocale}
                   source={source}

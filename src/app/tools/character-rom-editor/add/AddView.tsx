@@ -8,8 +8,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { NeonText } from "@/components/effects/NeonText";
-import { ManufacturerSystemSelect } from "@/components/character-editor/selectors/ManufacturerSystemSelect";
 import { ImportStepIndicator } from "@/components/character-editor/import/ImportStepIndicator";
+import { MetadataStep } from "@/components/character-editor/import/MetadataStep";
 import { LibraryCardCompact } from "@/components/character-editor/library/LibraryCard";
 import { SizePresetDropdown } from "@/components/character-editor/selectors/SizePresetDropdown";
 import { CharacterCountPresetDropdown } from "@/components/character-editor/selectors/CharacterCountPresetDropdown";
@@ -46,6 +46,7 @@ export function AddView() {
   const [description, setDescription] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [system, setSystem] = useState("");
+  const [chip, setChip] = useState("");
   const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
 
@@ -216,7 +217,7 @@ export function AddView() {
           source: source.trim() || "yourself",
           manufacturer: manufacturer.trim(),
           system: system.trim(),
-          chip: "",
+          chip: chip.trim(),
           locale: locale.trim(),
           createdAt: now,
           updatedAt: now,
@@ -239,6 +240,7 @@ export function AddView() {
     source,
     manufacturer,
     system,
+    chip,
     locale,
     config,
     sourceMode,
@@ -294,97 +296,23 @@ export function AddView() {
             {/* Step 1: Metadata */}
             {step === 1 && (
               <div className="space-y-6">
-                <div className="text-center mb-6">
-                  <h2 className="text-lg font-medium text-gray-200 mb-2">
-                    Character Set Details
-                  </h2>
-                  <p className="text-sm text-gray-400">
-                    Add information about this character set
-                  </p>
-                </div>
-
-                <div className="card-retro p-6 space-y-6">
-                  {/* Name */}
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-300 mb-1.5"
-                    >
-                      Name <span className="text-retro-pink">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="My Character Set"
-                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
-                      autoFocus
-                    />
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-300 mb-1.5"
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Optional description..."
-                      rows={2}
-                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 resize-none"
-                    />
-                  </div>
-
-                  {/* Manufacturer and System */}
-                  <ManufacturerSystemSelect
-                    manufacturer={manufacturer}
-                    system={system}
-                    onManufacturerChange={setManufacturer}
-                    onSystemChange={setSystem}
-                  />
-
-                  {/* Locale */}
-                  <div>
-                    <label
-                      htmlFor="locale"
-                      className="block text-sm font-medium text-gray-300 mb-1.5"
-                    >
-                      Locale
-                    </label>
-                    <input
-                      type="text"
-                      id="locale"
-                      value={locale}
-                      onChange={(e) => setLocale(e.target.value)}
-                      placeholder="e.g., English, German, Japanese"
-                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
-                    />
-                  </div>
-
-                  {/* Source */}
-                  <div>
-                    <label
-                      htmlFor="source"
-                      className="block text-sm font-medium text-gray-300 mb-1.5"
-                    >
-                      Source
-                    </label>
-                    <input
-                      type="text"
-                      id="source"
-                      value={source}
-                      onChange={(e) => setSource(e.target.value)}
-                      placeholder="Attribution or origin"
-                      className="w-full px-4 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
-                    />
-                  </div>
-                </div>
+                <MetadataStep
+                  name={name}
+                  onNameChange={setName}
+                  description={description}
+                  onDescriptionChange={setDescription}
+                  manufacturer={manufacturer}
+                  onManufacturerChange={setManufacturer}
+                  system={system}
+                  onSystemChange={setSystem}
+                  chip={chip}
+                  onChipChange={setChip}
+                  locale={locale}
+                  onLocaleChange={setLocale}
+                  source={source}
+                  onSourceChange={setSource}
+                  autoFocusName
+                />
 
                 {/* Navigation */}
                 <div className="flex justify-end pt-4">
