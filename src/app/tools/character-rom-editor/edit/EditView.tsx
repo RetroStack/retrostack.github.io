@@ -47,7 +47,7 @@ export function EditView() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const { getById, save, deleteSet } = useCharacterLibrary();
+  const { getById, save, deleteSet, loading: libraryLoading } = useCharacterLibrary();
   const toast = useToast();
 
   // Loading and error states
@@ -156,9 +156,14 @@ export function EditView() {
     [characterSet, editor, toast],
   );
 
-  // Load character set
+  // Load character set (wait for library to be ready first)
   useEffect(() => {
     async function loadCharacterSet() {
+      // Wait for the library to finish loading (it imports built-in sets)
+      if (libraryLoading) {
+        return;
+      }
+
       if (!id) {
         setError("No character set ID provided");
         setLoading(false);
@@ -182,7 +187,7 @@ export function EditView() {
 
     loadCharacterSet();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, libraryLoading]);
 
   // Handle save
   const handleSave = useCallback(async () => {
