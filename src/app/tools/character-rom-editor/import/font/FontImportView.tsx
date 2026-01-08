@@ -526,7 +526,7 @@ export function FontImportView() {
                                 px-3 py-1 text-xs rounded border transition-colors
                                 ${
                                   options.startCode === range.startCode && options.endCode === range.endCode
-                                    ? "border-retro-purple bg-retro-purple/10 text-retro-purple"
+                                    ? "border-retro-pink bg-retro-pink/10 text-retro-pink"
                                     : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
                                 }
                               `}
@@ -588,7 +588,7 @@ export function FontImportView() {
                             max={255}
                             value={options.threshold}
                             onChange={(e) => updateOption("threshold", parseInt(e.target.value))}
-                            className="w-full accent-retro-purple"
+                            className="w-full accent-retro-cyan"
                           />
                         </div>
 
@@ -605,7 +605,7 @@ export function FontImportView() {
                             max={8}
                             value={options.baselineOffset}
                             onChange={(e) => updateOption("baselineOffset", parseInt(e.target.value))}
-                            className="w-full accent-retro-purple"
+                            className="w-full accent-retro-cyan"
                           />
                         </div>
 
@@ -615,7 +615,7 @@ export function FontImportView() {
                             id="centerGlyphs"
                             checked={options.centerGlyphs}
                             onChange={(e) => updateOption("centerGlyphs", e.target.checked)}
-                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-purple focus:ring-retro-purple"
+                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan"
                           />
                           <label htmlFor="centerGlyphs" className="text-xs text-gray-400">
                             Center glyphs in cells

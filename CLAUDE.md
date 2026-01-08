@@ -98,6 +98,66 @@ bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus
 - Gray text (`text-gray-200`)
 - Cyan focus border (`focus:border-retro-cyan`)
 
+### Option Buttons (chip/pill selectors)
+```
+// Default state
+border-retro-grid/50 text-gray-400 hover:border-retro-grid
+
+// Selected state (pink)
+border-retro-pink bg-retro-pink/10 text-retro-pink
+```
+- Use pink for selected state to indicate active selection
+- Gray border and text for unselected state
+
+### Range Sliders (trackbars)
+```
+accent-retro-cyan
+```
+- Use cyan/blue accent color for all range input sliders
+- Provides visual distinction from selection buttons
+
+### Checkboxes
+```
+rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan
+```
+- Cyan check color to match slider accent
+- Navy background with grid border
+
+### Dropdown Trigger Buttons (3D raised style)
+```
+// Base styles
+text-retro-cyan rounded
+
+// 3D gradient background (light top, dark bottom)
+bg-gradient-to-b from-gray-600/50 to-gray-700/50
+
+// Blue border with lighter top edge for depth
+border border-retro-cyan/50 border-t-retro-cyan/70
+
+// Shadow for raised effect
+shadow-md shadow-black/30
+
+// Hover state (lighter)
+hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan
+
+// Active/pressed state (darker, reduced shadow)
+active:from-gray-700/50 active:to-gray-800/50 active:shadow-sm
+
+transition-all
+```
+- 3D raised button effect with gradient and shadow
+- Blue/cyan text (`text-retro-cyan`)
+- Gradient background: lighter at top, darker at bottom
+- Blue border with brighter top edge for depth illusion
+- Shadow creates raised appearance
+- Active state appears "pressed in" (darker gradient, smaller shadow)
+- Applies to ALL dropdown trigger buttons:
+  - Overflow menu icons (vertical dots) - `OverflowMenu` component
+  - Text "..." picker buttons - `ChipSelect`, `ManufacturerSystemSelect`
+  - "More ▼" buttons - `DimensionPresetSelector`, `CharacterCountPresetSelector`
+  - Color preset selector - `ColorPresetSelector`
+  - Multi-select dropdowns - `MultiSelectDropdown`
+
 ### Shared Metadata Form
 Use the `MetadataStep` component (`src/components/character-editor/import/MetadataStep.tsx`) for all character set metadata forms. It includes:
 - Name, Description, Manufacturer/System, Chip, Locale, Source fields

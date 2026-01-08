@@ -105,7 +105,7 @@ export function ManufacturerSystemSelect({
           type="button"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           disabled={disabled}
-          className="px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-gray-400 hover:text-white hover:border-retro-grid transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-2 bg-gradient-to-b from-gray-600/50 to-gray-700/50 border border-retro-cyan/50 border-t-retro-cyan/70 hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan active:from-gray-700/50 active:to-gray-800/50 shadow-md shadow-black/30 active:shadow-sm rounded text-sm text-retro-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           title="Select manufacturer and system"
         >
           ...

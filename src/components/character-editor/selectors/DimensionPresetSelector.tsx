@@ -173,7 +173,7 @@ export function DimensionPresetSelector({
             type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             disabled={disabled}
-            className="px-3 py-1 text-xs rounded border border-retro-grid/50 text-gray-400 hover:border-retro-grid flex items-center gap-1 disabled:opacity-50"
+            className="px-3 py-1 text-xs rounded text-retro-cyan bg-gradient-to-b from-gray-600/50 to-gray-700/50 border border-retro-cyan/50 border-t-retro-cyan/70 hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan active:from-gray-700/50 active:to-gray-800/50 shadow-md shadow-black/30 active:shadow-sm flex items-center gap-1 transition-all disabled:opacity-50"
           >
             More
             <svg
