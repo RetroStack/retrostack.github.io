@@ -14,6 +14,8 @@ import {
   LibraryGridError,
   LibraryFilters,
   OnboardingTour,
+  type SortField,
+  type SortDirection,
 } from "@/components/character-editor";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useCharacterLibrary } from "@/hooks/character-editor";
@@ -55,6 +57,10 @@ export function CharacterEditorLibrary() {
   const [systemFilters, setSystemFilters] = useState<string[]>([]);
   const [chipFilters, setChipFilters] = useState<string[]>([]);
   const [localeFilters, setLocaleFilters] = useState<string[]>([]);
+
+  // Sort state
+  const [sortField, setSortField] = useState<SortField>("updatedAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   // Get available manufacturers and systems from character sets
   const availableManufacturers = useMemo(() => {
@@ -170,14 +176,63 @@ export function CharacterEditorLibrary() {
       );
     }
 
-    // Sort with pinned items first, then by updated date
+    // Sort with pinned items first, then by selected sort field
     return [...result].sort((a, b) => {
+      // Pinned items always come first
       const aPinned = a.metadata.isPinned ? 1 : 0;
       const bPinned = b.metadata.isPinned ? 1 : 0;
       if (aPinned !== bPinned) return bPinned - aPinned;
-      return b.metadata.updatedAt - a.metadata.updatedAt;
+
+      // Apply selected sort
+      let comparison = 0;
+      switch (sortField) {
+        case "name":
+          comparison = a.metadata.name.localeCompare(b.metadata.name);
+          break;
+        case "description":
+          comparison = (a.metadata.description || "").localeCompare(b.metadata.description || "");
+          break;
+        case "source":
+          comparison = (a.metadata.source || "").localeCompare(b.metadata.source || "");
+          break;
+        case "updatedAt":
+          comparison = a.metadata.updatedAt - b.metadata.updatedAt;
+          break;
+        case "createdAt":
+          comparison = a.metadata.createdAt - b.metadata.createdAt;
+          break;
+        case "width":
+          comparison = a.config.width - b.config.width;
+          break;
+        case "height":
+          comparison = a.config.height - b.config.height;
+          break;
+        case "size": {
+          const aSize = a.config.width * a.config.height;
+          const bSize = b.config.width * b.config.height;
+          comparison = aSize - bSize;
+          break;
+        }
+        case "characters":
+          comparison = getCharacterCount(a) - getCharacterCount(b);
+          break;
+        case "manufacturer":
+          comparison = (a.metadata.manufacturer || "").localeCompare(b.metadata.manufacturer || "");
+          break;
+        case "system":
+          comparison = (a.metadata.system || "").localeCompare(b.metadata.system || "");
+          break;
+        case "chip":
+          comparison = (a.metadata.chip || "").localeCompare(b.metadata.chip || "");
+          break;
+        case "locale":
+          comparison = (a.metadata.locale || "").localeCompare(b.metadata.locale || "");
+          break;
+      }
+
+      return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [characterSets, searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, chipFilters, localeFilters]);
+  }, [characterSets, searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, chipFilters, localeFilters, sortField, sortDirection]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -311,6 +366,14 @@ export function CharacterEditorLibrary() {
     setCharacterCountFilters(counts);
   }, []);
 
+  const handleSortFieldChange = useCallback((field: SortField) => {
+    setSortField(field);
+  }, []);
+
+  const handleSortDirectionToggle = useCallback(() => {
+    setSortDirection((prev: SortDirection) => (prev === "asc" ? "desc" : "asc"));
+  }, []);
+
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setWidthFilters([]);
@@ -436,6 +499,10 @@ export function CharacterEditorLibrary() {
               availableLocales={availableLocales}
               localeFilters={localeFilters}
               onLocaleFilterChange={handleLocaleFilterChange}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSortFieldChange={handleSortFieldChange}
+              onSortDirectionToggle={handleSortDirectionToggle}
               totalCount={characterSets.length}
               filteredCount={filteredSets.length}
             />

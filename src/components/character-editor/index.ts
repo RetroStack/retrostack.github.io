@@ -44,8 +44,9 @@ export type { LibraryGridProps } from "./LibraryGrid";
 export {
   LibraryFilters,
   LibraryFiltersCompact,
+  SORT_OPTIONS,
 } from "./LibraryFilters";
-export type { LibraryFiltersProps } from "./LibraryFilters";
+export type { LibraryFiltersProps, SortField, SortDirection } from "./LibraryFilters";
 
 // Import components
 export { ImportDropZone } from "./ImportDropZone";

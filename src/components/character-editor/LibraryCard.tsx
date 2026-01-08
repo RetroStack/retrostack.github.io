@@ -50,6 +50,16 @@ export function LibraryCard({
 
   const characterCount = characters.length;
 
+  // Format date for display
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   // Build menu items
   const menuItems = useMemo(() => {
     const items = [];
@@ -157,36 +167,48 @@ export function LibraryCard({
         />
       </div>
 
-      {/* Footer with size, count, and actions - pushed to bottom */}
-      <div className="flex items-center justify-between pt-2 border-t border-retro-grid/30 text-[10px] mt-auto">
-        <div className="flex items-center gap-2">
-          {/* Size badge */}
-          <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-pink rounded">
-            {formatSize(config)}
-          </span>
-
-          {/* Character count */}
-          <span className="text-gray-500">
-            {characterCount} char{characterCount !== 1 ? "s" : ""}
-          </span>
-
-          {/* Built-in badge */}
-          {metadata.isBuiltIn && (
-            <span className="px-1.5 py-0.5 bg-retro-navy text-gray-400 rounded">
-              Built-in
+      {/* Footer with size, count, dates, and actions - pushed to bottom */}
+      <div className="flex flex-col gap-2 pt-2 border-t border-retro-grid/30 text-[10px] mt-auto">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Size badge */}
+            <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-pink rounded">
+              {formatSize(config)}
             </span>
+
+            {/* Character count */}
+            <span className="text-gray-500">
+              {characterCount} char{characterCount !== 1 ? "s" : ""}
+            </span>
+
+            {/* Built-in badge */}
+            {metadata.isBuiltIn && (
+              <span className="px-1.5 py-0.5 bg-retro-navy text-gray-400 rounded">
+                Built-in
+              </span>
+            )}
+          </div>
+
+          {/* Quick action button */}
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="px-2 py-1 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors"
+            >
+              Edit
+            </button>
           )}
         </div>
 
-        {/* Quick action button */}
-        {onEdit && (
-          <button
-            onClick={onEdit}
-            className="px-2 py-1 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors"
-          >
-            Edit
-          </button>
-        )}
+        {/* Dates */}
+        <div className="flex items-center gap-3 text-gray-500">
+          <span title="Date created">
+            <span className="text-[8px] text-gray-600">Created:</span> {formatDate(metadata.createdAt)}
+          </span>
+          <span title="Date modified">
+            <span className="text-[8px] text-gray-600">Modified:</span> {formatDate(metadata.updatedAt)}
+          </span>
+        </div>
       </div>
     </div>
   );

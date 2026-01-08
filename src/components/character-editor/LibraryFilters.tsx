@@ -3,6 +3,38 @@
 import { useCallback, useMemo } from "react";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 
+export type SortField =
+  | "name"
+  | "description"
+  | "source"
+  | "updatedAt"
+  | "createdAt"
+  | "width"
+  | "height"
+  | "size"
+  | "characters"
+  | "manufacturer"
+  | "system"
+  | "chip"
+  | "locale";
+export type SortDirection = "asc" | "desc";
+
+export const SORT_OPTIONS: { value: SortField; label: string }[] = [
+  { value: "updatedAt", label: "Date Modified" },
+  { value: "createdAt", label: "Date Created" },
+  { value: "name", label: "Name" },
+  { value: "description", label: "Description" },
+  { value: "source", label: "Source" },
+  { value: "width", label: "Width" },
+  { value: "height", label: "Height" },
+  { value: "size", label: "Size (W×H)" },
+  { value: "characters", label: "Count" },
+  { value: "manufacturer", label: "Manufacturer" },
+  { value: "system", label: "System" },
+  { value: "chip", label: "Chip" },
+  { value: "locale", label: "Locale" },
+];
+
 export interface LibraryFiltersProps {
   /** Current search query */
   searchQuery: string;
@@ -46,6 +78,14 @@ export interface LibraryFiltersProps {
   localeFilters?: string[];
   /** Callback when locale filters change */
   onLocaleFilterChange?: (locales: string[]) => void;
+  /** Current sort field */
+  sortField?: SortField;
+  /** Current sort direction */
+  sortDirection?: SortDirection;
+  /** Callback when sort field changes */
+  onSortFieldChange?: (field: SortField) => void;
+  /** Callback when sort direction is toggled */
+  onSortDirectionToggle?: () => void;
   /** Total count of items */
   totalCount: number;
   /** Filtered count of items */
@@ -77,10 +117,13 @@ export function LibraryFilters({
   availableLocales = [],
   localeFilters = [],
   onLocaleFilterChange,
+  sortField = "updatedAt",
+  sortDirection = "desc",
+  onSortFieldChange,
+  onSortDirectionToggle,
   totalCount,
   filteredCount,
 }: LibraryFiltersProps) {
-
   // Get all manufacturers from the library
   const allManufacturers = useMemo(() => {
     return [...availableManufacturers].sort();
@@ -108,7 +151,15 @@ export function LibraryFilters({
     onSystemFilterChange?.([]);
     onChipFilterChange?.([]);
     onLocaleFilterChange?.([]);
-  }, [onSearchChange, onSizeFilterChange, onCharacterCountFilterChange, onManufacturerFilterChange, onSystemFilterChange, onChipFilterChange, onLocaleFilterChange]);
+  }, [
+    onSearchChange,
+    onSizeFilterChange,
+    onCharacterCountFilterChange,
+    onManufacturerFilterChange,
+    onSystemFilterChange,
+    onChipFilterChange,
+    onLocaleFilterChange,
+  ]);
 
   const hasActiveFilters =
     searchQuery.length > 0 ||
@@ -122,16 +173,18 @@ export function LibraryFilters({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Search input */}
-      <div className="relative">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search character sets..."
-          className="w-full px-4 py-2 pl-10 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 transition-colors"
-          aria-label="Search character sets"
-        />
+      {/* Search input and sort controls */}
+      <div className="flex gap-2">
+        {/* Search input */}
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search character sets..."
+            className="w-full px-4 py-2 pl-10 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50 transition-colors"
+            aria-label="Search character sets"
+          />
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
             fill="none"
@@ -154,16 +207,46 @@ export function LibraryFilters({
               aria-label="Clear search"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
         </div>
+
+        {/* Sort controls */}
+        {onSortFieldChange && onSortDirectionToggle && (
+          <div className="flex gap-1">
+            {/* Sort field dropdown */}
+            <select
+              value={sortField}
+              onChange={(e) => onSortFieldChange(e.target.value as SortField)}
+              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-retro-cyan/50 transition-colors cursor-pointer"
+              aria-label="Sort by"
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort direction toggle button */}
+            <button
+              type="button"
+              onClick={onSortDirectionToggle}
+              className={`px-3 py-2 border rounded-lg text-xs font-mono transition-colors ${
+                sortDirection === "desc"
+                  ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                  : "bg-retro-navy/50 border-retro-grid/50 text-gray-400 hover:text-gray-200 hover:border-retro-cyan/50"
+              }`}
+              aria-label={sortDirection === "asc" ? "Sort ascending (A to Z)" : "Sort descending (Z to A)"}
+              title={sortDirection === "asc" ? "Ascending (A→Z)" : "Descending (Z→A)"}
+            >
+              {sortDirection === "asc" ? "abc" : "cba"}
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Filter dropdowns */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
@@ -190,11 +273,11 @@ export function LibraryFilters({
         {/* Character count filter */}
         {onCharacterCountFilterChange && (
           <MultiSelectDropdown
-            label="Characters"
+            label="Count"
             options={availableCharacterCounts.map((c) => ({ value: c, label: `${c} chars` }))}
             selected={characterCountFilters}
             onChange={onCharacterCountFilterChange}
-            placeholder="Characters"
+            placeholder="Count"
             allOptionLabel="Any count"
           />
         )}
@@ -257,10 +340,7 @@ export function LibraryFilters({
         </span>
 
         {hasActiveFilters && (
-          <button
-            onClick={handleClearFilters}
-            className="text-retro-cyan hover:text-retro-pink transition-colors"
-          >
+          <button onClick={handleClearFilters} className="text-retro-cyan hover:text-retro-pink transition-colors">
             Clear filters
           </button>
         )}
@@ -306,9 +386,7 @@ export function LibraryFiltersCompact({
         </svg>
       </div>
 
-      <span className="text-xs text-gray-500 whitespace-nowrap">
-        {totalCount} items
-      </span>
+      <span className="text-xs text-gray-500 whitespace-nowrap">{totalCount} items</span>
     </div>
   );
 }
