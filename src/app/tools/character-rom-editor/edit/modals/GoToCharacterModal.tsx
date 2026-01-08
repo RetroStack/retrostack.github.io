@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor/data/ascii";
+import { isPrintableAscii, getControlCharInfo } from "@/lib/character-editor/data/ascii";
 
 export interface GoToCharacterModalProps {
   /** Whether the modal is open */
@@ -97,7 +97,7 @@ export function GoToCharacterModal({
 
   // Get character info for preview
   const isPrintable = parsedIndex !== null && isPrintableAscii(parsedIndex);
-  const controlName = parsedIndex !== null ? getCharacterDisplayName(parsedIndex) : null;
+  const controlCharInfo = parsedIndex !== null ? getControlCharInfo(parsedIndex) : null;
 
   return (
     <div
@@ -158,10 +158,10 @@ export function GoToCharacterModal({
                   <span className="text-sm text-retro-pink font-mono">&apos;{String.fromCharCode(parsedIndex)}&apos;</span>
                 </div>
               )}
-              {controlName && (
+              {controlCharInfo && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-400">Control:</span>
-                  <span className="text-sm text-retro-pink">{controlName}</span>
+                  <span className="text-sm text-retro-pink">{controlCharInfo.abbr} ({controlCharInfo.name})</span>
                 </div>
               )}
             </div>

@@ -2,7 +2,7 @@
 
 import { ColorPresetSelector } from "../selectors/ColorPresetSelector";
 import { CustomColors } from "@/lib/character-editor/data/colorPresets";
-import { getCharacterDisplayName, isPrintableAscii } from "@/lib/character-editor/data/ascii";
+import { getControlCharInfo, isPrintableAscii } from "@/lib/character-editor/data/ascii";
 import { Tooltip } from "@/components/ui/Tooltip";
 
 export interface EditorHeaderProps {
@@ -70,7 +70,7 @@ export function EditorHeader({
 
   // Check if character is printable ASCII (32-126) or control character
   const isPrintable = isPrintableAscii(characterIndex);
-  const controlCharName = getCharacterDisplayName(characterIndex);
+  const controlCharInfo = getControlCharInfo(characterIndex);
 
   return (
     <div className={`flex items-center gap-4 px-4 py-2 bg-retro-navy/50 border-b border-retro-grid/50 ${className}`}>
@@ -125,13 +125,9 @@ export function EditorHeader({
             &apos;{String.fromCharCode(characterIndex)}&apos;
           </span>
         )}
-        {controlCharName && (
-          <span
-            className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded"
-            title="ASCII Control Character"
-          >
-            {" "}
-            ({controlCharName})
+        {controlCharInfo && (
+          <span className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded">
+            {controlCharInfo.abbr} ({controlCharInfo.name})
           </span>
         )}
         {batchMode && <span className="px-1.5 py-0.5 text-xs bg-retro-pink/20 text-retro-pink rounded">Batch</span>}

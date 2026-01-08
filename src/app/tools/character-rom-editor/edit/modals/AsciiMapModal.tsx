@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { Character } from "@/lib/character-editor/types";
-import { isPrintableAscii, getCharacterDisplayName } from "@/lib/character-editor/data/ascii";
+import { isPrintableAscii, getControlCharInfo } from "@/lib/character-editor/data/ascii";
 
 export interface AsciiMapModalProps {
   /** Whether the modal is open */
@@ -42,7 +42,7 @@ function MiniCharacter({
   const height = character.pixels.length;
   const width = character.pixels[0]?.length || 0;
   const isPrintable = isPrintableAscii(index);
-  const controlName = getCharacterDisplayName(index);
+  const controlCharInfo = getControlCharInfo(index);
 
   // Calculate tooltip
   const tooltip = useMemo(() => {
@@ -52,11 +52,11 @@ function MiniCharacter({
     ];
     if (isPrintable) {
       parts.push(`'${String.fromCharCode(index)}'`);
-    } else if (controlName) {
-      parts.push(controlName);
+    } else if (controlCharInfo) {
+      parts.push(`${controlCharInfo.abbr} (${controlCharInfo.name})`);
     }
     return parts.join(" | ");
-  }, [index, isPrintable, controlName]);
+  }, [index, isPrintable, controlCharInfo]);
 
   return (
     <button
