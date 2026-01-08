@@ -172,9 +172,11 @@ export function ShareModal({
                     type="text"
                     value={shareUrl}
                     readOnly
-                    className="w-full px-3 py-2 pr-16 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white font-mono truncate focus:outline-none focus:border-retro-cyan"
+                    className="w-full h-full px-3 py-2 pr-20 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white font-mono truncate focus:outline-none focus:border-retro-cyan"
                     onClick={(e) => (e.target as HTMLInputElement).select()}
                   />
+                  {/* Gradient fade for URL text before character counter */}
+                  <div className="absolute top-0 bottom-0 right-0 w-20 pointer-events-none bg-gradient-to-r from-transparent via-retro-dark/80 to-retro-dark" />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
                     {shareUrl.length} chars
                   </span>

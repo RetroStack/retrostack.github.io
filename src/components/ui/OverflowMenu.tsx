@@ -61,7 +61,7 @@ export function OverflowMenu({
       {/* Trigger Button */}
       <button
         onClick={handleToggle}
-        className="touch-target flex items-center justify-center p-2 text-retro-cyan bg-gradient-to-b from-gray-600/50 to-gray-700/50 border border-retro-cyan/50 border-t-retro-cyan/70 hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan active:from-gray-700/50 active:to-gray-800/50 shadow-md shadow-black/30 active:shadow-sm transition-all rounded-md"
+        className="touch-target flex items-center justify-center p-2 text-gray-400 hover:text-white bg-retro-dark/50 hover:bg-retro-dark rounded-md transition-colors"
         aria-label={label}
         aria-expanded={isOpen}
         aria-haspopup="menu"

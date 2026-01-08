@@ -125,20 +125,30 @@ export function LibraryCard({
     }
 
     return items;
-  }, [onEdit, onRename, onEditMetadata, onExport, onDuplicate, onDelete, onTogglePinned, metadata.isBuiltIn, metadata.isPinned]);
+  }, [
+    onEdit,
+    onRename,
+    onEditMetadata,
+    onExport,
+    onDuplicate,
+    onDelete,
+    onTogglePinned,
+    metadata.isBuiltIn,
+    metadata.isPinned,
+  ]);
 
   return (
-    <div className={`card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all h-full relative has-[[aria-expanded=true]]:z-50 ${metadata.isPinned ? "ring-1 ring-retro-yellow/50" : ""}`}>
+    <div
+      className={`card-retro p-4 flex flex-col gap-3 hover-glow-cyan transition-all h-full relative has-[[aria-expanded=true]]:z-50 ${
+        metadata.isPinned ? "ring-1 ring-retro-yellow/50" : ""
+      }`}
+    >
       {/* Header with title and menu */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-retro-cyan truncate flex items-center gap-1.5">
             {metadata.isPinned && (
-              <svg
-                className="w-3.5 h-3.5 text-retro-yellow flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-3.5 h-3.5 text-retro-yellow flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
               </svg>
             )}
@@ -146,36 +156,26 @@ export function LibraryCard({
           </h3>
           {(metadata.manufacturer || metadata.system || metadata.chip || metadata.locale) && (
             <p className="text-[10px] text-gray-500 mt-0.5">
-              {metadata.manufacturer}{metadata.manufacturer && metadata.system ? " " : ""}{metadata.system}
+              {metadata.manufacturer}
+              {metadata.manufacturer && metadata.system ? " " : ""}
+              {metadata.system}
               {metadata.chip && (metadata.manufacturer || metadata.system) ? " · " : ""}
               {metadata.chip}
               {metadata.locale && (metadata.manufacturer || metadata.system || metadata.chip) ? " · " : ""}
               {metadata.locale}
             </p>
           )}
-          {metadata.description && (
-            <p className="text-xs text-gray-400 line-clamp-2 mt-0.5">
-              {metadata.description}
-            </p>
-          )}
+          {metadata.description && <p className="text-xs text-gray-400 line-clamp-2 mt-0.5">{metadata.description}</p>}
         </div>
 
         <div className="flex-shrink-0">
-          {menuItems.length > 0 && (
-            <OverflowMenu items={menuItems} align="right" label="Character set actions" />
-          )}
+          {menuItems.length > 0 && <OverflowMenu items={menuItems} align="right" label="Character set actions" />}
         </div>
       </div>
 
       {/* Character preview */}
       <div className="flex justify-center py-2 bg-black/30 rounded">
-        <CharacterPreview
-          characters={characters}
-          config={config}
-          maxCharacters={512}
-          maxWidth={256}
-          maxHeight={4096}
-        />
+        <CharacterPreview characters={characters} config={config} maxCharacters={512} maxWidth={256} maxHeight={4096} />
       </div>
 
       {/* Footer with size, count, dates, and actions - pushed to bottom */}
@@ -183,9 +183,7 @@ export function LibraryCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* Size badge */}
-            <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-pink rounded">
-              {formatSize(config)}
-            </span>
+            <span className="px-1.5 py-0.5 bg-retro-purple/30 text-retro-pink rounded">{formatSize(config)}</span>
 
             {/* Character count */}
             <span className="text-gray-500">
@@ -193,11 +191,7 @@ export function LibraryCard({
             </span>
 
             {/* Built-in badge */}
-            {metadata.isBuiltIn && (
-              <span className="px-1.5 py-0.5 bg-retro-navy text-gray-400 rounded">
-                Built-in
-              </span>
-            )}
+            {metadata.isBuiltIn && <span className="px-1.5 py-0.5 bg-retro-navy text-gray-400 rounded">Built-in</span>}
           </div>
 
           {/* Quick action button */}
@@ -253,38 +247,27 @@ export function LibraryCardCompact({
       onClick={onClick}
       className={`
         w-full p-3 rounded border text-left transition-all
-        ${selected
-          ? "border-retro-cyan bg-retro-cyan/10"
-          : "border-retro-grid/30 bg-retro-navy/30 hover:border-retro-grid/50"
+        ${
+          selected
+            ? "border-retro-cyan bg-retro-cyan/10"
+            : "border-retro-grid/30 bg-retro-navy/30 hover:border-retro-grid/50"
         }
       `}
     >
       <div className="flex items-center gap-3">
         <div className="flex-shrink-0 bg-black/30 p-1 rounded">
-          <CharacterPreview
-            characters={characters}
-            config={config}
-            maxCharacters={8}
-            maxWidth={48}
-            maxHeight={24}
-          />
+          <CharacterPreview characters={characters} config={config} maxCharacters={8} maxWidth={48} maxHeight={24} />
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-gray-200 truncate">
-            {metadata.name}
-          </div>
+          <div className="text-sm font-medium text-gray-200 truncate">{metadata.name}</div>
           <div className="text-[10px] text-gray-500">
             {formatSize(config)} - {characters.length} chars
           </div>
         </div>
 
         {selected && (
-          <svg
-            className="w-4 h-4 text-retro-cyan flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4 text-retro-cyan flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
           </svg>
         )}
@@ -296,22 +279,11 @@ export function LibraryCardCompact({
 /**
  * Empty state card for adding new character sets
  */
-export function LibraryCardEmpty({
-  onImport,
-  onCreate,
-}: {
-  onImport?: () => void;
-  onCreate?: () => void;
-}) {
+export function LibraryCardEmpty({ onImport, onCreate }: { onImport?: () => void; onCreate?: () => void }) {
   return (
     <div className="card-retro p-6 flex flex-col items-center justify-center gap-4 border-dashed">
       <div className="w-12 h-12 rounded-full bg-retro-cyan/20 flex items-center justify-center">
-        <svg
-          className="w-6 h-6 text-retro-cyan"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-6 h-6 text-retro-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -344,7 +316,12 @@ export function LibraryCardEmpty({
             className="px-3 py-1.5 text-xs bg-retro-cyan/20 text-retro-cyan rounded hover:bg-retro-cyan/30 transition-colors flex items-center gap-1"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
             </svg>
             Import
           </button>

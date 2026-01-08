@@ -17,8 +17,8 @@
 /** IndexedDB database name */
 export const DB_NAME = "retrostack-web";
 
-/** IndexedDB version */
-export const DB_VERSION = 1;
+/** IndexedDB version - bump this when adding new object stores or indexes */
+export const DB_VERSION = 5;
 
 // =============================================================================
 // Character Editor IndexedDB Stores
