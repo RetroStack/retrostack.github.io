@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
@@ -17,6 +17,14 @@ import { useCharacterLibrary } from "@/hooks/character-editor";
 import { useToast } from "@/hooks/useToast";
 import { useOnboarding, CHARACTER_EDITOR_ONBOARDING_STEPS } from "@/hooks";
 import { getCharacterCount } from "@/lib/character-editor/types";
+
+// LocalStorage keys for persisting sort preferences
+const SORT_FIELD_STORAGE_KEY = "retrostack-character-editor-sort-field";
+const SORT_DIRECTION_STORAGE_KEY = "retrostack-character-editor-sort-direction";
+
+// Default sort settings
+const DEFAULT_SORT_FIELD: SortField = "name";
+const DEFAULT_SORT_DIRECTION: SortDirection = "asc";
 
 /**
  * Main library view for the Character ROM Editor
@@ -54,9 +62,26 @@ export function CharacterEditorLibrary() {
   const [chipFilters, setChipFilters] = useState<string[]>([]);
   const [localeFilters, setLocaleFilters] = useState<string[]>([]);
 
-  // Sort state
-  const [sortField, setSortField] = useState<SortField>("updatedAt");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  // Sort state (defaults to name/asc, loaded from localStorage)
+  const [sortField, setSortField] = useState<SortField>(DEFAULT_SORT_FIELD);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(DEFAULT_SORT_DIRECTION);
+
+  // Load sort preferences from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedSortField = localStorage.getItem(SORT_FIELD_STORAGE_KEY);
+      const storedSortDirection = localStorage.getItem(SORT_DIRECTION_STORAGE_KEY);
+
+      if (storedSortField) {
+        setSortField(storedSortField as SortField);
+      }
+      if (storedSortDirection) {
+        setSortDirection(storedSortDirection as SortDirection);
+      }
+    } catch {
+      // localStorage might not be available (e.g., private browsing)
+    }
+  }, []);
 
   // Get available manufacturers and systems from character sets
   const availableManufacturers = useMemo(() => {
@@ -383,10 +408,23 @@ export function CharacterEditorLibrary() {
 
   const handleSortFieldChange = useCallback((field: SortField) => {
     setSortField(field);
+    try {
+      localStorage.setItem(SORT_FIELD_STORAGE_KEY, field);
+    } catch {
+      // localStorage might not be available
+    }
   }, []);
 
   const handleSortDirectionToggle = useCallback(() => {
-    setSortDirection((prev: SortDirection) => (prev === "asc" ? "desc" : "asc"));
+    setSortDirection((prev: SortDirection) => {
+      const newDirection = prev === "asc" ? "desc" : "asc";
+      try {
+        localStorage.setItem(SORT_DIRECTION_STORAGE_KEY, newDirection);
+      } catch {
+        // localStorage might not be available
+      }
+      return newDirection;
+    });
   }, []);
 
   const handleClearFilters = useCallback(() => {
