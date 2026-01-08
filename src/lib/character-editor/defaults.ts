@@ -4,11 +4,13 @@
  * Built-in character sets for classic retro systems.
  * These are authentic character ROM data from various vintage computers.
  * Data is stored in JSON and imported here with type definitions.
+ * Also supports loading character sets from external URLs.
  */
 
 import { SerializedCharacterSet } from "./types";
 import { binaryToBase64 } from "./binary";
 import charsetData from "./builtinCharsets.json";
+import { getEnabledExternalSources, ExternalCharsetSource } from "./externalSources";
 
 /**
  * Source character set data format with full metadata
@@ -130,4 +132,158 @@ export function getBuiltInCharacterSetById(id: string): SerializedCharacterSet |
  */
 export function isBuiltInCharacterSet(id: string): boolean {
   return builtinCharsets.some((source) => source.id === id);
+}
+
+// =============================================================================
+// External Character Set Loading
+// =============================================================================
+
+/**
+ * Cache for fetched external character sets
+ * Maps source URL to fetched data (or null if fetch failed)
+ */
+const externalCharsetCache = new Map<string, ChargenSourceData[] | null>();
+
+/**
+ * Fetch character sets from a single external URL
+ * Returns null if fetch fails (does not throw)
+ */
+async function fetchExternalCharsets(
+  source: ExternalCharsetSource
+): Promise<ChargenSourceData[] | null> {
+  // Check cache first
+  if (externalCharsetCache.has(source.url)) {
+    return externalCharsetCache.get(source.url) ?? null;
+  }
+
+  try {
+    const response = await fetch(source.url);
+    if (!response.ok) {
+      console.warn(
+        `Failed to fetch external charsets from ${source.name}: ${response.status}`
+      );
+      externalCharsetCache.set(source.url, null);
+      return null;
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      console.warn(
+        `Invalid format from ${source.name}: expected array of character sets`
+      );
+      externalCharsetCache.set(source.url, null);
+      return null;
+    }
+
+    // Validate and filter valid entries
+    const validCharsets = data.filter((item): item is ChargenSourceData => {
+      return (
+        typeof item === "object" &&
+        item !== null &&
+        typeof item.id === "string" &&
+        typeof item.name === "string" &&
+        typeof item.width === "number" &&
+        typeof item.height === "number" &&
+        Array.isArray(item.data)
+      );
+    });
+
+    externalCharsetCache.set(source.url, validCharsets);
+    return validCharsets;
+  } catch (error) {
+    console.warn(`Error fetching external charsets from ${source.name}:`, error);
+    externalCharsetCache.set(source.url, null);
+    return null;
+  }
+}
+
+/**
+ * Fetch all character sets from all enabled external sources
+ * Returns combined array of all successfully fetched character sets
+ */
+export async function fetchAllExternalCharsets(): Promise<SerializedCharacterSet[]> {
+  const sources = getEnabledExternalSources();
+  if (sources.length === 0) {
+    return [];
+  }
+
+  const results = await Promise.all(sources.map(fetchExternalCharsets));
+
+  const allCharsets: SerializedCharacterSet[] = [];
+  for (const charsets of results) {
+    if (charsets) {
+      for (const source of charsets) {
+        allCharsets.push(createCharacterSetFromSource(source));
+      }
+    }
+  }
+
+  return allCharsets;
+}
+
+/**
+ * Get all external character set IDs from all enabled sources
+ * Returns array of IDs from successfully fetched sources
+ */
+export async function getExternalIds(): Promise<string[]> {
+  const sources = getEnabledExternalSources();
+  if (sources.length === 0) {
+    return [];
+  }
+
+  const results = await Promise.all(sources.map(fetchExternalCharsets));
+
+  const ids: string[] = [];
+  for (const charsets of results) {
+    if (charsets) {
+      for (const source of charsets) {
+        ids.push(source.id);
+      }
+    }
+  }
+
+  return ids;
+}
+
+/**
+ * Get a specific external character set by ID
+ * Searches all enabled external sources
+ * Returns null if not found
+ */
+export async function getExternalCharacterSetById(
+  id: string
+): Promise<SerializedCharacterSet | null> {
+  const sources = getEnabledExternalSources();
+  if (sources.length === 0) {
+    return null;
+  }
+
+  const results = await Promise.all(sources.map(fetchExternalCharsets));
+
+  for (const charsets of results) {
+    if (charsets) {
+      const source = charsets.find((s) => s.id === id);
+      if (source) {
+        return createCharacterSetFromSource(source);
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Check if a character set ID belongs to an external source
+ */
+export async function isExternalCharacterSet(id: string): Promise<boolean> {
+  const externalIds = await getExternalIds();
+  return externalIds.includes(id);
+}
+
+/**
+ * Clear the external charset cache
+ * Useful for forcing a refresh from external sources
+ */
+export function clearExternalCache(): void {
+  externalCharsetCache.clear();
 }

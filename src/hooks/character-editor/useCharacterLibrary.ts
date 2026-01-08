@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import { SerializedCharacterSet, CharacterSet, generateId } from "@/lib/character-editor/types";
 import { characterStorage } from "@/lib/character-editor/storage";
 import { deserializeCharacterSet, serializeCharacterSet } from "@/lib/character-editor/binary";
-import { getBuiltInIds, getBuiltInCharacterSetById } from "@/lib/character-editor/defaults";
+import {
+  getBuiltInIds,
+  getBuiltInCharacterSetById,
+  getExternalIds,
+  getExternalCharacterSetById,
+} from "@/lib/character-editor/defaults";
 
 export interface UseCharacterLibraryResult {
   /** All character sets in the library */
@@ -64,11 +69,11 @@ export function useCharacterLibrary(): UseCharacterLibraryResult {
 
       // Get all built-in IDs and find which ones are missing
       const builtInIds = getBuiltInIds();
-      const missingIds = builtInIds.filter((id) => !existingIds.has(id));
+      const missingBuiltInIds = builtInIds.filter((id) => !existingIds.has(id));
 
       // Import only the missing built-in character sets
-      if (missingIds.length > 0) {
-        for (const id of missingIds) {
+      if (missingBuiltInIds.length > 0) {
+        for (const id of missingBuiltInIds) {
           const builtInSet = getBuiltInCharacterSetById(id);
           if (builtInSet) {
             await characterStorage.save(builtInSet);
@@ -76,8 +81,22 @@ export function useCharacterLibrary(): UseCharacterLibraryResult {
         }
       }
 
+      // Fetch external character sets and import missing ones
+      const externalIds = await getExternalIds();
+      const missingExternalIds = externalIds.filter((id) => !existingIds.has(id));
+
+      if (missingExternalIds.length > 0) {
+        for (const id of missingExternalIds) {
+          const externalSet = await getExternalCharacterSetById(id);
+          if (externalSet) {
+            await characterStorage.save(externalSet);
+          }
+        }
+      }
+
       // Load all character sets (including newly added ones)
-      const sets = missingIds.length > 0 ? await characterStorage.getAll() : existingSets;
+      const hasNewSets = missingBuiltInIds.length > 0 || missingExternalIds.length > 0;
+      const sets = hasNewSets ? await characterStorage.getAll() : existingSets;
       setCharacterSets(sets);
 
       // Get available sizes for filtering
