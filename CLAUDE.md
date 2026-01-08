@@ -95,15 +95,18 @@ bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder
 - White text (`text-white`)
 - Cyan focus border (`focus:border-retro-cyan`)
 
-### Non-editable Dropdowns (select, MultiSelectDropdown)
+### Non-editable Dropdowns / Comboboxes (select, MultiSelectDropdown)
 
 ```css
 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan
 ```
 
 - Semi-transparent navy background (`bg-retro-navy/50`)
-- Gray text (`text-gray-200`)
-- Cyan focus border (`focus:border-retro-cyan`)
+- Gray text (`text-gray-200` when has selection, `text-gray-400` when empty)
+- Cyan border when open (`border-retro-cyan`)
+- Grid border when closed (`border-retro-grid/50`)
+- **NOT** the 3D raised button style - that's only for action buttons
+- Used in: `MultiSelectDropdown`, `ColorPresetSelector`, native `<select>` elements
 
 ### Option Buttons (chip/pill selectors)
 
@@ -127,14 +130,33 @@ accent-retro-cyan
 - Use cyan/blue accent color for all range input sliders
 - Provides visual distinction from selection buttons
 
-### Checkboxes
+### Toggle Switches (iOS-style)
+
+Use the `ToggleSwitch` component from `@/components/ui/ToggleSwitch` instead of checkboxes.
 
 ```css
-rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan
+/* Track - Off state */
+bg-retro-purple/50 border-retro-purple rounded-full
+
+/* Track - On state */
+bg-retro-pink border-retro-pink rounded-full
+
+/* Thumb - Off state */
+bg-gray-400 rounded-full
+
+/* Thumb - On state */
+bg-white rounded-full
+
+/* Focus ring */
+focus:ring-2 focus:ring-retro-cyan focus:ring-offset-retro-dark
 ```
 
-- Cyan check color to match slider accent
-- Navy background with grid border
+- Pink track when on (`bg-retro-pink`), purple track when off (`bg-retro-purple/50`)
+- White thumb when on, gray thumb when off (`bg-gray-400`)
+- Size: `h-6 w-11` track, `h-5 w-5` thumb
+- Cyan focus ring for accessibility
+- Smooth transition animation
+- Used in place of all checkboxes throughout the app
 
 ### Dropdown Trigger Buttons (3D raised style)
 
@@ -166,12 +188,11 @@ transition-all
 - Blue border with brighter top edge for depth illusion
 - Shadow creates raised appearance
 - Active state appears "pressed in" (darker gradient, smaller shadow)
-- Applies to ALL dropdown trigger buttons:
+- Applies to action/picker dropdown buttons (NOT comboboxes):
   - Overflow menu icons (vertical dots) - `OverflowMenu` component
   - Text "..." picker buttons - `ChipSelect`, `ManufacturerSystemSelect`
   - "More ▼" buttons - `DimensionPresetSelector`, `CharacterCountPresetSelector`
-  - Color preset selector - `ColorPresetSelector`
-  - Multi-select dropdowns - `MultiSelectDropdown`
+- **Does NOT apply to comboboxes**: `MultiSelectDropdown`, `ColorPresetSelector`, native `<select>` elements (use non-editable dropdown style instead)
 
 ### Dropdown Panel Design
 

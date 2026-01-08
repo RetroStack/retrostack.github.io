@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { NeonText } from "@/components/effects/NeonText";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import { ImportStepIndicator } from "@/components/character-editor/import/ImportStepIndicator";
@@ -605,14 +606,12 @@ export function ImageImportView() {
 
                         {/* Invert toggle */}
                         <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
+                          <ToggleSwitch
                             id="invert"
                             checked={options.invert}
-                            onChange={(e) => updateOption("invert", e.target.checked)}
-                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-pink focus:ring-retro-pink"
+                            onChange={(checked) => updateOption("invert", checked)}
                           />
-                          <label htmlFor="invert" className="text-xs text-gray-400">
+                          <label htmlFor="invert" className="text-xs text-gray-400 cursor-pointer" onClick={() => updateOption("invert", !options.invert)}>
                             Invert colors (treat light as foreground)
                           </label>
                         </div>

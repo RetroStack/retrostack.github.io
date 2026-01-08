@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { NeonText } from "@/components/effects/NeonText";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import { ImportStepIndicator } from "@/components/character-editor/import/ImportStepIndicator";
@@ -610,14 +611,12 @@ export function FontImportView() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
+                          <ToggleSwitch
                             id="centerGlyphs"
                             checked={options.centerGlyphs}
-                            onChange={(e) => updateOption("centerGlyphs", e.target.checked)}
-                            className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan"
+                            onChange={(checked) => updateOption("centerGlyphs", checked)}
                           />
-                          <label htmlFor="centerGlyphs" className="text-xs text-gray-400">
+                          <label htmlFor="centerGlyphs" className="text-xs text-gray-400 cursor-pointer" onClick={() => updateOption("centerGlyphs", !options.centerGlyphs)}>
                             Center glyphs in cells
                           </label>
                         </div>

@@ -82,7 +82,9 @@ export function ColorPresetSelector({
       {/* Trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded text-sm text-retro-cyan bg-gradient-to-b from-gray-600/50 to-gray-700/50 border border-retro-cyan/50 border-t-retro-cyan/70 hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan active:from-gray-700/50 active:to-gray-800/50 shadow-md shadow-black/30 active:shadow-sm transition-all"
+        className={`flex items-center gap-2 px-3 py-1.5 bg-retro-navy/50 border rounded text-sm text-gray-200 transition-colors ${
+          isOpen ? "border-retro-cyan" : "border-retro-grid/50 hover:border-retro-grid"
+        }`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >

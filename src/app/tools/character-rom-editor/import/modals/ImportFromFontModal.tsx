@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import {
   FontImportOptions,
@@ -549,14 +550,12 @@ export function ImportFromFontModal({
 
                   {/* Center toggle */}
                   <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <ToggleSwitch
                       id="centerGlyphs"
                       checked={options.centerGlyphs}
-                      onChange={(e) => updateOption("centerGlyphs", e.target.checked)}
-                      className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan"
+                      onChange={(checked) => updateOption("centerGlyphs", checked)}
                     />
-                    <label htmlFor="centerGlyphs" className="text-xs text-gray-400">
+                    <label htmlFor="centerGlyphs" className="text-xs text-gray-400 cursor-pointer" onClick={() => updateOption("centerGlyphs", !options.centerGlyphs)}>
                       Center glyphs in cells
                     </label>
                   </div>

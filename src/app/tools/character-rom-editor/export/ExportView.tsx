@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { NeonText } from "@/components/effects/NeonText";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
@@ -452,30 +453,26 @@ export function ExportView() {
 
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={cHeaderOptions.includeGuards}
-                          onChange={(e) =>
+                          onChange={(checked) =>
                             setCHeaderOptions({
                               ...cHeaderOptions,
-                              includeGuards: e.target.checked,
+                              includeGuards: checked,
                             })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Include guards (#ifndef)
                       </label>
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={cHeaderOptions.includeComments}
-                          onChange={(e) =>
+                          onChange={(checked) =>
                             setCHeaderOptions({
                               ...cHeaderOptions,
-                              includeComments: e.target.checked,
+                              includeComments: checked,
                             })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Include comments
                       </label>
@@ -523,27 +520,23 @@ export function ExportView() {
 
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={assemblyOptions.useHex}
-                          onChange={(e) =>
-                            setAssemblyOptions({ ...assemblyOptions, useHex: e.target.checked })
+                          onChange={(checked) =>
+                            setAssemblyOptions({ ...assemblyOptions, useHex: checked })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Use hex values ($FF)
                       </label>
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={assemblyOptions.includeComments}
-                          onChange={(e) =>
+                          onChange={(checked) =>
                             setAssemblyOptions({
                               ...assemblyOptions,
-                              includeComments: e.target.checked,
+                              includeComments: checked,
                             })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Include comments
                       </label>
@@ -612,24 +605,20 @@ export function ExportView() {
 
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={pngOptions.showGrid}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, showGrid: e.target.checked })
+                          onChange={(checked) =>
+                            setPngOptions({ ...pngOptions, showGrid: checked })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Show grid lines
                       </label>
                       <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <input
-                          type="checkbox"
+                        <ToggleSwitch
                           checked={pngOptions.transparent}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, transparent: e.target.checked })
+                          onChange={(checked) =>
+                            setPngOptions({ ...pngOptions, transparent: checked })
                           }
-                          className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                         />
                         Transparent background
                       </label>
@@ -794,13 +783,11 @@ export function ExportView() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showTitle}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showTitle: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showTitle: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             Title header
                           </label>
@@ -817,13 +804,11 @@ export function ExportView() {
                         {referenceSheetOptions.layout === "table" && (
                           <div className="flex items-center justify-between">
                             <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                              <input
-                                type="checkbox"
+                              <ToggleSwitch
                                 checked={referenceSheetOptions.showGroupLabel}
-                                onChange={(e) =>
-                                  setReferenceSheetOptions({ ...referenceSheetOptions, showGroupLabel: e.target.checked })
+                                onChange={(checked) =>
+                                  setReferenceSheetOptions({ ...referenceSheetOptions, showGroupLabel: checked })
                                 }
-                                className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                               />
                               Group labels
                             </label>
@@ -840,13 +825,11 @@ export function ExportView() {
                         )}
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showHex}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showHex: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showHex: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             Hex codes ($00)
                           </label>
@@ -862,13 +845,11 @@ export function ExportView() {
                         </div>
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showDecimal}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showDecimal: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showDecimal: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             Decimal codes
                           </label>
@@ -884,13 +865,11 @@ export function ExportView() {
                         </div>
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showOctal}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showOctal: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showOctal: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             Octal codes (000)
                           </label>
@@ -906,13 +885,11 @@ export function ExportView() {
                         </div>
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showBinary}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showBinary: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showBinary: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             Binary codes (00000000)
                           </label>
@@ -928,13 +905,11 @@ export function ExportView() {
                         </div>
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showAscii}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showAscii: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showAscii: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             ASCII printable
                           </label>
@@ -950,13 +925,11 @@ export function ExportView() {
                         </div>
                         <div className="flex items-center justify-between">
                           <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                            <input
-                              type="checkbox"
+                            <ToggleSwitch
                               checked={referenceSheetOptions.showNonPrintableAscii}
-                              onChange={(e) =>
-                                setReferenceSheetOptions({ ...referenceSheetOptions, showNonPrintableAscii: e.target.checked })
+                              onChange={(checked) =>
+                                setReferenceSheetOptions({ ...referenceSheetOptions, showNonPrintableAscii: checked })
                               }
-                              className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan/50"
                             />
                             ASCII non-printable
                           </label>

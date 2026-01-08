@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import {
   ImageImportOptions,
@@ -519,14 +520,12 @@ export function ImportFromImageModal({
 
                   {/* Invert toggle */}
                   <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <ToggleSwitch
                       id="invert"
                       checked={options.invert}
-                      onChange={(e) => updateOption("invert", e.target.checked)}
-                      className="rounded border-retro-grid/50 bg-retro-navy/50 text-retro-cyan focus:ring-retro-cyan"
+                      onChange={(checked) => updateOption("invert", checked)}
                     />
-                    <label htmlFor="invert" className="text-xs text-gray-400">
+                    <label htmlFor="invert" className="text-xs text-gray-400 cursor-pointer" onClick={() => updateOption("invert", !options.invert)}>
                       Invert colors (treat light as foreground)
                     </label>
                   </div>

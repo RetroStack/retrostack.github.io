@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { CharacterSetMetadata } from "@/lib/character-editor/types";
 import { ManufacturerSystemSelect } from "@/components/character-editor/selectors/ManufacturerSystemSelect";
 import { ChipSelect } from "@/components/character-editor/selectors/ChipSelect";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { getRomChipsForSystem } from "@/lib/character-editor/data/manufacturers";
 
 export interface MetadataEditModalProps {
@@ -175,21 +176,10 @@ export function MetadataEditModal({ isOpen, onClose, metadata, onSave }: Metadat
               <label className="block text-sm text-gray-300">Pin to top</label>
               <p className="text-xs text-gray-500">Pinned items appear first in search results</p>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsPinned(!isPinned)}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-retro-cyan focus:ring-offset-2 focus:ring-offset-retro-dark ${
-                isPinned ? "bg-retro-pink border-retro-pink" : "bg-retro-purple/50 border-retro-purple"
-              }`}
-              role="switch"
-              aria-checked={isPinned}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out ${
-                  isPinned ? "translate-x-5 bg-white" : "translate-x-0 bg-gray-400"
-                }`}
-              />
-            </button>
+            <ToggleSwitch
+              checked={isPinned}
+              onChange={setIsPinned}
+            />
           </div>
         </div>
 
