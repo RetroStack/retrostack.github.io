@@ -153,7 +153,9 @@ export function CharacterEditorLibrary() {
           set.metadata.description.toLowerCase().includes(query) ||
           set.metadata.source.toLowerCase().includes(query) ||
           (set.metadata.manufacturer && set.metadata.manufacturer.toLowerCase().includes(query)) ||
-          (set.metadata.system && set.metadata.system.toLowerCase().includes(query))
+          (set.metadata.system && set.metadata.system.toLowerCase().includes(query)) ||
+          (set.metadata.chip && set.metadata.chip.toLowerCase().includes(query)) ||
+          (set.metadata.locale && set.metadata.locale.toLowerCase().includes(query))
       );
     }
 
