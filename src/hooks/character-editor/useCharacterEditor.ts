@@ -379,12 +379,17 @@ export function useCharacterEditor(
   }, [updateState, selectedIndices]);
 
   const centerSelected = useCallback(() => {
+    console.log("centerSelected called", { selectedIndices: Array.from(selectedIndices) });
     updateState((state) => {
+      console.log("updateState updater called", { numCharacters: state.characters.length });
+      const before = state.characters.map(c => c.pixels.flat().filter(Boolean).length);
       state.characters = batchTransform(
         state.characters,
         selectedIndices,
         centerCharacter
       );
+      const after = state.characters.map(c => c.pixels.flat().filter(Boolean).length);
+      console.log("After batchTransform", { before, after });
       return state;
     });
   }, [updateState, selectedIndices]);

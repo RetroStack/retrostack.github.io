@@ -487,7 +487,10 @@ export function TransformToolbar({
 
           {/* Center button */}
           <ToolbarButton
-            onClick={onCenter || (() => {})}
+            onClick={() => {
+              console.log("Center button clicked", { onCenter: !!onCenter, disabled });
+              if (onCenter) onCenter();
+            }}
             disabled={disabled || !onCenter}
             tooltip="Center Content"
             previewContent={previews?.center}
