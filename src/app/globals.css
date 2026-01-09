@@ -812,6 +812,30 @@ body {
   }
 }
 
+/* Viewport-locked layout - prevents all scrolling on iOS Safari */
+.viewport-locked {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* When viewport-locked is active, prevent body scroll */
+body:has(.viewport-locked) {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* iOS Safari keyboard handling - use visual viewport */
+@supports (-webkit-touch-callout: none) {
+  .viewport-locked {
+    /* On iOS, use visual viewport height to account for keyboard */
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+}
+
 /* Full height minus header */
 .full-height {
   min-height: calc(100dvh - var(--header-height));

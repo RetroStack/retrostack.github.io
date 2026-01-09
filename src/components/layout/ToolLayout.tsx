@@ -22,7 +22,7 @@ export function ToolLayout({
   className = "",
 }: ToolLayoutProps) {
   return (
-    <div className={`flex flex-col safe-top ${fullHeight ? "viewport-height overflow-hidden" : "min-h-screen"}`}>
+    <div className={`flex flex-col safe-top ${fullHeight ? "viewport-locked" : "min-h-screen"}`}>
       <Header />
 
       {/* Toolbar */}
