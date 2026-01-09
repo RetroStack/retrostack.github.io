@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- Modal state reset on open/close is intentional */
 
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/Button";

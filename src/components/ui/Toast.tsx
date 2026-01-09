@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type ToastVariant = "success" | "error" | "info" | "warning";
 
@@ -62,6 +62,11 @@ export function Toast({ id, message, variant = "info", duration = 4000, onDismis
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
+  const handleDismiss = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => onDismiss(id), 300);
+  }, [id, onDismiss]);
+
   useEffect(() => {
     // Trigger enter animation
     const enterTimer = setTimeout(() => setIsVisible(true), 10);
@@ -75,12 +80,7 @@ export function Toast({ id, message, variant = "info", duration = 4000, onDismis
       clearTimeout(enterTimer);
       clearTimeout(dismissTimer);
     };
-  }, [duration]);
-
-  const handleDismiss = () => {
-    setIsLeaving(true);
-    setTimeout(() => onDismiss(id), 300);
-  };
+  }, [duration, handleDismiss]);
 
   const styles = variantStyles[variant];
 

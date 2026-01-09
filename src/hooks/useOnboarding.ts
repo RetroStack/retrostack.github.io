@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- SSR-safe hydration from localStorage */
 
 import { useState, useEffect, useCallback } from "react";
 import { CHARACTER_EDITOR_STORAGE_KEY_ONBOARDING } from "@/lib/character-editor/storage/keys";

@@ -45,8 +45,6 @@ export interface UseUndoRedoResult<T> {
   startBatch: () => void;
   /** End batching and commit all changes as a single history entry */
   endBatch: (label?: string) => void;
-  /** Whether currently in batch mode */
-  isBatching: boolean;
 }
 
 /**
@@ -290,7 +288,6 @@ export function useUndoRedo<T>(
     totalHistoryEntries,
     startBatch,
     endBatch,
-    isBatching: isBatchingRef.current,
   };
 }
 

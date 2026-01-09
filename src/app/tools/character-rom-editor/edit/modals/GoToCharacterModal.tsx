@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { isPrintableAscii, getControlCharInfo } from "@/lib/character-editor/data/ascii";
 
 export interface GoToCharacterModalProps {
@@ -54,21 +54,17 @@ export function GoToCharacterModal({
   onGoTo,
 }: GoToCharacterModalProps) {
   const [input, setInput] = useState("");
-  const [parsedIndex, setParsedIndex] = useState<number | null>(null);
 
   // Reset input when modal opens
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting modal state on open is intentional
       setInput("");
-      setParsedIndex(null);
     }
   }, [isOpen]);
 
-  // Parse input on change
-  useEffect(() => {
-    const index = parseCharacterIndex(input);
-    setParsedIndex(index);
-  }, [input]);
+  // Parse input as derived state
+  const parsedIndex = useMemo(() => parseCharacterIndex(input), [input]);
 
   // Check if parsed index is valid
   const isValid = parsedIndex !== null && parsedIndex >= 0 && parsedIndex < totalCharacters;

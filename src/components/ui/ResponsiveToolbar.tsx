@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- DOM measurement requires effect */
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { OverflowMenu, OverflowMenuItem } from "./OverflowMenu";
@@ -63,10 +64,9 @@ export function ResponsiveToolbar({
     // Get all action items with their priorities (exclude separators for priority sorting)
     const actionItems = actions
       .filter((item): item is ToolbarAction => !isSeparator(item))
-      .map((item, originalIndex) => ({
+      .map((item) => ({
         item,
         priority: item.priority ?? 1,
-        originalIndex: actions.indexOf(item),
       }));
 
     // Sort by priority (lowest first - these get hidden first)
@@ -96,6 +96,7 @@ export function ResponsiveToolbar({
   }, [actions, minVisibleItems]);
 
   useEffect(() => {
+    // Initial calculation and resize observer for responsive toolbar
     calculateVisibleItems();
 
     const observer = new ResizeObserver(() => {

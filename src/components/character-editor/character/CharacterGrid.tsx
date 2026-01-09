@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useCallback, useState } from "react";
+import { useRef, useMemo, useCallback } from "react";
 import { CharacterDisplay, EmptyCharacterDisplay } from "./CharacterDisplay";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
@@ -387,11 +387,9 @@ export function InteractiveCharacterGrid({
 
   // Calculate character display size (scaled)
   const charWidth = config.width * smallScale;
-  const charHeight = config.height * smallScale;
 
-  // Cell dimensions including padding for selection ring
+  // Cell width including padding for selection ring
   const cellWidth = charWidth + gap + 8;
-  const cellHeight = charHeight + gap + 8;
 
   const columns = useMemo(() => {
     if (!size.width) return minColumns;

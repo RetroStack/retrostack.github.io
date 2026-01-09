@@ -40,6 +40,7 @@ export function ShareModal({
   // Generate share URL when modal opens
   useEffect(() => {
     if (!isOpen || !shareStatus.canShare) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Reset on close
       setShareUrl(null);
       return;
     }

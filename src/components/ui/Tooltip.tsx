@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- SSR-safe client detection */
 
 import { useState, useRef, useEffect, ReactNode, useCallback } from "react";
 import { createPortal } from "react-dom";

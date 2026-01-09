@@ -59,10 +59,13 @@ export function HistorySlider<T>({
 
   // Store onJump in a ref so window event handlers always have the latest version
   const onJumpRef = useRef(onJump);
-  onJumpRef.current = onJump;
-
   const getIndexFromClientXRef = useRef(getIndexFromClientX);
-  getIndexFromClientXRef.current = getIndexFromClientX;
+
+  // Keep refs up to date
+  useEffect(() => {
+    onJumpRef.current = onJump;
+    getIndexFromClientXRef.current = getIndexFromClientX;
+  }, [onJump, getIndexFromClientX]);
 
   // Window-level move handler for reliable dragging on touch devices
   useEffect(() => {
