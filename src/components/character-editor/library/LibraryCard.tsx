@@ -109,7 +109,7 @@ export function LibraryCard({
       });
     }
 
-    if (onEditMetadata) {
+    if (onEditMetadata && !metadata.isBuiltIn) {
       items.push({
         id: "edit-metadata",
         label: "Edit Metadata",

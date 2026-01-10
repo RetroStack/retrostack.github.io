@@ -20,6 +20,8 @@ import { Tooltip } from "@/components/ui/Tooltip";
 export interface EditorHeaderProps {
   /** Character set name */
   characterSetName: string;
+  /** Whether this is a built-in (read-only) character set */
+  isBuiltIn?: boolean;
   /** Whether there are unsaved changes */
   isDirty: boolean;
   /** Current character index (0-based) */
@@ -56,6 +58,7 @@ export interface EditorHeaderProps {
  */
 export function EditorHeader({
   characterSetName,
+  isBuiltIn = false,
   isDirty,
   characterIndex,
   totalCharacters,
@@ -103,11 +106,19 @@ export function EditorHeader({
       {/* Divider */}
       <div className="w-px h-4 bg-retro-grid/50" />
 
-      {/* Character set name with dirty indicator */}
+      {/* Character set name with read-only/dirty indicator */}
       <div className="flex items-center gap-2 text-sm text-gray-300 min-w-0">
         <span className="truncate max-w-[150px] sm:max-w-[200px]" title={characterSetName}>
           {characterSetName}
         </span>
+        {isBuiltIn && (
+          <span
+            className="flex-shrink-0 text-xs px-2 py-0.5 rounded bg-retro-amber/20 text-retro-amber border border-retro-amber/30"
+            title="Built-in character sets are read-only. Use 'Save As' to create an editable copy."
+          >
+            Read-only
+          </span>
+        )}
         {isDirty && (
           <span className="flex items-center gap-1.5 flex-shrink-0" title="Unsaved changes">
             {/* Pulsing dot indicator */}

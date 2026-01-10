@@ -270,6 +270,12 @@ export function EditView() {
   const handleSave = useCallback(async () => {
     if (!characterSet) return;
 
+    // Prevent saving built-in sets
+    if (characterSet.metadata.isBuiltIn) {
+      toast.info("Built-in sets are read-only. Use 'Save As' to create a copy.");
+      return;
+    }
+
     try {
       setSaving(true);
 
@@ -669,7 +675,9 @@ export function EditView() {
     {
       id: "save",
       label: saving ? "Saving..." : "Save Set",
-      tooltip: "Save character set to browser storage",
+      tooltip: characterSet?.metadata.isBuiltIn
+        ? "Cannot save built-in character set (use Save As)"
+        : "Save character set to browser storage",
       shortcut: "Ctrl+S",
       icon: (
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -689,8 +697,8 @@ export function EditView() {
         </svg>
       ),
       onClick: handleSave,
-      disabled: saving || !editor.isDirty,
-      active: editor.isDirty,
+      disabled: saving || !editor.isDirty || characterSet?.metadata.isBuiltIn,
+      active: editor.isDirty && !characterSet?.metadata.isBuiltIn,
       priority: 3,
     },
     {
@@ -1092,6 +1100,7 @@ export function EditView() {
         {/* Consolidated editor header - fixed height */}
         <EditorHeader
           characterSetName={characterSet?.metadata.name || "Untitled"}
+          isBuiltIn={characterSet?.metadata.isBuiltIn}
           isDirty={editor.isDirty}
           characterIndex={editor.selectedIndex}
           totalCharacters={editor.characters.length}
