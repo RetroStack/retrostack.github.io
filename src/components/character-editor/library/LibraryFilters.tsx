@@ -20,6 +20,7 @@
 
 import { useCallback, useMemo } from "react";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
+import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
 
 export type SortField =
   | "name"
@@ -232,27 +233,20 @@ export function LibraryFilters({
         </div>
 
         {/* Vertical separator */}
-        {onSortFieldChange && onSortDirectionToggle && (
-          <div className="w-px bg-retro-grid/50 mx-2 self-stretch" />
-        )}
+        {onSortFieldChange && onSortDirectionToggle && <div className="w-px bg-retro-grid/50 mx-2 self-stretch" />}
 
         {/* Sort controls */}
         {onSortFieldChange && onSortDirectionToggle && (
           <div className="flex gap-1 items-center">
             <span className="text-xs text-gray-400 mr-1">Sort:</span>
             {/* Sort field dropdown */}
-            <select
+            <SingleSelectDropdown
+              options={SORT_OPTIONS}
               value={sortField}
-              onChange={(e) => onSortFieldChange(e.target.value as SortField)}
-              className="px-3 py-2 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200 focus:outline-none focus:border-retro-cyan transition-colors cursor-pointer"
-              aria-label="Sort by"
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              onChange={onSortFieldChange}
+              ariaLabel="Sort by"
+              className="min-w-[180px]"
+            />
 
             {/* Sort direction toggle button */}
             <button

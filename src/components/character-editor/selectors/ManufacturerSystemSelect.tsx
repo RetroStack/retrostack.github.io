@@ -24,6 +24,7 @@ import {
   Picker3DButton,
   pickerInputClasses,
 } from "@/components/ui/DropdownPrimitives";
+import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
 
 export interface ManufacturerSystemSelectProps {
   /** Currently selected manufacturer */
@@ -152,44 +153,57 @@ export function ManufacturerSystemSelectCompact({
     return getSystemsForManufacturer(manufacturer);
   }, [manufacturer]);
 
-  const selectClasses = `
-    px-2 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded
-    text-xs text-gray-200 focus:outline-none focus:border-retro-cyan/50
-    transition-colors disabled:opacity-50
-  `;
+  const manufacturerOptions = useMemo(
+    () => [
+      { value: "", label: "All manufacturers" },
+      ...allManufacturers.map((m) => ({ value: m, label: m })),
+    ],
+    [allManufacturers]
+  );
+
+  const systemOptions = useMemo(
+    () => [
+      { value: "", label: manufacturer ? "All systems" : "Select manufacturer..." },
+      ...availableSystems.map((s) => ({ value: s, label: s })),
+    ],
+    [manufacturer, availableSystems]
+  );
+
+  const handleManufacturerChange = (value: string) => {
+    onManufacturerChange(value);
+    if (value !== manufacturer) onSystemChange("");
+  };
+
+  if (disabled) {
+    return (
+      <div className={`flex gap-2 ${className}`}>
+        <div className="px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-400 opacity-50">
+          {manufacturer || "All manufacturers"}
+        </div>
+        <div className="px-3 py-1.5 bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-400 opacity-50">
+          {system || (manufacturer ? "All systems" : "Select manufacturer...")}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex gap-2 ${className}`}>
-      <select
+      <SingleSelectDropdown
+        options={manufacturerOptions}
         value={manufacturer}
-        onChange={(e) => {
-          onManufacturerChange(e.target.value);
-          if (e.target.value !== manufacturer) onSystemChange("");
-        }}
-        disabled={disabled}
-        className={selectClasses}
-      >
-        <option value="">All manufacturers</option>
-        {allManufacturers.map((m) => (
-          <option key={m} value={m}>
-            {m}
-          </option>
-        ))}
-      </select>
+        onChange={handleManufacturerChange}
+        className="min-w-[140px]"
+        ariaLabel="Select manufacturer"
+      />
 
-      <select
+      <SingleSelectDropdown
+        options={systemOptions}
         value={system}
-        onChange={(e) => onSystemChange(e.target.value)}
-        disabled={disabled || !manufacturer}
-        className={selectClasses}
-      >
-        <option value="">{manufacturer ? "All systems" : "Select manufacturer..."}</option>
-        {availableSystems.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+        onChange={onSystemChange}
+        className="min-w-[140px]"
+        ariaLabel="Select system"
+      />
     </div>
   );
 }

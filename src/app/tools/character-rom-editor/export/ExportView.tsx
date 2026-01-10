@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
+import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
 import { NeonText } from "@/components/effects/NeonText";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
@@ -501,21 +502,22 @@ export function ExportView() {
                       <label className="block text-xs font-medium text-gray-400 mb-1">
                         Directive Style
                       </label>
-                      <select
+                      <SingleSelectDropdown
+                        options={[
+                          { value: ".byte", label: ".byte (ca65, DASM)" },
+                          { value: "db", label: "db (NASM, z80)" },
+                          { value: ".db", label: ".db (ASM6)" },
+                          { value: "DC.B", label: "DC.B (68000)" },
+                        ]}
                         value={assemblyOptions.directive}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           setAssemblyOptions({
                             ...assemblyOptions,
-                            directive: e.target.value as AssemblyOptions["directive"],
+                            directive: value as AssemblyOptions["directive"],
                           })
                         }
-                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
-                      >
-                        <option value=".byte">.byte (ca65, DASM)</option>
-                        <option value="db">db (NASM, z80)</option>
-                        <option value=".db">.db (ASM6)</option>
-                        <option value="DC.B">DC.B (68000)</option>
-                      </select>
+                        ariaLabel="Directive style"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -552,34 +554,36 @@ export function ExportView() {
                         <label className="block text-xs font-medium text-gray-400 mb-1">
                           Columns
                         </label>
-                        <select
+                        <SingleSelectDropdown
+                          options={[
+                            { value: 8, label: "8" },
+                            { value: 16, label: "16" },
+                            { value: 32, label: "32" },
+                          ]}
                           value={pngOptions.columns}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, columns: parseInt(e.target.value) })
+                          onChange={(value) =>
+                            setPngOptions({ ...pngOptions, columns: value })
                           }
-                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
-                        >
-                          <option value={8}>8</option>
-                          <option value={16}>16</option>
-                          <option value={32}>32</option>
-                        </select>
+                          ariaLabel="Columns"
+                        />
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-400 mb-1">
                           Scale
                         </label>
-                        <select
+                        <SingleSelectDropdown
+                          options={[
+                            { value: 1, label: "1x" },
+                            { value: 2, label: "2x" },
+                            { value: 4, label: "4x" },
+                            { value: 8, label: "8x" },
+                          ]}
                           value={pngOptions.scale}
-                          onChange={(e) =>
-                            setPngOptions({ ...pngOptions, scale: parseInt(e.target.value) })
+                          onChange={(value) =>
+                            setPngOptions({ ...pngOptions, scale: value })
                           }
-                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
-                        >
-                          <option value={1}>1x</option>
-                          <option value={2}>2x</option>
-                          <option value={4}>4x</option>
-                          <option value={8}>8x</option>
-                        </select>
+                          ariaLabel="Scale"
+                        />
                       </div>
                     </div>
 
@@ -678,36 +682,38 @@ export function ExportView() {
                           <label className="block text-xs font-medium text-gray-400 mb-1">
                             Columns
                           </label>
-                          <select
+                          <SingleSelectDropdown
+                            options={[
+                              { value: 8, label: "8" },
+                              { value: 16, label: "16" },
+                              { value: 32, label: "32" },
+                            ]}
                             value={referenceSheetOptions.columns}
-                            onChange={(e) =>
-                              setReferenceSheetOptions({ ...referenceSheetOptions, columns: parseInt(e.target.value) })
+                            onChange={(value) =>
+                              setReferenceSheetOptions({ ...referenceSheetOptions, columns: value })
                             }
-                            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
-                          >
-                            <option value={8}>8</option>
-                            <option value={16}>16</option>
-                            <option value={32}>32</option>
-                          </select>
+                            ariaLabel="Columns"
+                          />
                         </div>
                       )}
                       <div>
                         <label className="block text-xs font-medium text-gray-400 mb-1">
                           Scale
                         </label>
-                        <select
+                        <SingleSelectDropdown
+                          options={[
+                            { value: 3, label: "3x" },
+                            { value: 4, label: "4x" },
+                            { value: 5, label: "5x" },
+                            { value: 6, label: "6x" },
+                            { value: 8, label: "8x" },
+                          ]}
                           value={referenceSheetOptions.scale}
-                          onChange={(e) =>
-                            setReferenceSheetOptions({ ...referenceSheetOptions, scale: parseInt(e.target.value) })
+                          onChange={(value) =>
+                            setReferenceSheetOptions({ ...referenceSheetOptions, scale: value })
                           }
-                          className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan"
-                        >
-                          <option value={3}>3x</option>
-                          <option value={4}>4x</option>
-                          <option value={5}>5x</option>
-                          <option value={6}>6x</option>
-                          <option value={8}>8x</option>
-                        </select>
+                          ariaLabel="Scale"
+                        />
                       </div>
                     </div>
 
