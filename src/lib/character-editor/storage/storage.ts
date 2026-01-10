@@ -16,6 +16,135 @@ import {
 import type { ICharacterSetStorage, IKeyValueStorage } from "./interfaces";
 
 /**
+ * Database corruption state
+ * Used to track and communicate database corruption to the UI
+ */
+export interface DatabaseCorruptionState {
+  /** Whether the database is corrupted */
+  isCorrupted: boolean;
+  /** Error message describing the corruption */
+  errorMessage?: string;
+}
+
+/**
+ * Callback type for database corruption notifications
+ */
+export type DatabaseCorruptionCallback = (state: DatabaseCorruptionState) => void;
+
+// Global corruption state and listeners
+let corruptionState: DatabaseCorruptionState = { isCorrupted: false };
+const corruptionListeners: Set<DatabaseCorruptionCallback> = new Set();
+
+/**
+ * Subscribe to database corruption state changes
+ * @param callback Function to call when corruption state changes
+ * @returns Unsubscribe function
+ */
+export function onDatabaseCorruption(callback: DatabaseCorruptionCallback): () => void {
+  corruptionListeners.add(callback);
+  // Immediately notify if already corrupted
+  if (corruptionState.isCorrupted) {
+    callback(corruptionState);
+  }
+  return () => {
+    corruptionListeners.delete(callback);
+  };
+}
+
+/**
+ * Get current database corruption state
+ */
+export function getDatabaseCorruptionState(): DatabaseCorruptionState {
+  return { ...corruptionState };
+}
+
+/**
+ * Mark the database as corrupted and notify listeners
+ */
+function setDatabaseCorrupted(errorMessage: string): void {
+  corruptionState = { isCorrupted: true, errorMessage };
+  corruptionListeners.forEach((callback) => callback(corruptionState));
+}
+
+/**
+ * Clear the corruption state (after successful reset)
+ */
+function clearCorruptionState(): void {
+  corruptionState = { isCorrupted: false };
+}
+
+/**
+ * Check if an error indicates database corruption
+ */
+function isCorruptionError(error: unknown): boolean {
+  if (error instanceof DOMException) {
+    // Common IndexedDB corruption errors
+    const corruptionErrorNames = [
+      "InvalidStateError",
+      "UnknownError",
+      "DataError",
+      "ConstraintError",
+      "AbortError",
+    ];
+    if (corruptionErrorNames.includes(error.name)) {
+      return true;
+    }
+    // Check error message for corruption indicators
+    const message = error.message?.toLowerCase() ?? "";
+    if (
+      message.includes("corrupt") ||
+      message.includes("invalid") ||
+      message.includes("database") ||
+      message.includes("version")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Delete the IndexedDB database and reload the page
+ * This is the recovery mechanism for corrupted databases
+ */
+export async function resetDatabase(): Promise<void> {
+  if (typeof window === "undefined") return;
+
+  try {
+    // Close any open database connection
+    const storage = characterStorage as unknown as { db: IDBDatabase | null };
+    if (storage.db) {
+      storage.db.close();
+      storage.db = null;
+    }
+
+    // Delete the database
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.deleteDatabase(DB_NAME);
+      request.onsuccess = () => {
+        clearCorruptionState();
+        resolve();
+      };
+      request.onerror = () => {
+        reject(new Error("Failed to delete database"));
+      };
+      request.onblocked = () => {
+        // Database is blocked, but we'll still try to reload
+        clearCorruptionState();
+        resolve();
+      };
+    });
+
+    // Reload the page to reinitialize everything
+    window.location.reload();
+  } catch (error) {
+    console.error("Failed to reset database:", error);
+    // Even if deletion fails, try to reload
+    window.location.reload();
+  }
+}
+
+/**
  * Check if IndexedDB is available
  */
 function isIndexedDBAvailable(): boolean {
@@ -99,8 +228,18 @@ class CharacterStorage implements ICharacterSetStorage {
     return new Promise((resolve) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-      request.onerror = () => {
-        console.error("Failed to open IndexedDB, using localStorage fallback");
+      request.onerror = (event) => {
+        const error = (event.target as IDBOpenDBRequest).error;
+        console.error("Failed to open IndexedDB:", error);
+
+        // Check if this is a corruption error
+        if (error && isCorruptionError(error)) {
+          setDatabaseCorrupted(
+            error.message || "Database appears to be corrupted and cannot be opened."
+          );
+        }
+
+        // Fall back to localStorage
         resolve();
       };
 
@@ -113,6 +252,27 @@ class CharacterStorage implements ICharacterSetStorage {
         const db = (event.target as IDBOpenDBRequest).result;
         const transaction = (event.target as IDBOpenDBRequest).transaction!;
         const oldVersion = event.oldVersion;
+
+        // Handle upgrade transaction errors
+        transaction.onerror = (txEvent) => {
+          const txError = (txEvent.target as IDBTransaction).error;
+          console.error("Database upgrade transaction error:", txError);
+          if (txError && isCorruptionError(txError)) {
+            setDatabaseCorrupted(
+              txError.message || "Database upgrade failed - database may be corrupted."
+            );
+          }
+        };
+
+        transaction.onabort = (txEvent) => {
+          const txError = (txEvent.target as IDBTransaction).error;
+          console.error("Database upgrade transaction aborted:", txError);
+          if (txError && isCorruptionError(txError)) {
+            setDatabaseCorrupted(
+              txError.message || "Database upgrade aborted - database may be corrupted."
+            );
+          }
+        };
 
         // Create the character sets store (if new database)
         if (!db.objectStoreNames.contains(CHARACTER_EDITOR_STORE_NAME)) {
@@ -298,10 +458,11 @@ class CharacterStorage implements ICharacterSetStorage {
       // Ensure manufacturer/system/locale/isPinned/notes/origin fields exist for migrated data
       return sets.map((set) => {
         // Convert legacy "imported" origin to "binary"
+        // Cast to string for comparison since old data may have deprecated values
         let origin = set.metadata.origin;
         if (origin === undefined) {
           origin = set.metadata.isBuiltIn ? "binary" : "created";
-        } else if (origin === "imported") {
+        } else if ((origin as string) === "imported") {
           origin = "binary";
         }
         return {
@@ -345,9 +506,29 @@ class CharacterStorage implements ICharacterSetStorage {
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([CHARACTER_EDITOR_STORE_NAME], "readonly");
+      let transaction: IDBTransaction;
+      try {
+        transaction = this.db!.transaction([CHARACTER_EDITOR_STORE_NAME], "readonly");
+      } catch (error) {
+        // Transaction creation failed - likely database corruption
+        if (isCorruptionError(error)) {
+          const message = error instanceof Error ? error.message : "Failed to create transaction";
+          setDatabaseCorrupted(message);
+        }
+        reject(new Error("Failed to access database"));
+        return;
+      }
+
       const store = transaction.objectStore(CHARACTER_EDITOR_STORE_NAME);
       const request = store.getAll();
+
+      // Handle transaction-level errors
+      transaction.onerror = (event) => {
+        const txError = (event.target as IDBTransaction).error;
+        if (txError && isCorruptionError(txError)) {
+          setDatabaseCorrupted(txError.message || "Database read failed - database may be corrupted.");
+        }
+      };
 
       request.onsuccess = () => {
         // Sort by pinned first, then by updated date (newest first)
@@ -363,7 +544,11 @@ class CharacterStorage implements ICharacterSetStorage {
         resolve(results);
       };
 
-      request.onerror = () => {
+      request.onerror = (event) => {
+        const error = (event.target as IDBRequest).error;
+        if (error && isCorruptionError(error)) {
+          setDatabaseCorrupted(error.message || "Failed to read character sets - database may be corrupted.");
+        }
         reject(new Error("Failed to get character sets"));
       };
     });

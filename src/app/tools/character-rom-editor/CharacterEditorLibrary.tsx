@@ -22,8 +22,10 @@ import {
 import { OnboardingTour } from "@/components/character-editor/help/OnboardingTour";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
+import { useDatabaseCorruption } from "@/hooks/character-editor/useDatabaseCorruption";
 import { useToast } from "@/hooks/useToast";
 import { useOnboarding, CHARACTER_EDITOR_ONBOARDING_STEPS } from "@/hooks/useOnboarding";
+import { DatabaseCorruptionDialog } from "@/components/character-editor/DatabaseCorruptionDialog";
 import {
   filterAndSortCharacterSets,
   hasActiveFilters as checkActiveFilters,
@@ -60,6 +62,7 @@ const DEFAULT_SORT_DIRECTION: SortDirection = "asc";
 export function CharacterEditorLibrary() {
   const router = useRouter();
   const toast = useToast();
+  const { isCorrupted, errorMessage } = useDatabaseCorruption();
   const {
     characterSets,
     loading,
@@ -685,6 +688,12 @@ export function CharacterEditorLibrary() {
         onNext={onboarding.next}
         onPrev={onboarding.prev}
         onSkip={onboarding.skip}
+      />
+
+      {/* Database corruption dialog */}
+      <DatabaseCorruptionDialog
+        isOpen={isCorrupted}
+        errorMessage={errorMessage}
       />
     </div>
   );
