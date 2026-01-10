@@ -151,20 +151,27 @@ export function useCharacterLibrary(options?: UseCharacterLibraryOptions): UseCh
       }
 
       // Fetch external character sets and import missing ones
-      const externalIds = await getExternalIds();
-      const missingExternalIds = externalIds.filter((id) => !existingById.has(id));
+      // Silently ignore any failures when loading external sources
+      let externalSetsLoaded = false;
+      try {
+        const externalIds = await getExternalIds();
+        const missingExternalIds = externalIds.filter((id) => !existingById.has(id));
 
-      if (missingExternalIds.length > 0) {
-        for (const id of missingExternalIds) {
-          const externalSet = await getExternalCharacterSetById(id);
-          if (externalSet) {
-            await storage.save(externalSet);
+        if (missingExternalIds.length > 0) {
+          for (const id of missingExternalIds) {
+            const externalSet = await getExternalCharacterSetById(id);
+            if (externalSet) {
+              await storage.save(externalSet);
+              externalSetsLoaded = true;
+            }
           }
         }
+      } catch {
+        // External sources are optional - ignore failures silently
       }
 
       // Load all character sets (including newly added or updated ones)
-      const hasChanges = missingBuiltInIds.length > 0 || outdatedBuiltInIds.length > 0 || missingExternalIds.length > 0;
+      const hasChanges = missingBuiltInIds.length > 0 || outdatedBuiltInIds.length > 0 || externalSetsLoaded;
       const sets = hasChanges ? await storage.getAll() : existingSets;
       setCharacterSets(sets);
 
