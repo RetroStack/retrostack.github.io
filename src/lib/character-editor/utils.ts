@@ -7,7 +7,6 @@
  * - Filename generation for exports
  * - File type validation for imports
  * - Common helpers (debounce, throttle, clamp)
- * - Character comparison utilities
  *
  * @module lib/character-editor/utils
  *
@@ -150,19 +149,6 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Get anchor point label for display
- */
-export function getAnchorLabel(anchor: string): string {
-  const labels: Record<string, string> = {
-    tl: "Top Left",
-    tr: "Top Right",
-    bl: "Bottom Left",
-    br: "Bottom Right",
-  };
-  return labels[anchor] || anchor;
-}
-
-/**
  * Format timestamp for display
  */
 export function formatTimestamp(timestamp: number): string {
@@ -180,21 +166,4 @@ export function formatTimestamp(timestamp: number): string {
   } else {
     return date.toLocaleDateString();
   }
-}
-
-/**
- * Check if two characters are equal
- */
-export function charactersEqual(
-  a: { pixels: boolean[][] },
-  b: { pixels: boolean[][] }
-): boolean {
-  if (a.pixels.length !== b.pixels.length) return false;
-  for (let row = 0; row < a.pixels.length; row++) {
-    if (a.pixels[row].length !== b.pixels[row].length) return false;
-    for (let col = 0; col < a.pixels[row].length; col++) {
-      if (a.pixels[row][col] !== b.pixels[row][col]) return false;
-    }
-  }
-  return true;
 }

@@ -35,7 +35,6 @@ export interface NavItem {
 export const title: string = "RetroStack - Vintage Computing Hardware & Software";
 export const description: string =
   "Explore vintage computing with open-source hardware replicas, documentation, and modern development tools for classic systems.";
-export const tagline: string = "Vintage Computing, Modern Tools";
 export const NAV_ITEMS: NavItem[] = [
   {
     label: "Home",
