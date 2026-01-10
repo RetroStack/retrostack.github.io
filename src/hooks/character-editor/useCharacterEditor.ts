@@ -189,6 +189,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
 
     // CRUD (from useCharacterCRUD)
     addCharacter: crud.addCharacter,
+    insertCharacterAfter: crud.insertCharacterAfter,
     addCharacters: crud.addCharacters,
     deleteSelected: crud.deleteSelected,
     copyCharacter: crud.copyCharacter,

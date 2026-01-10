@@ -560,22 +560,6 @@ export function EditView() {
   const toolbarActions: ToolbarItem[] = [
     // Group 1: Character set file operations
     {
-      id: "add-char",
-      label: "Add Char",
-      tooltip: "Add a new character to the set",
-      shortcut: "Ctrl+N",
-      icon: (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          {/* Letter A */}
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l3.5-10h3L17 17M8.5 13h7" />
-          {/* Plus sign */}
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 4v4m-2-2h4" />
-        </svg>
-      ),
-      onClick: editor.addCharacter,
-      priority: 2,
-    },
-    {
       id: "save",
       label: saving ? "Saving..." : "Save Set",
       tooltip: "Save character set to browser storage",
@@ -1068,6 +1052,7 @@ export function EditView() {
                 onScale={() => setShowScaleModal(true)}
                 onDelete={() => setShowDeleteCharacterConfirm(true)}
                 onCopy={() => setShowCopyModal(true)}
+                onAdd={editor.insertCharacterAfter}
                 disabled={!selectedCharacter}
                 className="h-full"
               />

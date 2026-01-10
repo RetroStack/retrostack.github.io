@@ -5,6 +5,7 @@
  * Used throughout the character editor and other tool interfaces.
  *
  * Icons included:
+ * - AddIcon: Plus sign for adding new items
  * - CopyIcon: Duplicate/copy to clipboard
  * - DeleteIcon: Delete/trash with lid and lines
  * - ClearIcon: Empty/hollow square (clear to empty)
@@ -16,17 +17,25 @@
 import { IconProps, getIconClass } from "./types";
 
 /**
+ * Add character icon - Letter A with plus sign
+ */
+export function AddIcon({ className, size, ...props }: IconProps) {
+  return (
+    <svg className={getIconClass(size, className)} viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
+      {/* Letter A */}
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l3.5-10h3L17 17M8.5 13h7" />
+      {/* Plus sign */}
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 4v4m-2-2h4" />
+    </svg>
+  );
+}
+
+/**
  * Copy/duplicate icon
  */
 export function CopyIcon({ className, size, ...props }: IconProps) {
   return (
-    <svg
-      className={getIconClass(size, className)}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg className={getIconClass(size, className)} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -42,13 +51,7 @@ export function CopyIcon({ className, size, ...props }: IconProps) {
  */
 export function DeleteIcon({ className, size, ...props }: IconProps) {
   return (
-    <svg
-      className={getIconClass(size, className)}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg className={getIconClass(size, className)} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -64,13 +67,7 @@ export function DeleteIcon({ className, size, ...props }: IconProps) {
  */
 export function ClearIcon({ className, size, ...props }: IconProps) {
   return (
-    <svg
-      className={getIconClass(size, className)}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg className={getIconClass(size, className)} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
       <rect x="4" y="4" width="16" height="16" rx="1" strokeWidth={2} />
     </svg>
   );
@@ -92,13 +89,7 @@ export function FillIcon({ className, size, ...props }: IconProps) {
  */
 export function InvertIcon({ className, size, ...props }: IconProps) {
   return (
-    <svg
-      className={getIconClass(size, className)}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg className={getIconClass(size, className)} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

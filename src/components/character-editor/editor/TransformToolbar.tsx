@@ -14,12 +14,7 @@ import {
 } from "@/lib/character-editor/transforms";
 
 // Icons from centralized library
-import {
-  ArrowUpIcon,
-  ArrowDownIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-} from "@/components/ui/icons/ArrowIcons";
+import { ArrowUpIcon, ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon } from "@/components/ui/icons/ArrowIcons";
 import {
   RotateLeftIcon,
   RotateRightIcon,
@@ -28,13 +23,7 @@ import {
   ScaleIcon,
   CenterIcon,
 } from "@/components/ui/icons/TransformIcons";
-import {
-  CopyIcon,
-  DeleteIcon,
-  ClearIcon,
-  FillIcon,
-  InvertIcon,
-} from "@/components/ui/icons/ActionIcons";
+import { AddIcon, CopyIcon, DeleteIcon, ClearIcon, FillIcon, InvertIcon } from "@/components/ui/icons/ActionIcons";
 
 // Extracted components
 import { TransformPreviewContent } from "./TransformPreview";
@@ -69,6 +58,8 @@ export interface TransformToolbarProps {
   onDelete?: () => void;
   /** Callback for copy from current set */
   onCopy?: () => void;
+  /** Callback for adding a new character */
+  onAdd?: () => void;
   /** Whether toolbar is disabled */
   disabled?: boolean;
   /** Additional CSS classes */
@@ -94,6 +85,7 @@ export function TransformToolbar({
   onScale,
   onDelete,
   onCopy,
+  onAdd,
   disabled = false,
   className = "",
 }: TransformToolbarProps) {
@@ -184,11 +176,7 @@ export function TransformToolbar({
         />
       ),
       center: (
-        <TransformPreviewContent
-          before={before}
-          after={centerCharacter(character).pixels}
-          label="Center Content"
-        />
+        <TransformPreviewContent before={before} after={centerCharacter(character).pixels} label="Center Content" />
       ),
       clear: (
         <TransformPreviewContent
@@ -338,20 +326,10 @@ export function TransformToolbar({
           <InvertIcon />
         </ToolbarButton>
         <div className="flex items-center gap-1">
-          <ToolbarButton
-            onClick={onClear}
-            disabled={disabled}
-            tooltip="Clear"
-            previewContent={previews?.clear}
-          >
+          <ToolbarButton onClick={onClear} disabled={disabled} tooltip="Clear" previewContent={previews?.clear}>
             <ClearIcon />
           </ToolbarButton>
-          <ToolbarButton
-            onClick={onFill}
-            disabled={disabled}
-            tooltip="Fill"
-            previewContent={previews?.fill}
-          >
+          <ToolbarButton onClick={onFill} disabled={disabled} tooltip="Fill" previewContent={previews?.fill}>
             <FillIcon />
           </ToolbarButton>
         </div>
@@ -362,29 +340,25 @@ export function TransformToolbar({
         <>
           <ToolbarDivider />
           <ToolbarLabel>Scale</ToolbarLabel>
-          <ToolbarButton
-            onClick={onScale}
-            disabled={disabled}
-            tooltip="Scale Character"
-          >
+          <ToolbarButton onClick={onScale} disabled={disabled} tooltip="Scale Character">
             <ScaleIcon />
           </ToolbarButton>
         </>
       )}
 
       {/* Character section */}
-      {(onCopy || onDelete) && (
+      {(onCopy || onDelete || onAdd) && (
         <>
           <ToolbarDivider />
           <ToolbarLabel>Char</ToolbarLabel>
           <div className="flex items-center gap-1">
+            {onAdd && (
+              <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
+                <AddIcon />
+              </ToolbarButton>
+            )}
             {onCopy && (
-              <ToolbarButton
-                onClick={onCopy}
-                disabled={disabled}
-                tooltip="Copy from character set"
-                shortcut="C"
-              >
+              <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
                 <CopyIcon />
               </ToolbarButton>
             )}

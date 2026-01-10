@@ -3,6 +3,7 @@
  *
  * Provides create, read, update, and delete operations for characters:
  * - addCharacter: Add empty character at the end
+ * - insertCharacterAfter: Insert empty character after current selection
  * - addCharacters: Add multiple characters (from import)
  * - deleteSelected: Delete selected character(s)
  * - copyCharacter: Copy character from one position to another
@@ -49,6 +50,8 @@ export interface UseCharacterCRUDOptions {
 export interface UseCharacterCRUDResult {
   /** Add a new character at the end */
   addCharacter: () => void;
+  /** Insert a new character after the currently selected index */
+  insertCharacterAfter: () => void;
   /** Add multiple characters at the end */
   addCharacters: (characters: Character[]) => void;
   /** Delete selected character(s) */
@@ -87,6 +90,24 @@ export function useCharacterCRUD({
     onClearBatchSelection();
   }, [updateState, characterCount, onSelectionChange, onClearBatchSelection]);
 
+  const insertCharacterAfter = useCallback(() => {
+    updateState((state) => {
+      const { width, height } = state.config;
+      const newCharacter = createEmptyCharacter(width, height);
+      // Insert after the currently selected index
+      const insertIndex = selectedIndex + 1;
+      state.characters = [
+        ...state.characters.slice(0, insertIndex),
+        newCharacter,
+        ...state.characters.slice(insertIndex),
+      ];
+      return state;
+    });
+    // Select the new character (which is now at selectedIndex + 1)
+    onSelectionChange(selectedIndex + 1);
+    onClearBatchSelection();
+  }, [updateState, selectedIndex, onSelectionChange, onClearBatchSelection]);
+
   const addCharacters = useCallback(
     (newCharacters: Character[]) => {
       if (newCharacters.length === 0) return;
@@ -99,7 +120,7 @@ export function useCharacterCRUD({
       onSelectionChange(characterCount);
       onClearBatchSelection();
     },
-    [updateState, characterCount, onSelectionChange, onClearBatchSelection]
+    [updateState, characterCount, onSelectionChange, onClearBatchSelection],
   );
 
   const deleteSelected = useCallback(() => {
@@ -126,7 +147,7 @@ export function useCharacterCRUD({
         return state;
       });
     },
-    [updateState]
+    [updateState],
   );
 
   const resizeCharacters = useCallback(
@@ -137,7 +158,7 @@ export function useCharacterCRUD({
         return state;
       });
     },
-    [updateState]
+    [updateState],
   );
 
   const updateCharacter = useCallback(
@@ -149,7 +170,7 @@ export function useCharacterCRUD({
         return state;
       });
     },
-    [updateState]
+    [updateState],
   );
 
   const setCharacters = useCallback(
@@ -159,11 +180,12 @@ export function useCharacterCRUD({
         return state;
       });
     },
-    [updateState]
+    [updateState],
   );
 
   return {
     addCharacter,
+    insertCharacterAfter,
     addCharacters,
     deleteSelected,
     copyCharacter,
