@@ -7,6 +7,7 @@
  * Icons included:
  * - AddIcon: Plus sign for adding new items
  * - CopyIcon: Duplicate/copy to clipboard
+ * - DuplicateIcon: Duplicate with plus sign for duplicating items
  * - DeleteIcon: Delete/trash with lid and lines
  * - ClearIcon: Empty/hollow square (clear to empty)
  * - FillIcon: Solid filled square (fill with content)
@@ -42,6 +43,27 @@ export function CopyIcon({ className, size, ...props }: IconProps) {
         strokeWidth={2}
         d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
       />
+    </svg>
+  );
+}
+
+/**
+ * Duplicate icon - two overlapping documents with plus sign
+ */
+export function DuplicateIcon({ className, size, ...props }: IconProps) {
+  return (
+    <svg className={getIconClass(size, className)} fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
+      {/* Back document */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2"
+      />
+      {/* Front document */}
+      <rect x="10" y="10" width="10" height="10" rx="1" strokeWidth={2} />
+      {/* Plus sign */}
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 4v3m-1.5-1.5h3" />
     </svg>
   );
 }

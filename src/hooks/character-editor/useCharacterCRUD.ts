@@ -54,6 +54,8 @@ export interface UseCharacterCRUDResult {
   insertCharacterAfter: () => void;
   /** Add multiple characters at the end */
   addCharacters: (characters: Character[]) => void;
+  /** Duplicate all selected characters after the primary selection */
+  duplicateSelected: () => void;
   /** Delete selected character(s) */
   deleteSelected: () => void;
   /** Copy a character to another position */
@@ -123,6 +125,29 @@ export function useCharacterCRUD({
     [updateState, characterCount, onSelectionChange, onClearBatchSelection],
   );
 
+  const duplicateSelected = useCallback(() => {
+    // Get all selected indices (primary + batch), sorted
+    const allSelected = Array.from(selectedIndices).sort((a, b) => a - b);
+    if (allSelected.length === 0) return;
+
+    updateState((state) => {
+      // Clone all selected characters
+      const duplicates = allSelected.map((idx) => cloneCharacter(state.characters[idx]));
+      // Insert after the primary selection index
+      const insertIndex = selectedIndex + 1;
+      state.characters = [
+        ...state.characters.slice(0, insertIndex),
+        ...duplicates,
+        ...state.characters.slice(insertIndex),
+      ];
+      return state;
+    }, "Duplicate characters");
+
+    // Select the first duplicated character
+    onSelectionChange(selectedIndex + 1);
+    onClearBatchSelection();
+  }, [updateState, selectedIndices, selectedIndex, onSelectionChange, onClearBatchSelection]);
+
   const deleteSelected = useCallback(() => {
     if (characterCount <= 1) return; // Keep at least one character
 
@@ -187,6 +212,7 @@ export function useCharacterCRUD({
     addCharacter,
     insertCharacterAfter,
     addCharacters,
+    duplicateSelected,
     deleteSelected,
     copyCharacter,
     resizeCharacters,

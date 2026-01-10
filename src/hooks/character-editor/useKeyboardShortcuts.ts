@@ -37,10 +37,7 @@ export interface UseKeyboardShortcutsOptions {
 /**
  * Hook for managing keyboard shortcuts
  */
-export function useKeyboardShortcuts(
-  shortcuts: KeyboardShortcut[],
-  options: UseKeyboardShortcutsOptions = {}
-) {
+export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], options: UseKeyboardShortcutsOptions = {}) {
   const { enabled = true, target = null } = options;
   const shortcutsRef = useRef(shortcuts);
 
@@ -49,31 +46,28 @@ export function useKeyboardShortcuts(
     shortcutsRef.current = shortcuts;
   }, [shortcuts]);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      // Ignore if typing in an input
-      const tagName = (e.target as HTMLElement)?.tagName?.toLowerCase();
-      if (tagName === "input" || tagName === "textarea" || tagName === "select") {
-        // Allow certain shortcuts even in inputs
-        const isModified = e.ctrlKey || e.metaKey;
-        if (!isModified) return;
-      }
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Ignore if typing in an input
+    const tagName = (e.target as HTMLElement)?.tagName?.toLowerCase();
+    if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+      // Allow certain shortcuts even in inputs
+      const isModified = e.ctrlKey || e.metaKey;
+      if (!isModified) return;
+    }
 
-      for (const shortcut of shortcutsRef.current) {
-        const keyMatch = e.key.toLowerCase() === shortcut.key.toLowerCase();
-        const ctrlMatch = !!shortcut.ctrl === (e.ctrlKey || e.metaKey);
-        const shiftMatch = !!shortcut.shift === e.shiftKey;
-        const altMatch = !!shortcut.alt === e.altKey;
+    for (const shortcut of shortcutsRef.current) {
+      const keyMatch = e.key.toLowerCase() === shortcut.key.toLowerCase();
+      const ctrlMatch = !!shortcut.ctrl === (e.ctrlKey || e.metaKey);
+      const shiftMatch = !!shortcut.shift === e.shiftKey;
+      const altMatch = !!shortcut.alt === e.altKey;
 
-        if (keyMatch && ctrlMatch && shiftMatch && altMatch) {
-          e.preventDefault();
-          shortcut.action();
-          return;
-        }
+      if (keyMatch && ctrlMatch && shiftMatch && altMatch) {
+        e.preventDefault();
+        shortcut.action();
+        return;
       }
-    },
-    []
-  );
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -140,6 +134,7 @@ export function createEditorShortcuts(actions: {
   selectAll: () => void;
   deleteSelected: () => void;
   addCharacter: () => void;
+  duplicateSelected?: () => void;
   showHelp: () => void;
   // Navigation
   navigatePrev?: () => void;
@@ -281,6 +276,19 @@ export function createEditorShortcuts(actions: {
       description: "Add new character",
       context: "Editor",
     },
+
+    // Duplicate
+    ...(actions.duplicateSelected
+      ? [
+          {
+            key: "d",
+            ctrl: true,
+            action: actions.duplicateSelected,
+            description: "Duplicate selected characters",
+            context: "Editor",
+          } as KeyboardShortcut,
+        ]
+      : []),
 
     // Help
     {

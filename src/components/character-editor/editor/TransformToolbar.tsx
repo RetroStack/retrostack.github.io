@@ -23,7 +23,15 @@ import {
   ScaleIcon,
   CenterIcon,
 } from "@/components/ui/icons/TransformIcons";
-import { AddIcon, CopyIcon, DeleteIcon, ClearIcon, FillIcon, InvertIcon } from "@/components/ui/icons/ActionIcons";
+import {
+  AddIcon,
+  CopyIcon,
+  DuplicateIcon,
+  DeleteIcon,
+  ClearIcon,
+  FillIcon,
+  InvertIcon,
+} from "@/components/ui/icons/ActionIcons";
 
 // Extracted components
 import { TransformPreviewContent } from "./TransformPreview";
@@ -60,6 +68,8 @@ export interface TransformToolbarProps {
   onCopy?: () => void;
   /** Callback for adding a new character */
   onAdd?: () => void;
+  /** Callback for duplicating selected characters */
+  onDuplicate?: () => void;
   /** Whether toolbar is disabled */
   disabled?: boolean;
   /** Additional CSS classes */
@@ -86,6 +96,7 @@ export function TransformToolbar({
   onDelete,
   onCopy,
   onAdd,
+  onDuplicate,
   disabled = false,
   className = "",
 }: TransformToolbarProps) {
@@ -347,32 +358,46 @@ export function TransformToolbar({
       )}
 
       {/* Character section */}
-      {(onCopy || onDelete || onAdd) && (
+      {(onCopy || onDelete || onAdd || onDuplicate) && (
         <>
           <ToolbarDivider />
           <ToolbarLabel>Char</ToolbarLabel>
-          <div className="flex items-center gap-1">
-            {onAdd && (
-              <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
-                <AddIcon />
-              </ToolbarButton>
-            )}
-            {onCopy && (
-              <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
-                <CopyIcon />
-              </ToolbarButton>
-            )}
-            {onDelete && (
-              <ToolbarButton
-                onClick={onDelete}
-                disabled={disabled}
-                tooltip="Delete character"
-                shortcut="Del"
-                className="hover:text-red-400"
-              >
-                <DeleteIcon />
-              </ToolbarButton>
-            )}
+          <div className="flex flex-col  items-center gap-1">
+            <div className="flex items-center gap-1">
+              {onAdd && (
+                <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
+                  <AddIcon />
+                </ToolbarButton>
+              )}
+              {onDuplicate && (
+                <ToolbarButton
+                  onClick={onDuplicate}
+                  disabled={disabled}
+                  tooltip="Duplicate selected characters"
+                  shortcut="Ctrl+D"
+                >
+                  <DuplicateIcon />
+                </ToolbarButton>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {onCopy && (
+                <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
+                  <CopyIcon />
+                </ToolbarButton>
+              )}
+              {onDelete && (
+                <ToolbarButton
+                  onClick={onDelete}
+                  disabled={disabled}
+                  tooltip="Delete character"
+                  shortcut="Del"
+                  className="hover:text-red-400"
+                >
+                  <DeleteIcon />
+                </ToolbarButton>
+              )}
+            </div>
           </div>
         </>
       )}

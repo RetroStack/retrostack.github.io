@@ -520,6 +520,7 @@ export function EditView() {
         selectAll: editor.selectAll,
         deleteSelected: () => setShowDeleteCharacterConfirm(true),
         addCharacter: editor.addCharacter,
+        duplicateSelected: editor.duplicateSelected,
         showHelp: () => setShowShortcutsHelp(true),
         // Navigation
         navigatePrev,
@@ -1120,6 +1121,7 @@ export function EditView() {
                 onDelete={() => setShowDeleteCharacterConfirm(true)}
                 onCopy={() => setShowCopyModal(true)}
                 onAdd={editor.insertCharacterAfter}
+                onDuplicate={editor.duplicateSelected}
                 disabled={!selectedCharacter}
                 className="h-full"
               />
