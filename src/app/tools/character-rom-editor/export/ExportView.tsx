@@ -165,7 +165,7 @@ export function ExportView() {
         setFilename(baseName + newExtension);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally excludes filename to prevent infinite loop when updating extension
   }, [format]);
 
   // Handle export

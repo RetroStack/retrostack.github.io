@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { VT323, Press_Start_2P, Orbitron } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { description, title } from "@/lib/constants";
 
 const vt323 = VT323({
   weight: "400",
@@ -24,9 +25,8 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "RetroStack - Vintage Computing Hardware & Software",
-  description:
-    "Open-source hardware replicas, ROM adapters, KiCAD libraries, and development tools for vintage computing enthusiasts.",
+  title: title,
+  description: description,
   keywords: [
     "retro computing",
     "vintage hardware",
@@ -39,9 +39,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "RetroStack" }],
   openGraph: {
-    title: "RetroStack - Vintage Computing Hardware & Software",
-    description:
-      "Open-source hardware replicas, ROM adapters, KiCAD libraries, and development tools for vintage computing enthusiasts.",
+    title: title,
+    description: description,
     type: "website",
     locale: "en_US",
   },
@@ -54,9 +53,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body
-        className={`${vt323.variable} ${pressStart2P.variable} ${orbitron.variable} antialiased`}
-      >
+      <head>
+        <meta name="apple-mobile-web-app-title" content="RetroStack" />
+      </head>
+      <body className={`${vt323.variable} ${pressStart2P.variable} ${orbitron.variable} antialiased`}>
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

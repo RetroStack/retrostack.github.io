@@ -128,16 +128,14 @@ export interface ISnapshotStorage {
 
 /**
  * Auto-save data structure
+ *
+ * Note: The canonical definition is in useAutoSave.ts hook.
+ * This mirrors that structure for storage utilities.
  */
 export interface AutoSaveData {
   characterSetId: string;
   binaryData: string;
-  config: {
-    width: number;
-    height: number;
-    padding: string;
-    bitDirection: string;
-  };
+  config: CharacterSetConfig;
   selectedIndex: number;
   timestamp: number;
   isDirty: boolean;

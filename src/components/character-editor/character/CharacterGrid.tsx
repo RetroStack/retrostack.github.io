@@ -19,8 +19,6 @@ export interface CharacterGridProps {
   selectedIndex?: number;
   /** Set of batch-selected character indices */
   batchSelection?: Set<number>;
-  /** Callback when a character is selected */
-  onSelect?: (index: number, shiftKey: boolean, metaOrCtrlKey?: boolean) => void;
   /** Whether to show the add button at the end */
   showAddButton?: boolean;
   /** Callback when add button is clicked */
@@ -52,20 +50,20 @@ export interface CharacterGridProps {
 }
 
 /**
- * Grid display of all characters in a character set
+ * Grid display of all characters in a character set (display-only)
  *
  * Features:
  * - Responsive column layout based on container width
- * - Selection state visualization
- * - Batch selection support with shift-click
+ * - Selection state visualization (visual only, no click handling)
  * - Optional add button for new characters
+ *
+ * Note: For interactive selection with shift-click, use InteractiveCharacterGrid instead.
  */
 export function CharacterGrid({
   characters,
   config,
   selectedIndex,
   batchSelection,
-  onSelect,
   showAddButton = false,
   onAdd,
   foregroundColor = "#ffffff",
@@ -119,12 +117,6 @@ export function CharacterGrid({
             smallScale={smallScale}
             selected={selectedIndex === index}
             batchSelected={batchSelection?.has(index) && selectedIndex !== index}
-            onClick={() => {
-              if (onSelect) {
-                // We need to handle the click in a way that captures shift key
-                // This is handled via the div wrapper below
-              }
-            }}
             foregroundColor={foregroundColor}
             backgroundColor={backgroundColor}
             interactive={interactive}

@@ -10,6 +10,10 @@ export interface NavItem {
   children?: NavChild[];
 }
 
+export const title: string = "RetroStack - Vintage Computing Hardware & Software";
+export const description: string =
+  "Open-source hardware replicas, information, and development tools for vintage computing enthusiasts.";
+
 export const NAV_ITEMS: NavItem[] = [
   {
     label: "Home",
@@ -21,8 +25,12 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "Computers", href: "/systems/computers", description: "TRS-80, Sorcerer, Apple I, and more" },
       { label: "Game Consoles", href: "/systems/game-consoles", description: "Classic gaming systems" },
-      { label: "SDKs", href: "/systems/sdks", description: "Software development kits" },
-      { label: "Trainer Boards", href: "/systems/trainer-boards", description: "BitStack: DigiTrainer, DigiMind" },
+      { label: "SDKs", href: "/systems/sdks", description: "System Development Kits" },
+      {
+        label: "Trainer Boards",
+        href: "/systems/trainer-boards",
+        description: "KIM-1, AIM-65, MicroProfessor, and more",
+      },
       { label: "Others", href: "/systems/others", description: "Mechanical calculators and more" },
     ],
   },
@@ -56,5 +64,5 @@ export const SOCIAL_LINKS = {
 export const SITE_CONFIG = {
   name: "RetroStack",
   tagline: "Vintage Computing, Modern Tools",
-  description: "Open-source hardware replicas, ROM adapters, KiCAD libraries, and development tools for vintage computing enthusiasts.",
+  description: description,
 } as const;

@@ -171,17 +171,6 @@ export interface ExportOptions {
 }
 
 /**
- * Auto-save data for recovery
- */
-export interface AutoSaveData {
-  characterSetId: string;
-  characters: Character[];
-  selectedIndex: number;
-  timestamp: number;
-  isDirty: boolean;
-}
-
-/**
  * Calculate bytes needed per line based on character width
  */
 export function bytesPerLine(width: number): number {

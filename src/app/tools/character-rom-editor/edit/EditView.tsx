@@ -187,7 +187,7 @@ export function EditView() {
     }
 
     loadCharacterSet();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getById and editor are stable refs from hooks
   }, [id, libraryLoading]);
 
   // Handle save
