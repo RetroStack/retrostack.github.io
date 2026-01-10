@@ -13,9 +13,6 @@ import { CharacterPreview } from "@/components/character-editor/character/Charac
 import { ImportStepIndicator } from "@/components/character-editor/import/ImportStepIndicator";
 import { MetadataStep } from "@/components/character-editor/import/MetadataStep";
 import { DimensionPresetSelector } from "@/components/character-editor/selectors/DimensionPresetSelector";
-import { ImportFromImageModal } from "./modals/ImportFromImageModal";
-import { ImportFromFontModal } from "./modals/ImportFromFontModal";
-import { ImportFromTextModal } from "./modals/ImportFromTextModal";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import {
   CharacterSetConfig,
@@ -88,15 +85,6 @@ export function ImportView() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Image import modal state
-  const [showImageImport, setShowImageImport] = useState(false);
-
-  // Font import modal state
-  const [showFontImport, setShowFontImport] = useState(false);
-
-  // Text/code import modal state
-  const [showTextImport, setShowTextImport] = useState(false);
-
   // State for imported characters from image (bypasses file parsing)
   const [importedCharacters, setImportedCharacters] = useState<Character[] | null>(null);
 
@@ -151,25 +139,19 @@ export function ImportView() {
     }
   }, [step]);
 
-  const handleWidthChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value, 10);
-      if (!isNaN(value) && value >= 1 && value <= 16) {
-        setConfig((prev) => ({ ...prev, width: value }));
-      }
-    },
-    []
-  );
+  const handleWidthChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 1 && value <= 16) {
+      setConfig((prev) => ({ ...prev, width: value }));
+    }
+  }, []);
 
-  const handleHeightChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value, 10);
-      if (!isNaN(value) && value >= 1 && value <= 16) {
-        setConfig((prev) => ({ ...prev, height: value }));
-      }
-    },
-    []
-  );
+  const handleHeightChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 1 && value <= 16) {
+      setConfig((prev) => ({ ...prev, height: value }));
+    }
+  }, []);
 
   const handlePaddingChange = useCallback((padding: PaddingDirection) => {
     setConfig((prev) => ({ ...prev, padding }));
@@ -182,81 +164,6 @@ export function ImportView() {
   const handlePresetClick = useCallback((width: number, height: number) => {
     setConfig((prev) => ({ ...prev, width, height }));
   }, []);
-
-  // Handler for image import completion
-  const handleImageImport = useCallback(
-    (chars: Character[], importedConfig: CharacterSetConfig) => {
-      // Store imported characters directly
-      setImportedCharacters(chars);
-
-      // Update config to match imported dimensions
-      setConfig(importedConfig);
-
-      // Create a synthetic file for display
-      const blob = new Blob([new ArrayBuffer(0)], { type: "application/octet-stream" });
-      const syntheticFile = new File([blob], "imported-from-image.bin");
-      setFile(syntheticFile);
-      setFileData(new ArrayBuffer(0));
-
-      // Set a default name
-      setName("Imported Character Set");
-
-      // Close modal and go to step 2
-      setShowImageImport(false);
-      setStep(2);
-    },
-    []
-  );
-
-  // Handler for font import completion
-  const handleFontImport = useCallback(
-    (chars: Character[], importedConfig: CharacterSetConfig, fontName: string) => {
-      // Store imported characters directly
-      setImportedCharacters(chars);
-
-      // Update config to match imported dimensions
-      setConfig(importedConfig);
-
-      // Create a synthetic file for display
-      const blob = new Blob([new ArrayBuffer(0)], { type: "application/octet-stream" });
-      const syntheticFile = new File([blob], "imported-from-font.bin");
-      setFile(syntheticFile);
-      setFileData(new ArrayBuffer(0));
-
-      // Set name from font
-      setName(fontName || "Imported Font");
-
-      // Close modal and go to step 2
-      setShowFontImport(false);
-      setStep(2);
-    },
-    []
-  );
-
-  // Handler for text/code import completion
-  const handleTextImport = useCallback(
-    (chars: Character[], importedConfig: CharacterSetConfig) => {
-      // Store imported characters directly
-      setImportedCharacters(chars);
-
-      // Update config to match imported dimensions
-      setConfig(importedConfig);
-
-      // Create a synthetic file for display
-      const blob = new Blob([new ArrayBuffer(0)], { type: "application/octet-stream" });
-      const syntheticFile = new File([blob], "imported-from-code.bin");
-      setFile(syntheticFile);
-      setFileData(new ArrayBuffer(0));
-
-      // Set a default name
-      setName("Imported Character Set");
-
-      // Close modal and go to step 2
-      setShowTextImport(false);
-      setStep(2);
-    },
-    []
-  );
 
   const handleLoadExample = useCallback(async (example: ExampleFile) => {
     try {
@@ -337,7 +244,7 @@ export function ImportView() {
         setSaving(false);
       }
     },
-    [fileData, name, description, source, manufacturer, system, chip, locale, config, characters, save, router]
+    [fileData, name, description, source, manufacturer, system, chip, locale, config, characters, save, router],
   );
 
   return (
@@ -352,18 +259,8 @@ export function ImportView() {
               href="/tools/character-rom-editor"
               className="text-xs text-gray-500 hover:text-retro-cyan transition-colors mb-2 inline-flex items-center gap-1"
             >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Library
             </Link>
@@ -373,11 +270,7 @@ export function ImportView() {
           </div>
 
           {/* Step indicator */}
-          <ImportStepIndicator
-            currentStep={step}
-            totalSteps={3}
-            labels={STEP_LABELS}
-          />
+          <ImportStepIndicator currentStep={step} totalSteps={3} labels={STEP_LABELS} />
 
           {/* Step content */}
           <div className="max-w-2xl mx-auto">
@@ -385,12 +278,8 @@ export function ImportView() {
             {step === 1 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
-                  <h2 className="text-lg font-medium text-gray-200 mb-2">
-                    Upload ROM File
-                  </h2>
-                  <p className="text-sm text-gray-400">
-                    Select a binary ROM file containing character data
-                  </p>
+                  <h2 className="text-lg font-medium text-gray-200 mb-2">Upload ROM File</h2>
+                  <p className="text-sm text-gray-400">Select a binary ROM file containing character data</p>
                 </div>
 
                 <ImportDropZone
@@ -413,12 +302,7 @@ export function ImportView() {
                   {/* Import from Image option */}
                   <div className="card-retro p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg
-                        className="w-5 h-5 text-retro-pink"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-5 h-5 text-retro-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -426,65 +310,36 @@ export function ImportView() {
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      <h3 className="text-sm font-medium text-gray-200">
-                        From Image
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-200">From Image</h3>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">
-                      Extract from PNG/image with a character grid.
-                    </p>
-                    <Button
-                      variant="pink"
-                      size="sm"
-                      onClick={() => setShowImageImport(true)}
-                      className="w-full"
-                    >
-                      Choose Image
-                    </Button>
+                    <p className="text-xs text-gray-500 mb-3">Extract from PNG/image with a character grid.</p>
+                    <Link href="/tools/character-rom-editor/import/image" className="block">
+                      <Button variant="pink" size="sm" className="w-full">
+                        Choose Image
+                      </Button>
+                    </Link>
                   </div>
 
                   {/* Import from Font option */}
                   <div className="card-retro p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg
-                        className="w-5 h-5 text-retro-cyan"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 6h16M12 6v14"
-                        />
+                      <svg className="w-5 h-5 text-retro-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M12 6v14" />
                       </svg>
-                      <h3 className="text-sm font-medium text-gray-200">
-                        From Font
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-200">From Font</h3>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">
-                      Rasterize TTF/OTF/WOFF font files.
-                    </p>
-                    <Button
-                      variant="cyan"
-                      size="sm"
-                      onClick={() => setShowFontImport(true)}
-                      className="w-full"
-                    >
-                      Choose Font
-                    </Button>
+                    <p className="text-xs text-gray-500 mb-3">Rasterize TTF/OTF/WOFF font files.</p>
+                    <Link href="/tools/character-rom-editor/import/font" className="block">
+                      <Button variant="cyan" size="sm" className="w-full">
+                        Choose Font
+                      </Button>
+                    </Link>
                   </div>
 
                   {/* Import from Code option */}
                   <div className="card-retro p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg
-                        className="w-5 h-5 text-retro-violet"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-5 h-5 text-retro-violet" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -492,21 +347,14 @@ export function ImportView() {
                           d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
                         />
                       </svg>
-                      <h3 className="text-sm font-medium text-gray-200">
-                        From Code
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-200">From Code</h3>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">
-                      Paste byte arrays from C, JS, or Assembly.
-                    </p>
-                    <Button
-                      variant="violet"
-                      size="sm"
-                      onClick={() => setShowTextImport(true)}
-                      className="w-full"
-                    >
-                      Paste Code
-                    </Button>
+                    <p className="text-xs text-gray-500 mb-3">Paste byte arrays from C, JS, or Assembly.</p>
+                    <Link href="/tools/character-rom-editor/import/text" className="block">
+                      <Button variant="violet" size="sm" className="w-full">
+                        Paste Code
+                      </Button>
+                    </Link>
                   </div>
                 </div>
 
@@ -514,12 +362,7 @@ export function ImportView() {
                 {EXAMPLE_FILES.length > 0 && (
                   <div className="card-retro p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg
-                        className="w-5 h-5 text-retro-cyan"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-5 h-5 text-retro-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -527,9 +370,7 @@ export function ImportView() {
                           d="M13 10V3L4 14h7v7l9-11h-7z"
                         />
                       </svg>
-                      <h3 className="text-sm font-medium text-gray-200">
-                        Quick Start with Example Files
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-200">Quick Start with Example Files</h3>
                     </div>
                     <div className="space-y-2">
                       {EXAMPLE_FILES.map((example) => (
@@ -557,9 +398,7 @@ export function ImportView() {
                             <div className="text-sm font-medium text-gray-200 group-hover:text-retro-cyan transition-colors">
                               {example.name}
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {example.description}
-                            </div>
+                            <div className="text-xs text-gray-500">{example.description}</div>
                           </div>
                           <svg
                             className="w-5 h-5 text-gray-600 group-hover:text-retro-cyan transition-colors"
@@ -567,12 +406,7 @@ export function ImportView() {
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
                       ))}
@@ -582,11 +416,7 @@ export function ImportView() {
 
                 {/* Navigation */}
                 <div className="flex justify-end pt-4">
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceedStep1}
-                    variant="cyan"
-                  >
+                  <Button onClick={handleNext} disabled={!canProceedStep1} variant="cyan">
                     Next
                   </Button>
                 </div>
@@ -618,11 +448,7 @@ export function ImportView() {
                   <Button onClick={handleBack} variant="ghost">
                     Back
                   </Button>
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceedStep2}
-                    variant="cyan"
-                  >
+                  <Button onClick={handleNext} disabled={!canProceedStep2} variant="cyan">
                     Next
                   </Button>
                 </div>
@@ -633,27 +459,18 @@ export function ImportView() {
             {step === 3 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
-                  <h2 className="text-lg font-medium text-gray-200 mb-2">
-                    Configure Binary Format
-                  </h2>
-                  <p className="text-sm text-gray-400">
-                    Adjust settings until the preview looks correct
-                  </p>
+                  <h2 className="text-lg font-medium text-gray-200 mb-2">Configure Binary Format</h2>
+                  <p className="text-sm text-gray-400">Adjust settings until the preview looks correct</p>
                 </div>
 
                 {/* Configuration */}
                 <div className="card-retro p-4 space-y-5">
                   {/* Dimensions */}
                   <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-3">
-                      Character Dimensions
-                    </h3>
+                    <h3 className="text-sm font-medium text-gray-300 mb-3">Character Dimensions</h3>
                     <div className="grid grid-cols-2 gap-4 max-w-xs">
                       <div>
-                        <label
-                          htmlFor="width"
-                          className="block text-xs text-gray-500 mb-1"
-                        >
+                        <label htmlFor="width" className="block text-xs text-gray-500 mb-1">
                           Width (pixels)
                         </label>
                         <input
@@ -667,10 +484,7 @@ export function ImportView() {
                         />
                       </div>
                       <div>
-                        <label
-                          htmlFor="height"
-                          className="block text-xs text-gray-500 mb-1"
-                        >
+                        <label htmlFor="height" className="block text-xs text-gray-500 mb-1">
                           Height (pixels)
                         </label>
                         <input
@@ -699,9 +513,7 @@ export function ImportView() {
                   <div className="grid grid-cols-2 gap-4">
                     {/* Padding direction */}
                     <div>
-                      <h3 className="text-sm font-medium text-gray-300 mb-2">
-                        Bit Padding
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">Bit Padding</h3>
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -736,9 +548,7 @@ export function ImportView() {
 
                     {/* Bit direction */}
                     <div>
-                      <h3 className="text-sm font-medium text-gray-300 mb-2">
-                        Bit Direction
-                      </h3>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">Bit Direction</h3>
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -783,9 +593,7 @@ export function ImportView() {
                 {/* Preview - full width, larger */}
                 <div className="card-retro p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-300">
-                      Preview
-                    </span>
+                    <span className="text-sm font-medium text-gray-300">Preview</span>
                     <span className="text-xs text-gray-500">
                       {config.width}x{config.height} - {characters.length} character
                       {characters.length !== 1 ? "s" : ""} detected
@@ -823,22 +631,14 @@ export function ImportView() {
                           d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      <p className="text-sm text-gray-400">
-                        No characters detected
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Try adjusting the dimensions
-                      </p>
+                      <p className="text-sm text-gray-400">No characters detected</p>
+                      <p className="text-xs text-gray-500 mt-1">Try adjusting the dimensions</p>
                     </div>
                   )}
                 </div>
 
                 {/* Error message */}
-                {saveError && (
-                  <div className="text-sm text-red-400 text-center">
-                    {saveError}
-                  </div>
-                )}
+                {saveError && <div className="text-sm text-red-400 text-center">{saveError}</div>}
 
                 {/* Navigation */}
                 <div className="flex justify-between pt-4">
@@ -846,18 +646,10 @@ export function ImportView() {
                     Back
                   </Button>
                   <div className="flex gap-3">
-                    <Button
-                      onClick={() => handleSave(false)}
-                      disabled={!canSave || saving}
-                      variant="cyan"
-                    >
+                    <Button onClick={() => handleSave(false)} disabled={!canSave || saving} variant="cyan">
                       {saving ? "Saving..." : "Save to Library"}
                     </Button>
-                    <Button
-                      onClick={() => handleSave(true)}
-                      disabled={!canSave || saving}
-                      variant="pink"
-                    >
+                    <Button onClick={() => handleSave(true)} disabled={!canSave || saving} variant="pink">
                       {saving ? "Saving..." : "Save & Edit"}
                     </Button>
                   </div>
@@ -869,27 +661,6 @@ export function ImportView() {
       </main>
 
       <Footer />
-
-      {/* Image Import Modal */}
-      <ImportFromImageModal
-        isOpen={showImageImport}
-        onClose={() => setShowImageImport(false)}
-        onImport={handleImageImport}
-      />
-
-      {/* Font Import Modal */}
-      <ImportFromFontModal
-        isOpen={showFontImport}
-        onClose={() => setShowFontImport(false)}
-        onImport={handleFontImport}
-      />
-
-      {/* Text/Code Import Modal */}
-      <ImportFromTextModal
-        isOpen={showTextImport}
-        onClose={() => setShowTextImport(false)}
-        onImport={handleTextImport}
-      />
     </div>
   );
 }

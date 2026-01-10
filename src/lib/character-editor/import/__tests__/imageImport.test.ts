@@ -133,7 +133,16 @@ describe("imageImport", () => {
         threshold: 128,
         invert: false,
         maxCharacters: 256,
+        pixelWidth: 1,
+        pixelHeight: 1,
       });
+    });
+
+    it("has default pixel dimensions of 1", () => {
+      const options = getDefaultImageImportOptions();
+
+      expect(options.pixelWidth).toBe(1);
+      expect(options.pixelHeight).toBe(1);
     });
 
     it("returns a new object each time", () => {
@@ -717,6 +726,226 @@ describe("imageImport", () => {
         // Other pixels should be off
         expect(result.characters[i].pixels[0][1]).toBe(false);
       }
+    });
+
+    describe("pixelWidth and pixelHeight options", () => {
+      it("averages brightness across pixel width when pixelWidth > 1", () => {
+        // Create image where each logical pixel is 2 source pixels wide
+        const imageData = new MockImageData(16, 8);
+        imageData.fill(255, 255, 255);
+
+        // For the first logical pixel (0,0), create a 2x1 area
+        // One black pixel (0) and one white pixel (255) = average 127.5 -> rounds to 128
+        imageData.setPixel(0, 0, 0, 0, 0); // Black
+        imageData.setPixel(1, 0, 255, 255, 255); // White
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8, // Logical character width
+          charHeight: 8, // Logical character height
+          pixelWidth: 2, // Each logical pixel is 2 source pixels wide
+          pixelHeight: 1,
+          threshold: 129, // Average of 128 is below 129, so "on"
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(1);
+        // First pixel should be on (average brightness 128 < 129)
+        expect(result.characters[0].pixels[0][0]).toBe(true);
+      });
+
+      it("averages brightness across pixel height when pixelHeight > 1", () => {
+        // Create image where each logical pixel is 2 source pixels tall
+        const imageData = new MockImageData(8, 16);
+        imageData.fill(255, 255, 255);
+
+        // For the first logical pixel (0,0), create a 1x2 area
+        // One black pixel (0) and one white pixel (255) = average 127.5 -> rounds to 128
+        imageData.setPixel(0, 0, 0, 0, 0); // Black
+        imageData.setPixel(0, 1, 255, 255, 255); // White
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8,
+          charHeight: 8,
+          pixelWidth: 1,
+          pixelHeight: 2, // Each logical pixel is 2 source pixels tall
+          threshold: 129, // Average of 128 is below 129, so "on"
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(1);
+        // First pixel should be on (average brightness 128 < 129)
+        expect(result.characters[0].pixels[0][0]).toBe(true);
+      });
+
+      it("averages brightness across 2x2 pixel area", () => {
+        // Create image where each logical pixel is 2x2 source pixels
+        const imageData = new MockImageData(16, 16);
+        imageData.fill(255, 255, 255);
+
+        // For the first logical pixel (0,0), create a 2x2 area
+        // 3 black pixels and 1 white pixel = average ~63.75
+        imageData.setPixel(0, 0, 0, 0, 0); // Black
+        imageData.setPixel(1, 0, 0, 0, 0); // Black
+        imageData.setPixel(0, 1, 0, 0, 0); // Black
+        imageData.setPixel(1, 1, 255, 255, 255); // White
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8,
+          charHeight: 8,
+          pixelWidth: 2,
+          pixelHeight: 2,
+          threshold: 128, // Average of ~63.75 is below 128, so "on"
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(1);
+        // First pixel should be on (average brightness ~63.75 < 128)
+        expect(result.characters[0].pixels[0][0]).toBe(true);
+      });
+
+      it("correctly calculates grid dimensions with pixelWidth/Height > 1", () => {
+        // Image is 32x32, with pixelWidth=2 and pixelHeight=2
+        // Effective character cell size is 8*2=16 x 8*2=16
+        // Should result in 2x2 = 4 characters
+        const imageData = new MockImageData(32, 32);
+        imageData.fill(255, 255, 255);
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8,
+          charHeight: 8,
+          pixelWidth: 2,
+          pixelHeight: 2,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.columns).toBe(2);
+        expect(result.rows).toBe(2);
+        expect(result.characters.length).toBe(4);
+      });
+
+      it("handles scaled image with gap correctly", () => {
+        // Image is 36x16, with pixelWidth=2, gap=4
+        // Cell width = 8*2 + 4 = 20
+        // Should have 1 column (36 / 20 = 1.8 -> 1)
+        const imageData = new MockImageData(36, 16);
+        imageData.fill(255, 255, 255);
+
+        // Draw first character area (0-15) as black
+        imageData.fillRect(0, 0, 16, 16, 0, 0, 0);
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8,
+          charHeight: 8,
+          pixelWidth: 2,
+          pixelHeight: 2,
+          gapX: 4,
+          gapY: 0,
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(1);
+        // First character should be all on (black areas)
+        expect(result.characters[0].pixels.every((row) => row.every((p) => p === true))).toBe(true);
+      });
+
+      it("threshold works correctly with averaged brightness", () => {
+        // Create a 2x2 pixel area with 2 black (0) and 2 white (255)
+        // Average = 127.5
+        const imageData = new MockImageData(2, 2);
+        imageData.setPixel(0, 0, 0, 0, 0); // Black
+        imageData.setPixel(1, 0, 255, 255, 255); // White
+        imageData.setPixel(0, 1, 255, 255, 255); // White
+        imageData.setPixel(1, 1, 0, 0, 0); // Black
+
+        const optionsLowThreshold: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 1,
+          charHeight: 1,
+          pixelWidth: 2,
+          pixelHeight: 2,
+          threshold: 100, // 127.5 > 100, so "off"
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const resultLow = parseImageToCharacters(imageData, optionsLowThreshold);
+        expect(resultLow.characters[0].pixels[0][0]).toBe(false);
+
+        const optionsHighThreshold: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 1,
+          charHeight: 1,
+          pixelWidth: 2,
+          pixelHeight: 2,
+          threshold: 150, // 127.5 < 150, so "on"
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const resultHigh = parseImageToCharacters(imageData, optionsHighThreshold);
+        expect(resultHigh.characters[0].pixels[0][0]).toBe(true);
+      });
+
+      it("handles out of bounds pixels when averaging", () => {
+        // Small image with pixelWidth=2, positioned to have some pixels out of bounds
+        const imageData = new MockImageData(8, 8);
+        imageData.fill(0, 0, 0); // All black
+
+        const options: ImageImportOptions = {
+          ...getDefaultImageImportOptions(),
+          charWidth: 8,
+          charHeight: 8,
+          pixelWidth: 2,
+          pixelHeight: 2,
+          offsetX: 4, // Push half the character out of bounds
+          forceColumns: 1,
+          forceRows: 1,
+        };
+
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(1);
+        // Pixels within bounds should be on (black), those outside should be off (white)
+        // First 2 logical pixels (x=0,1) are in bounds, last 6 (x=2-7) are partially/fully out of bounds
+        expect(result.characters[0].pixels[0][0]).toBe(true); // In bounds
+        expect(result.characters[0].pixels[0][1]).toBe(true); // In bounds
+        // x=2 -> source x starts at 4+2*2=8, but source width is only 8
+        // Out of bounds pixels are treated as white (255)
+      });
+
+      it("parses scaled image with default pixel dimensions of 1", () => {
+        // Verify that default pixelWidth=1 and pixelHeight=1 works as before
+        const imageData = new MockImageData(16, 16);
+        imageData.fill(255, 255, 255);
+        imageData.fillRect(0, 0, 8, 8, 0, 0, 0);
+
+        const options = getDefaultImageImportOptions();
+        const result = parseImageToCharacters(imageData, options);
+
+        expect(result.characters.length).toBe(4);
+        expect(result.columns).toBe(2);
+        expect(result.rows).toBe(2);
+        // First character should be all on (black)
+        expect(result.characters[0].pixels.every((row) => row.every((p) => p === true))).toBe(true);
+      });
     });
   });
 
