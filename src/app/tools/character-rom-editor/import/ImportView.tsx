@@ -226,6 +226,7 @@ export function ImportView() {
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
+            origin: "binary" as const,
           },
           config,
           characters,

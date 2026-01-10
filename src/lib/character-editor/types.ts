@@ -20,6 +20,25 @@ export type AnchorPoint =
   | "bl" | "bc" | "br";  // bottom-left, bottom-center, bottom-right
 
 /**
+ * Origin of a character set - how it was created
+ * - "created": Made from scratch (new empty set or preset)
+ * - "binary": Imported from binary file (.bin, .rom)
+ * - "text": Imported from text format (assembly, C arrays, hex)
+ * - "font": Imported from font file (TTF, OTF, WOFF)
+ * - "image": Imported from image file (PNG, JPG, etc.)
+ * - "shared": Imported from shared URL
+ * - "copied": Copied/duplicated from another character set
+ */
+export type CharacterSetOrigin =
+  | "created"
+  | "binary"
+  | "text"
+  | "font"
+  | "image"
+  | "shared"
+  | "copied";
+
+/**
  * Character set configuration
  * Defines the format of the binary data
  */
@@ -103,6 +122,17 @@ export interface CharacterSetMetadata {
   builtInVersion?: number;
   /** User-defined tags for organization */
   tags?: string[];
+  /**
+   * Origin: how this character set was created
+   * - "created": Made from scratch (new empty set or preset)
+   * - "imported": Imported from file or external source
+   * - "copied": Copied/duplicated from another character set
+   */
+  origin?: CharacterSetOrigin;
+  /** ID of the source character set if this was copied (for lineage tracking) */
+  copiedFromId?: string;
+  /** Name of the source character set at time of copy (snapshot, since original may change) */
+  copiedFromName?: string;
 
   // ============================================================================
   // User-owned fields (preserved during built-in updates, modifiable on any set)

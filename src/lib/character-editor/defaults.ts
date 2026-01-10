@@ -95,6 +95,7 @@ function createCharacterSetFromSource(
       updatedAt: now,
       isBuiltIn: true,
       builtInVersion: source.version,
+      origin: "binary",
     },
     config: {
       width: source.width,

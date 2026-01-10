@@ -33,14 +33,23 @@ export type SortField =
 export type SortDirection = "asc" | "desc";
 
 /**
- * isBuiltIn filter option values
- */
-export type IsBuiltInFilterValue = "built-in" | "user-created";
-
-/**
  * isPinned filter option values
  */
 export type IsPinnedFilterValue = "pinned" | "not-pinned";
+
+/**
+ * Origin filter option values
+ * Combines built-in status with user set origins
+ */
+export type OriginFilterValue =
+  | "built-in"
+  | "created"
+  | "binary"
+  | "text"
+  | "font"
+  | "image"
+  | "shared"
+  | "copied";
 
 /**
  * Library filter state
@@ -56,8 +65,8 @@ export interface LibraryFilterState {
   localeFilters: string[];
   tagFilters: string[];
   sourceFilters: string[];
-  isBuiltInFilters: IsBuiltInFilterValue[];
   isPinnedFilters: IsPinnedFilterValue[];
+  originFilters: OriginFilterValue[];
 }
 
 /**
@@ -75,8 +84,8 @@ export function createEmptyFilterState(): LibraryFilterState {
     localeFilters: [],
     tagFilters: [],
     sourceFilters: [],
-    isBuiltInFilters: [],
     isPinnedFilters: [],
+    originFilters: [],
   };
 }
 
@@ -95,8 +104,8 @@ export function hasActiveFilters(filters: LibraryFilterState): boolean {
     filters.localeFilters.length > 0 ||
     filters.tagFilters.length > 0 ||
     filters.sourceFilters.length > 0 ||
-    filters.isBuiltInFilters.length > 0 ||
-    filters.isPinnedFilters.length > 0
+    filters.isPinnedFilters.length > 0 ||
+    filters.originFilters.length > 0
   );
 }
 
@@ -115,8 +124,8 @@ export function hasActiveDropdownFilters(filters: LibraryFilterState): boolean {
     filters.localeFilters.length > 0 ||
     filters.tagFilters.length > 0 ||
     filters.sourceFilters.length > 0 ||
-    filters.isBuiltInFilters.length > 0 ||
-    filters.isPinnedFilters.length > 0
+    filters.isPinnedFilters.length > 0 ||
+    filters.originFilters.length > 0
   );
 }
 
@@ -134,8 +143,8 @@ export function countActiveDropdownFilters(filters: LibraryFilterState): number 
   if (filters.localeFilters.length > 0) count++;
   if (filters.tagFilters.length > 0) count++;
   if (filters.sourceFilters.length > 0) count++;
-  if (filters.isBuiltInFilters.length > 0) count++;
   if (filters.isPinnedFilters.length > 0) count++;
+  if (filters.originFilters.length > 0) count++;
   return count;
 }
 
@@ -251,23 +260,6 @@ export function matchesSourceFilter(set: SerializedCharacterSet, sourceFilters: 
 }
 
 /**
- * Check if a character set matches the isBuiltIn filters
- * Uses OR logic - matches if ANY selected filter matches
- */
-export function matchesIsBuiltInFilter(
-  set: SerializedCharacterSet,
-  isBuiltInFilters: IsBuiltInFilterValue[],
-): boolean {
-  if (isBuiltInFilters.length === 0) return true;
-  const isBuiltIn = set.metadata.isBuiltIn;
-  return isBuiltInFilters.some((filter) => {
-    if (filter === "built-in") return isBuiltIn === true;
-    if (filter === "user-created") return isBuiltIn === false;
-    return false;
-  });
-}
-
-/**
  * Check if a character set matches the isPinned filters
  * Uses OR logic - matches if ANY selected filter matches
  */
@@ -285,6 +277,29 @@ export function matchesIsPinnedFilter(
 }
 
 /**
+ * Check if a character set matches the origin filters
+ * Uses OR logic - matches if ANY selected filter matches
+ * "built-in" matches sets with isBuiltIn === true
+ * "created", "imported", "copied" match user sets based on their origin field
+ */
+export function matchesOriginFilter(
+  set: SerializedCharacterSet,
+  originFilters: OriginFilterValue[],
+): boolean {
+  if (originFilters.length === 0) return true;
+
+  // Built-in sets match "built-in" filter
+  if (set.metadata.isBuiltIn) {
+    return originFilters.includes("built-in");
+  }
+
+  // User sets match based on their origin field
+  // Default to "created" for legacy data without origin field
+  const origin = set.metadata.origin ?? "created";
+  return originFilters.includes(origin);
+}
+
+/**
  * Check if a character set matches all filters
  */
 export function matchesAllFilters(set: SerializedCharacterSet, filters: LibraryFilterState): boolean {
@@ -298,8 +313,8 @@ export function matchesAllFilters(set: SerializedCharacterSet, filters: LibraryF
     matchesCharacterCountFilter(set, filters.characterCountFilters) &&
     matchesTagFilter(set, filters.tagFilters) &&
     matchesSourceFilter(set, filters.sourceFilters) &&
-    matchesIsBuiltInFilter(set, filters.isBuiltInFilters) &&
-    matchesIsPinnedFilter(set, filters.isPinnedFilters)
+    matchesIsPinnedFilter(set, filters.isPinnedFilters) &&
+    matchesOriginFilter(set, filters.originFilters)
   );
 }
 
@@ -483,6 +498,23 @@ export function getAvailableSources(sets: SerializedCharacterSet[]): string[] {
     }
   }
   return Array.from(sources).sort();
+}
+
+/**
+ * Get unique origins from character sets
+ * Built-in sets return "built-in", user sets return their origin field
+ */
+export function getAvailableOrigins(sets: SerializedCharacterSet[]): OriginFilterValue[] {
+  const origins = new Set<OriginFilterValue>();
+  for (const set of sets) {
+    if (set.metadata.isBuiltIn) {
+      origins.add("built-in");
+    } else {
+      // Default to "created" for legacy data without origin field
+      origins.add(set.metadata.origin ?? "created");
+    }
+  }
+  return Array.from(origins).sort();
 }
 
 /**

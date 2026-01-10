@@ -25,8 +25,8 @@ import {
   PAGE_SIZE_OPTIONS,
   type PageSize,
   type PaginatedResult,
-  type IsBuiltInFilterValue,
   type IsPinnedFilterValue,
+  type OriginFilterValue,
 } from "@/lib/character-editor/library/filters";
 
 export type SortField =
@@ -61,14 +61,20 @@ export const SORT_OPTIONS: { value: SortField; label: string }[] = [
   { value: "locale", label: "Locale" },
 ];
 
-export const IS_BUILT_IN_OPTIONS: { value: IsBuiltInFilterValue; label: string }[] = [
-  { value: "built-in", label: "Built-in" },
-  { value: "user-created", label: "User Created" },
-];
-
 export const IS_PINNED_OPTIONS: { value: IsPinnedFilterValue; label: string }[] = [
   { value: "pinned", label: "Pinned" },
   { value: "not-pinned", label: "Not Pinned" },
+];
+
+export const ORIGIN_OPTIONS: { value: OriginFilterValue; label: string }[] = [
+  { value: "built-in", label: "Built-in" },
+  { value: "created", label: "Created" },
+  { value: "binary", label: "Binary Import" },
+  { value: "text", label: "Text Import" },
+  { value: "font", label: "Font Import" },
+  { value: "image", label: "Image Import" },
+  { value: "shared", label: "Shared Link" },
+  { value: "copied", label: "Copied" },
 ];
 
 export interface LibraryFiltersProps {
@@ -126,14 +132,16 @@ export interface LibraryFiltersProps {
   sourceFilters?: string[];
   /** Callback when source filters change */
   onSourceFilterChange?: (sources: string[]) => void;
-  /** Current isBuiltIn filters (multi-select) */
-  isBuiltInFilters?: IsBuiltInFilterValue[];
-  /** Callback when isBuiltIn filters change */
-  onIsBuiltInFiltersChange?: (values: IsBuiltInFilterValue[]) => void;
   /** Current isPinned filters (multi-select) */
   isPinnedFilters?: IsPinnedFilterValue[];
   /** Callback when isPinned filters change */
   onIsPinnedFiltersChange?: (values: IsPinnedFilterValue[]) => void;
+  /** Available origins from library */
+  availableOrigins?: OriginFilterValue[];
+  /** Current origin filters (multi-select) */
+  originFilters?: OriginFilterValue[];
+  /** Callback when origin filters change */
+  onOriginFilterChange?: (values: OriginFilterValue[]) => void;
   /** Current sort field */
   sortField?: SortField;
   /** Current sort direction */
@@ -185,10 +193,11 @@ export function LibraryFilters({
   availableSources = [],
   sourceFilters = [],
   onSourceFilterChange,
-  isBuiltInFilters = [],
-  onIsBuiltInFiltersChange,
   isPinnedFilters = [],
   onIsPinnedFiltersChange,
+  availableOrigins = [],
+  originFilters = [],
+  onOriginFilterChange,
   sortField = "updatedAt",
   sortDirection = "desc",
   onSortFieldChange,
@@ -231,8 +240,8 @@ export function LibraryFilters({
     onLocaleFilterChange?.([]);
     onTagFilterChange?.([]);
     onSourceFilterChange?.([]);
-    onIsBuiltInFiltersChange?.([]);
     onIsPinnedFiltersChange?.([]);
+    onOriginFilterChange?.([]);
   }, [
     onSearchChange,
     onSizeFilterChange,
@@ -243,8 +252,8 @@ export function LibraryFilters({
     onLocaleFilterChange,
     onTagFilterChange,
     onSourceFilterChange,
-    onIsBuiltInFiltersChange,
     onIsPinnedFiltersChange,
+    onOriginFilterChange,
   ]);
 
   const hasActiveFilters =
@@ -258,8 +267,8 @@ export function LibraryFilters({
     localeFilters.length > 0 ||
     tagFilters.length > 0 ||
     sourceFilters.length > 0 ||
-    isBuiltInFilters.length > 0 ||
-    isPinnedFilters.length > 0;
+    isPinnedFilters.length > 0 ||
+    originFilters.length > 0;
 
   // Check if any dropdown filters are active (excludes search query)
   const hasActiveDropdownFilters =
@@ -272,8 +281,8 @@ export function LibraryFilters({
     localeFilters.length > 0 ||
     tagFilters.length > 0 ||
     sourceFilters.length > 0 ||
-    isBuiltInFilters.length > 0 ||
-    isPinnedFilters.length > 0;
+    isPinnedFilters.length > 0 ||
+    originFilters.length > 0;
 
   // Count active dropdown filter categories for badge
   const activeDropdownFilterCount = [
@@ -286,8 +295,8 @@ export function LibraryFilters({
     localeFilters.length > 0,
     tagFilters.length > 0,
     sourceFilters.length > 0,
-    isBuiltInFilters.length > 0,
     isPinnedFilters.length > 0,
+    originFilters.length > 0,
   ].filter(Boolean).length;
 
   return (
@@ -403,15 +412,15 @@ export function LibraryFilters({
         }`}
       >
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 pt-1">
-          {/* Type (Built-in) filter */}
-          {onIsBuiltInFiltersChange && (
+          {/* Origin filter (combines Type and Origin) */}
+          {onOriginFilterChange && (
             <MultiSelectDropdown
-              label="Type"
-              options={IS_BUILT_IN_OPTIONS}
-              selected={isBuiltInFilters}
-              onChange={onIsBuiltInFiltersChange}
-              placeholder="Type"
-              allOptionLabel="Any type"
+              label="Origin"
+              options={ORIGIN_OPTIONS.filter((opt) => availableOrigins.includes(opt.value))}
+              selected={originFilters}
+              onChange={onOriginFilterChange}
+              placeholder="Origin"
+              allOptionLabel="Any origin"
               className="min-w-[200px]"
             />
           )}

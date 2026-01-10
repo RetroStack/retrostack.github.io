@@ -70,6 +70,7 @@ function SharedPageContent() {
           description: decodedSet.description,
           source: "Shared via URL",
           isBuiltIn: false,
+          origin: "shared",
           createdAt: now,
           updatedAt: now,
           manufacturer: "",

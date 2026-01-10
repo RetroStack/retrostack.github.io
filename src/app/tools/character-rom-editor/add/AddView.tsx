@@ -226,6 +226,13 @@ export function AddView() {
           createdAt: now,
           updatedAt: now,
           isBuiltIn: false,
+          origin: sourceMode === "copy" ? ("copied" as const) : ("created" as const),
+          ...(sourceMode === "copy" && selectedSource
+            ? {
+                copiedFromId: selectedSource.metadata.id,
+                copiedFromName: selectedSource.metadata.name,
+              }
+            : {}),
         },
         config,
         characters,

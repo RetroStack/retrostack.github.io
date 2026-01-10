@@ -224,6 +224,9 @@ export function useCharacterLibrary(options?: UseCharacterLibraryOptions): UseCh
           updatedAt: Date.now(),
           isBuiltIn: false,
           source: "yourself",
+          origin: "copied",
+          copiedFromId: characterSet.metadata.id,
+          copiedFromName: characterSet.metadata.name,
         },
       };
       const serialized = serializeCharacterSet(newSet);

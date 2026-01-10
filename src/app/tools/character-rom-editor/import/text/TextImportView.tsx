@@ -163,6 +163,7 @@ export function TextImportView() {
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
+            origin: "text" as const,
           },
           config: parseResult.config,
           characters: parseResult.characters,

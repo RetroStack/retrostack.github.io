@@ -308,6 +308,7 @@ export function FontImportView() {
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
+            origin: "font" as const,
           },
           config,
           characters: parseResult.characters,

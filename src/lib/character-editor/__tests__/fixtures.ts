@@ -201,8 +201,8 @@ export const emptyFilter: LibraryFilterState = {
   localeFilters: [],
   tagFilters: [],
   sourceFilters: [],
-  isBuiltInFilters: [],
   isPinnedFilters: [],
+  originFilters: [],
 };
 
 export const commodoreFilter: LibraryFilterState = {
@@ -232,6 +232,6 @@ export const complexFilter: LibraryFilterState = {
   localeFilters: ["English"],
   tagFilters: [],
   sourceFilters: [],
-  isBuiltInFilters: [],
   isPinnedFilters: [],
+  originFilters: [],
 };

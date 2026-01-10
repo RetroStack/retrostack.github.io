@@ -377,6 +377,7 @@ export function ImageImportView() {
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
+            origin: "image" as const,
           },
           config,
           characters: parseResult.characters,

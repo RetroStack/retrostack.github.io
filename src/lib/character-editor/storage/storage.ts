@@ -225,6 +225,47 @@ class CharacterStorage implements ICharacterSetStorage {
               }
             };
           }
+
+          // Migration v8: add origin field
+          if (oldVersion < 8) {
+            const store = transaction.objectStore(CHARACTER_EDITOR_STORE_NAME);
+
+            // Migrate existing records to add origin field
+            const cursorRequest = store.openCursor();
+            cursorRequest.onsuccess = (e) => {
+              const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
+              if (cursor) {
+                const record = cursor.value;
+                // Add origin field if missing
+                // Built-in sets get "binary", user sets get "created"
+                if (record.metadata && record.metadata.origin === undefined) {
+                  record.metadata.origin = record.metadata.isBuiltIn ? "binary" : "created";
+                }
+                cursor.update(record);
+                cursor.continue();
+              }
+            };
+          }
+
+          // Migration v9: convert "imported" origin to specific import types
+          // "imported" is no longer valid - convert to "binary" (most common import type)
+          if (oldVersion < 9 && oldVersion >= 8) {
+            const store = transaction.objectStore(CHARACTER_EDITOR_STORE_NAME);
+
+            const cursorRequest = store.openCursor();
+            cursorRequest.onsuccess = (e) => {
+              const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
+              if (cursor) {
+                const record = cursor.value;
+                // Convert "imported" to "binary"
+                if (record.metadata && record.metadata.origin === "imported") {
+                  record.metadata.origin = "binary";
+                  cursor.update(record);
+                }
+                cursor.continue();
+              }
+            };
+          }
         }
 
         // Create snapshots store (for all versions, including new and migrating DBs)
@@ -254,18 +295,28 @@ class CharacterStorage implements ICharacterSetStorage {
       const data = this.kvStorage.getItem(CHARACTER_EDITOR_STORAGE_KEY_FALLBACK);
       if (!data) return [];
       const sets = JSON.parse(data) as SerializedCharacterSet[];
-      // Ensure manufacturer/system/locale/isPinned/notes fields exist for migrated data
-      return sets.map((set) => ({
-        ...set,
-        metadata: {
-          ...set.metadata,
-          manufacturer: set.metadata.manufacturer ?? "",
-          system: set.metadata.system ?? "",
-          locale: set.metadata.locale ?? "",
-          isPinned: set.metadata.isPinned ?? false,
-          notes: set.metadata.notes ?? [],
-        },
-      }));
+      // Ensure manufacturer/system/locale/isPinned/notes/origin fields exist for migrated data
+      return sets.map((set) => {
+        // Convert legacy "imported" origin to "binary"
+        let origin = set.metadata.origin;
+        if (origin === undefined) {
+          origin = set.metadata.isBuiltIn ? "binary" : "created";
+        } else if (origin === "imported") {
+          origin = "binary";
+        }
+        return {
+          ...set,
+          metadata: {
+            ...set.metadata,
+            manufacturer: set.metadata.manufacturer ?? "",
+            system: set.metadata.system ?? "",
+            locale: set.metadata.locale ?? "",
+            isPinned: set.metadata.isPinned ?? false,
+            notes: set.metadata.notes ?? [],
+            origin,
+          },
+        };
+      });
     } catch {
       return [];
     }
