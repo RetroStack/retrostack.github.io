@@ -39,15 +39,7 @@ import {
   ScaleIcon,
   CenterIcon,
 } from "@/components/ui/icons/TransformIcons";
-import {
-  AddIcon,
-  CopyIcon,
-  DuplicateIcon,
-  DeleteIcon,
-  ClearIcon,
-  FillIcon,
-  InvertIcon,
-} from "@/components/ui/icons/ActionIcons";
+import { AddIcon, DuplicateIcon, DeleteIcon, ClearIcon, FillIcon, InvertIcon } from "@/components/ui/icons/ActionIcons";
 
 // Extracted components
 import { TransformPreviewContent } from "./TransformPreview";
@@ -75,17 +67,19 @@ export interface TransformToolbarProps {
   /** Callback for fill */
   onFill: () => void;
   /** Callback for center content */
-  onCenter?: () => void;
+  onCenter: () => void;
   /** Callback for scale */
-  onScale?: () => void;
+  onScale: () => void;
   /** Callback for delete */
-  onDelete?: () => void;
+  onDelete: () => void;
   /** Callback for copy from current set */
-  onCopy?: () => void;
+  onCopy: () => void;
   /** Callback for adding a new character */
-  onAdd?: () => void;
+  onAdd: () => void;
   /** Callback for duplicating selected characters */
-  onDuplicate?: () => void;
+  onDuplicate: () => void;
+  /** Callback for importing characters */
+  onImport: () => void;
   /** Whether toolbar is disabled */
   disabled?: boolean;
   /** Additional CSS classes */
@@ -113,6 +107,7 @@ export function TransformToolbar({
   onCopy,
   onAdd,
   onDuplicate,
+  onImport,
   disabled = false,
   className = "",
 }: TransformToolbarProps) {
@@ -340,18 +335,20 @@ export function TransformToolbar({
 
       <ToolbarDivider />
 
-      {/* Effects section */}
-      <ToolbarLabel>Effects</ToolbarLabel>
+      {/* Modify section */}
+      <ToolbarLabel>Modify</ToolbarLabel>
       <div className="flex flex-col items-center gap-1">
-        <ToolbarButton
-          onClick={onInvert}
-          disabled={disabled}
-          tooltip="Invert Colors"
-          shortcut="I"
-          previewContent={previews?.invert}
-        >
-          <InvertIcon />
-        </ToolbarButton>
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            onClick={onInvert}
+            disabled={disabled}
+            tooltip="Invert Colors"
+            shortcut="I"
+            previewContent={previews?.invert}
+          >
+            <InvertIcon />
+          </ToolbarButton>
+        </div>
         <div className="flex items-center gap-1">
           <ToolbarButton onClick={onClear} disabled={disabled} tooltip="Clear" previewContent={previews?.clear}>
             <ClearIcon />
@@ -360,63 +357,73 @@ export function TransformToolbar({
             <FillIcon />
           </ToolbarButton>
         </div>
-      </div>
-
-      {/* Scale section */}
-      {onScale && (
-        <>
-          <ToolbarDivider />
-          <ToolbarLabel>Scale</ToolbarLabel>
+        <div className="flex items-center gap-1">
           <ToolbarButton onClick={onScale} disabled={disabled} tooltip="Scale Character">
             <ScaleIcon />
           </ToolbarButton>
-        </>
-      )}
+          <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
+            {/* Custom icon: grid with arrow pointing to character */}
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* Small grid representing source character set */}
+              <rect x="3" y="3" width="4" height="4" strokeWidth={1.5} />
+              <rect x="8" y="3" width="4" height="4" strokeWidth={1.5} />
+              <rect x="3" y="8" width="4" height="4" strokeWidth={1.5} />
+              <rect x="8" y="8" width="4" height="4" strokeWidth={1.5} />
+              {/* Arrow pointing to target */}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10h6m0 0l-3-3m3 3l-3 3" />
+              {/* Target character */}
+              <rect x="15" y="15" width="6" height="6" rx="1" strokeWidth={2} />
+            </svg>
+          </ToolbarButton>
+        </div>
+      </div>
 
       {/* Character section */}
-      {(onCopy || onDelete || onAdd || onDuplicate) && (
-        <>
-          <ToolbarDivider />
-          <ToolbarLabel>Char</ToolbarLabel>
-          <div className="flex flex-col  items-center gap-1">
-            <div className="flex items-center gap-1">
-              {onAdd && (
-                <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
-                  <AddIcon />
-                </ToolbarButton>
-              )}
-              {onDuplicate && (
-                <ToolbarButton
-                  onClick={onDuplicate}
-                  disabled={disabled}
-                  tooltip="Duplicate selected characters"
-                  shortcut="Ctrl+D"
-                >
-                  <DuplicateIcon />
-                </ToolbarButton>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              {onCopy && (
-                <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
-                  <CopyIcon />
-                </ToolbarButton>
-              )}
-              {onDelete && (
-                <ToolbarButton
-                  onClick={onDelete}
-                  disabled={disabled}
-                  tooltip="Delete character"
-                  shortcut="Del"
-                  className="hover:text-red-400"
-                >
-                  <DeleteIcon />
-                </ToolbarButton>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      <ToolbarDivider />
+      <ToolbarLabel>Char</ToolbarLabel>
+      <div className="flex flex-col  items-center gap-1">
+        <div className="flex items-center gap-1">
+          <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
+            <AddIcon />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={onDuplicate}
+            disabled={disabled}
+            tooltip="Duplicate selected characters"
+            shortcut="Ctrl+D"
+          >
+            <DuplicateIcon />
+          </ToolbarButton>
+        </div>
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            onClick={onImport}
+            disabled={disabled}
+            tooltip="Import characters from another set"
+            shortcut="Ctrl+I"
+          >
+            {/* Letter A with arrow pointing down */}
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 20l2.5-7h3L16 20M9.25 16h5.5"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v8m0 0l-3-3m3 3l3-3" />
+            </svg>
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={onDelete}
+            disabled={disabled}
+            tooltip="Delete character"
+            shortcut="Del"
+            className="hover:text-red-400"
+          >
+            <DeleteIcon />
+          </ToolbarButton>
+        </div>
+      </div>
     </div>
   );
 }

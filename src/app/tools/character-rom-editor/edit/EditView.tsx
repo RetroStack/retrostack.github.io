@@ -606,7 +606,27 @@ export function EditView() {
   // Toolbar actions - reorganized into logical groups
   // Priority: 3 = essential (always visible), 2 = important, 1 = normal, 0 = low (first to hide)
   const toolbarActions: ToolbarItem[] = [
-    // Group 1: Character set file operations
+    // Group 0: Full CHaracter set operations
+    {
+      id: "new",
+      label: "New Set",
+      tooltip: "Create a new character set",
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          {/* Document with plus */}
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2v6h6" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11v6m-3-3h6" />
+        </svg>
+      ),
+      onClick: () => router.push("/tools/character-rom-editor/add"),
+      priority: 3,
+    },
     {
       id: "save",
       label: saving ? "Saving..." : "Save Set",
@@ -698,6 +718,61 @@ export function EditView() {
       disabled: characterSet?.metadata.isBuiltIn,
       priority: 1,
     },
+    { type: "separator", id: "sep-0" },
+    // Group 1: Editing full character set tools
+    {
+      id: "edit-metadata",
+      label: "Edit Info",
+      tooltip: "Edit character set name and description",
+      shortcut: "F2",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+          />
+        </svg>
+      ),
+      onClick: () => setShowMetadataModal(true),
+      priority: 3,
+    },
+    {
+      id: "resize",
+      label: "Resize Set",
+      tooltip: "Change character dimensions (width × height)",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+          />
+        </svg>
+      ),
+      onClick: () => setShowResizeModal(true),
+      priority: 0,
+    },
+    {
+      id: "reorder",
+      label: "Reorder",
+      tooltip: "Drag and drop to reorder characters",
+      shortcut: "O",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+          />
+        </svg>
+      ),
+      onClick: () => setShowReorderModal(true),
+      priority: 0,
+    },
     { type: "separator", id: "sep-1" },
     // Group 2: Edit history
     {
@@ -758,161 +833,7 @@ export function EditView() {
       priority: 2,
     },
     { type: "separator", id: "sep-2" },
-    // Group 3: Editing tools
-    {
-      id: "edit-metadata",
-      label: "Edit Info",
-      tooltip: "Edit character set name and description",
-      shortcut: "F2",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-          />
-        </svg>
-      ),
-      onClick: () => setShowMetadataModal(true),
-      priority: 3,
-    },
-    {
-      id: "resize",
-      label: "Resize Set",
-      tooltip: "Change character dimensions (width × height)",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-          />
-        </svg>
-      ),
-      onClick: () => setShowResizeModal(true),
-      priority: 0,
-    },
-    {
-      id: "import",
-      label: "Import Chars",
-      tooltip: "Import characters from ROM file or image",
-      shortcut: "Ctrl+I",
-      icon: (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          {/* Letter A representing character */}
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 20l2.5-7h3L16 20M9.25 16h5.5" />
-          {/* Arrow pointing down */}
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v8m0 0l-3-3m3 3l3-3" />
-        </svg>
-      ),
-      onClick: () => setShowImportModal(true),
-      priority: 1,
-    },
-    {
-      id: "reorder",
-      label: "Reorder",
-      tooltip: "Drag and drop to reorder characters",
-      shortcut: "O",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-          />
-        </svg>
-      ),
-      onClick: () => setShowReorderModal(true),
-      priority: 0,
-    },
-    { type: "separator", id: "sep-3" },
-    // Group 4: Export/Share
-    {
-      id: "export",
-      label: "Export Set",
-      tooltip: "Export character set as ROM binary file",
-      shortcut: "E",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 5v14a2 2 0 002 2h10a2 2 0 002-2V5M12 21V9m0 0l4 4m-4-4l-4 4"
-          />
-        </svg>
-      ),
-      onClick: handleExport,
-      priority: 1,
-    },
-    {
-      id: "share",
-      label: "Share",
-      tooltip: "Generate a shareable link to this character set",
-      shortcut: "Ctrl+Shift+E",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-          />
-        </svg>
-      ),
-      onClick: () => setShowShare(true),
-      priority: 0,
-    },
-    { type: "separator", id: "sep-4" },
-    // Group 5: History/Snapshots
-    {
-      id: "snapshots",
-      label: `Snapshots (${snapshots.snapshots.length})`,
-      tooltip: "Save and restore named versions of your work",
-      shortcut: "Ctrl+Shift+S",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-          />
-        </svg>
-      ),
-      onClick: () => setShowSnapshots(true),
-      priority: 1,
-    },
-    { type: "separator", id: "sep-5" },
-    // Group 6: Navigation/View
-    {
-      id: "overlay",
-      label: "Overlay",
-      tooltip: "Overlay another character set for tracing",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-          />
-        </svg>
-      ),
-      onClick: () => {
-        if (overlayCharacterSet) {
-          setOverlayCharacterSet(null);
-        } else {
-          setShowOverlaySearch(true);
-        }
-      },
-      active: !!overlayCharacterSet,
-      activeVariant: "amber" as const,
-      priority: 0,
-    },
+    // Group 3: Navigation Tooling
     {
       id: "goto",
       label: "Go to",
@@ -949,6 +870,33 @@ export function EditView() {
       onClick: () => setShowAsciiMap(true),
       priority: 0,
     },
+    { type: "separator", id: "sep-3" },
+    // Group 4: Advanced Tools
+    {
+      id: "overlay",
+      label: "Overlay",
+      tooltip: "Overlay another character set for tracing",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+          />
+        </svg>
+      ),
+      onClick: () => {
+        if (overlayCharacterSet) {
+          setOverlayCharacterSet(null);
+        } else {
+          setShowOverlaySearch(true);
+        }
+      },
+      active: !!overlayCharacterSet,
+      activeVariant: "amber" as const,
+      priority: 0,
+    },
     {
       id: "text-preview",
       label: "Preview",
@@ -960,10 +908,83 @@ export function EditView() {
         </svg>
       ),
       onClick: () => setShowTextPreview(true),
+      priority: 2,
+    },
+    {
+      id: "snapshots",
+      label: `Snapshots (${snapshots.snapshots.length})`,
+      tooltip: "Save and restore named versions of your work",
+      shortcut: "Ctrl+Shift+S",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+          />
+        </svg>
+      ),
+      onClick: () => setShowSnapshots(true),
+      priority: 1,
+    },
+    { type: "separator", id: "sep-4" },
+    // Group 5: Import/Export/Share Tools
+    {
+      id: "import-set",
+      label: "Import Set",
+      tooltip: "Import a character set from file",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 5v14a2 2 0 002 2h10a2 2 0 002-2V5M12 3v12m0 0l4-4m-4 4l-4-4"
+          />
+        </svg>
+      ),
+      onClick: () => router.push("/tools/character-rom-editor/import"),
+      priority: 1,
+    },
+    {
+      id: "export",
+      label: "Export Set",
+      tooltip: "Export character set as ROM binary file",
+      shortcut: "E",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 5v14a2 2 0 002 2h10a2 2 0 002-2V5M12 21V9m0 0l4 4m-4-4l-4 4"
+          />
+        </svg>
+      ),
+      onClick: handleExport,
+      priority: 1,
+    },
+    {
+      id: "share",
+      label: "Share",
+      tooltip: "Generate a shareable link to this character set",
+      shortcut: "Ctrl+Shift+E",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+          />
+        </svg>
+      ),
+      onClick: () => setShowShare(true),
       priority: 0,
     },
-    { type: "separator", id: "sep-6" },
-    // Group 7: Help
+    { type: "separator", id: "sep-5" },
+    // Group 6: Help
     {
       id: "help",
       label: "Help",
@@ -1122,6 +1143,7 @@ export function EditView() {
                 onCopy={() => setShowCopyModal(true)}
                 onAdd={editor.insertCharacterAfter}
                 onDuplicate={editor.duplicateSelected}
+                onImport={() => setShowImportModal(true)}
                 disabled={!selectedCharacter}
                 className="h-full"
               />
