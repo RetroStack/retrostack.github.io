@@ -84,6 +84,7 @@ export function BinaryImportView() {
   const [chip, setChip] = useState("");
   const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
 
   // Step 3: Config state
   const [config, setConfig] = useState<CharacterSetConfig>(createDefaultConfig());
@@ -231,6 +232,7 @@ export function BinaryImportView() {
             system: system.trim(),
             chip: chip.trim(),
             locale: locale.trim(),
+            tags,
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -252,7 +254,7 @@ export function BinaryImportView() {
         setSaving(false);
       }
     },
-    [fileData, name, description, source, manufacturer, system, chip, locale, config, characters, save, router]
+    [fileData, name, description, source, manufacturer, system, chip, locale, tags, config, characters, save, router]
   );
 
   return (
@@ -424,6 +426,8 @@ export function BinaryImportView() {
                   onLocaleChange={setLocale}
                   source={source}
                   onSourceChange={setSource}
+                  tags={tags}
+                  onTagsChange={setTags}
                 />
 
                 {/* Navigation */}

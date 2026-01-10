@@ -184,6 +184,18 @@ export function LibraryCard({
             </p>
           )}
           {metadata.description && <p className="text-xs text-gray-400 line-clamp-2 mt-0.5">{metadata.description}</p>}
+          {metadata.tags && metadata.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {metadata.tags.map((tag, index) => (
+                <span
+                  key={`tag-${index}`}
+                  className="px-1.5 py-0.5 bg-retro-amber/15 text-retro-amber/80 rounded text-[10px]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex-shrink-0">

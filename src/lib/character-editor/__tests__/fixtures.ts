@@ -199,6 +199,7 @@ export const emptyFilter: LibraryFilterState = {
   systemFilters: [],
   chipFilters: [],
   localeFilters: [],
+  tagFilters: [],
 };
 
 export const commodoreFilter: LibraryFilterState = {
@@ -226,4 +227,5 @@ export const complexFilter: LibraryFilterState = {
   systemFilters: ["C64"],
   chipFilters: [],
   localeFilters: ["English"],
+  tagFilters: [],
 };

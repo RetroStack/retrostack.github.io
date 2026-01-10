@@ -102,6 +102,12 @@ export interface LibraryFiltersProps {
   localeFilters?: string[];
   /** Callback when locale filters change */
   onLocaleFilterChange?: (locales: string[]) => void;
+  /** Available tags from library */
+  availableTags?: string[];
+  /** Current tag filters (multi-select) */
+  tagFilters?: string[];
+  /** Callback when tag filters change */
+  onTagFilterChange?: (tags: string[]) => void;
   /** Current sort field */
   sortField?: SortField;
   /** Current sort direction */
@@ -147,6 +153,9 @@ export function LibraryFilters({
   availableLocales = [],
   localeFilters = [],
   onLocaleFilterChange,
+  availableTags = [],
+  tagFilters = [],
+  onTagFilterChange,
   sortField = "updatedAt",
   sortDirection = "desc",
   onSortFieldChange,
@@ -184,6 +193,7 @@ export function LibraryFilters({
     onSystemFilterChange?.([]);
     onChipFilterChange?.([]);
     onLocaleFilterChange?.([]);
+    onTagFilterChange?.([]);
   }, [
     onSearchChange,
     onSizeFilterChange,
@@ -192,6 +202,7 @@ export function LibraryFilters({
     onSystemFilterChange,
     onChipFilterChange,
     onLocaleFilterChange,
+    onTagFilterChange,
   ]);
 
   const hasActiveFilters =
@@ -202,7 +213,8 @@ export function LibraryFilters({
     manufacturerFilters.length > 0 ||
     systemFilters.length > 0 ||
     chipFilters.length > 0 ||
-    localeFilters.length > 0;
+    localeFilters.length > 0 ||
+    tagFilters.length > 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -359,6 +371,18 @@ export function LibraryFilters({
             onChange={onLocaleFilterChange}
             placeholder="Locale"
             allOptionLabel="Any locale"
+          />
+        )}
+
+        {/* Tags filter */}
+        {onTagFilterChange && availableTags.length > 0 && (
+          <MultiSelectDropdown
+            label="Tags"
+            options={availableTags.map((t) => ({ value: t, label: t }))}
+            selected={tagFilters}
+            onChange={onTagFilterChange}
+            placeholder="Tags"
+            allOptionLabel="Any tag"
           />
         )}
       </div>

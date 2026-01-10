@@ -28,6 +28,7 @@ export function MetadataEditModal({ isOpen, onClose, metadata, onSave }: Metadat
   const [system, setSystem] = useState(metadata.system);
   const [chip, setChip] = useState(metadata.chip);
   const [locale, setLocale] = useState(metadata.locale);
+  const [tags, setTags] = useState<string[]>(metadata.tags ?? []);
   const [isPinned, setIsPinned] = useState(metadata.isPinned ?? false);
   const [saving, setSaving] = useState(false);
 
@@ -41,6 +42,7 @@ export function MetadataEditModal({ isOpen, onClose, metadata, onSave }: Metadat
       setSystem(metadata.system);
       setChip(metadata.chip);
       setLocale(metadata.locale);
+      setTags(metadata.tags ?? []);
       setIsPinned(metadata.isPinned ?? false);
     }
   }, [isOpen, metadata]);
@@ -58,6 +60,7 @@ export function MetadataEditModal({ isOpen, onClose, metadata, onSave }: Metadat
         system: system,
         chip: chip,
         locale: locale.trim(),
+        tags: tags,
         isPinned: isPinned,
       });
       onClose();
@@ -88,6 +91,8 @@ export function MetadataEditModal({ isOpen, onClose, metadata, onSave }: Metadat
           onLocaleChange={setLocale}
           source={source}
           onSourceChange={setSource}
+          tags={tags}
+          onTagsChange={setTags}
           autoFocusName
           compact
           idPrefix="metadata-edit"

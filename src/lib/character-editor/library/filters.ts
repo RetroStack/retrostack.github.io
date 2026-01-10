@@ -44,6 +44,7 @@ export interface LibraryFilterState {
   systemFilters: string[];
   chipFilters: string[];
   localeFilters: string[];
+  tagFilters: string[];
 }
 
 /**
@@ -59,6 +60,7 @@ export function createEmptyFilterState(): LibraryFilterState {
     systemFilters: [],
     chipFilters: [],
     localeFilters: [],
+    tagFilters: [],
   };
 }
 
@@ -74,18 +76,21 @@ export function hasActiveFilters(filters: LibraryFilterState): boolean {
     filters.manufacturerFilters.length > 0 ||
     filters.systemFilters.length > 0 ||
     filters.chipFilters.length > 0 ||
-    filters.localeFilters.length > 0
+    filters.localeFilters.length > 0 ||
+    filters.tagFilters.length > 0
   );
 }
 
 /**
  * Check if a character set matches the search query
- * Searches across name, description, source, manufacturer, system, chip, and locale
+ * Searches across name, description, source, manufacturer, system, chip, locale, and tags
  */
 export function matchesSearchQuery(set: SerializedCharacterSet, query: string): boolean {
   if (!query.trim()) return true;
 
   const lowerQuery = query.toLowerCase();
+  const tagsMatch = (set.metadata.tags ?? []).some((tag) => tag.toLowerCase().includes(lowerQuery));
+
   return (
     set.metadata.name.toLowerCase().includes(lowerQuery) ||
     set.metadata.description.toLowerCase().includes(lowerQuery) ||
@@ -93,7 +98,8 @@ export function matchesSearchQuery(set: SerializedCharacterSet, query: string): 
     (set.metadata.manufacturer?.toLowerCase().includes(lowerQuery) ?? false) ||
     (set.metadata.system?.toLowerCase().includes(lowerQuery) ?? false) ||
     (set.metadata.chip?.toLowerCase().includes(lowerQuery) ?? false) ||
-    (set.metadata.locale?.toLowerCase().includes(lowerQuery) ?? false)
+    (set.metadata.locale?.toLowerCase().includes(lowerQuery) ?? false) ||
+    tagsMatch
   );
 }
 
@@ -155,6 +161,16 @@ export function matchesCharacterCountFilter(set: SerializedCharacterSet, charact
 }
 
 /**
+ * Check if a character set matches the tag filter
+ * Uses OR logic - matches if ANY selected tag is present
+ */
+export function matchesTagFilter(set: SerializedCharacterSet, tagFilters: string[]): boolean {
+  if (tagFilters.length === 0) return true;
+  const setTags = set.metadata.tags ?? [];
+  return tagFilters.some((tag) => setTags.includes(tag));
+}
+
+/**
  * Check if a character set matches all filters
  */
 export function matchesAllFilters(set: SerializedCharacterSet, filters: LibraryFilterState): boolean {
@@ -165,7 +181,8 @@ export function matchesAllFilters(set: SerializedCharacterSet, filters: LibraryF
     matchesSystemFilter(set, filters.systemFilters) &&
     matchesChipFilter(set, filters.chipFilters) &&
     matchesLocaleFilter(set, filters.localeFilters) &&
-    matchesCharacterCountFilter(set, filters.characterCountFilters)
+    matchesCharacterCountFilter(set, filters.characterCountFilters) &&
+    matchesTagFilter(set, filters.tagFilters)
   );
 }
 
@@ -323,6 +340,19 @@ export function getAvailableCharacterCounts(sets: SerializedCharacterSet[]): num
     counts.add(getCharacterCount(set));
   }
   return Array.from(counts).sort((a, b) => a - b);
+}
+
+/**
+ * Get unique tags from character sets
+ */
+export function getAvailableTags(sets: SerializedCharacterSet[]): string[] {
+  const tags = new Set<string>();
+  for (const set of sets) {
+    for (const tag of set.metadata.tags ?? []) {
+      tags.add(tag);
+    }
+  }
+  return Array.from(tags).sort();
 }
 
 /**

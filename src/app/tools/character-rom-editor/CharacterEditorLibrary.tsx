@@ -32,6 +32,7 @@ import {
   getAvailableChips,
   getAvailableLocales,
   getAvailableCharacterCounts,
+  getAvailableTags,
   filterInvalidSystems,
   paginateItems,
   parsePageSize,
@@ -84,6 +85,7 @@ export function CharacterEditorLibrary() {
   const [systemFilters, setSystemFilters] = useState<string[]>([]);
   const [chipFilters, setChipFilters] = useState<string[]>([]);
   const [localeFilters, setLocaleFilters] = useState<string[]>([]);
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
 
   // Sort state (defaults to name/asc, loaded from localStorage)
   const [sortField, setSortField] = useState<SortField>(DEFAULT_SORT_FIELD);
@@ -128,6 +130,8 @@ export function CharacterEditorLibrary() {
 
   const availableCharacterCounts = useMemo(() => getAvailableCharacterCounts(characterSets), [characterSets]);
 
+  const availableTags = useMemo(() => getAvailableTags(characterSets), [characterSets]);
+
   // Delete confirmation state
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -151,6 +155,7 @@ export function CharacterEditorLibrary() {
       systemFilters,
       chipFilters,
       localeFilters,
+      tagFilters,
     }),
     [
       searchQuery,
@@ -161,6 +166,7 @@ export function CharacterEditorLibrary() {
       systemFilters,
       chipFilters,
       localeFilters,
+      tagFilters,
     ],
   );
 
@@ -332,6 +338,10 @@ export function CharacterEditorLibrary() {
     setCharacterCountFilters(counts);
   }, []);
 
+  const handleTagFilterChange = useCallback((tags: string[]) => {
+    setTagFilters(tags);
+  }, []);
+
   const handleSortFieldChange = useCallback((field: SortField) => {
     setSortField(field);
     try {
@@ -376,6 +386,7 @@ export function CharacterEditorLibrary() {
     setSystemFilters([]);
     setChipFilters([]);
     setLocaleFilters([]);
+    setTagFilters([]);
   }, []);
 
   // Use pure function to check if filters are active
@@ -483,6 +494,9 @@ export function CharacterEditorLibrary() {
               availableLocales={availableLocales}
               localeFilters={localeFilters}
               onLocaleFilterChange={handleLocaleFilterChange}
+              availableTags={availableTags}
+              tagFilters={tagFilters}
+              onTagFilterChange={handleTagFilterChange}
               sortField={sortField}
               sortDirection={sortDirection}
               onSortFieldChange={handleSortFieldChange}

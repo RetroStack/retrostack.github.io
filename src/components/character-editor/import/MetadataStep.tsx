@@ -17,6 +17,8 @@ export interface MetadataStepProps {
   onLocaleChange: (locale: string) => void;
   source: string;
   onSourceChange: (source: string) => void;
+  tags?: string[];
+  onTagsChange?: (tags: string[]) => void;
   title?: string;
   subtitle?: string;
   autoFocusName?: boolean;

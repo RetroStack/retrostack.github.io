@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { ManufacturerSystemSelect } from "../selectors/ManufacturerSystemSelect";
 import { ChipSelect } from "../selectors/ChipSelect";
 import { getRomChipsForSystem } from "@/lib/character-editor/data/manufacturers";
+import { TagInput } from "@/components/ui/TagInput";
 
 export interface MetadataFormFieldsProps {
   /** Name field value */
@@ -34,6 +35,10 @@ export interface MetadataFormFieldsProps {
   source: string;
   /** Callback when source changes */
   onSourceChange: (source: string) => void;
+  /** Tags field value */
+  tags?: string[];
+  /** Callback when tags change */
+  onTagsChange?: (tags: string[]) => void;
   /** Whether to auto-focus the name field */
   autoFocusName?: boolean;
   /** Use compact spacing (space-y-4 instead of space-y-6) */
@@ -64,6 +69,8 @@ export function MetadataFormFields({
   onLocaleChange,
   source,
   onSourceChange,
+  tags = [],
+  onTagsChange,
   autoFocusName = false,
   compact = false,
   idPrefix = "metadata",
@@ -187,6 +194,27 @@ export function MetadataFormFields({
           className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
         />
       </div>
+
+      {/* Tags */}
+      {onTagsChange && (
+        <div>
+          <label
+            htmlFor={`${idPrefix}-tags-input`}
+            className="block text-sm text-gray-300 mb-1"
+          >
+            Tags
+          </label>
+          <TagInput
+            tags={tags}
+            onTagsChange={onTagsChange}
+            placeholder="Add tags (comma to add)"
+            idPrefix={`${idPrefix}-tags`}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Press comma or Enter to add a tag
+          </p>
+        </div>
+      )}
     </div>
   );
 }

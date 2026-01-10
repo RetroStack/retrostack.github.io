@@ -73,6 +73,8 @@ export interface CharacterSetMetadata {
   isPinned?: boolean;
   /** Version of the built-in character set (used for auto-updates, only for isBuiltIn: true) */
   builtInVersion?: number;
+  /** User-defined tags for organization */
+  tags?: string[];
 }
 
 /**
@@ -150,6 +152,8 @@ export interface LibraryFilter {
   chipFilters: string[];
   /** Multi-select filter for locales (OR logic) */
   localeFilters: string[];
+  /** Multi-select filter for tags (OR logic) */
+  tagFilters: string[];
 }
 
 /**

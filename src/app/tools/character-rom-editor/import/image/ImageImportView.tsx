@@ -81,6 +81,7 @@ export function ImageImportView() {
   const [chip, setChip] = useState("");
   const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
 
   // Saving state
   const [saving, setSaving] = useState(false);
@@ -372,6 +373,7 @@ export function ImageImportView() {
             system: system.trim(),
             chip: chip.trim(),
             locale: locale.trim(),
+            tags,
             createdAt: now,
             updatedAt: now,
             isBuiltIn: false,
@@ -393,7 +395,7 @@ export function ImageImportView() {
         setSaving(false);
       }
     },
-    [parseResult, name, description, source, manufacturer, system, chip, locale, config, save, router],
+    [parseResult, name, description, source, manufacturer, system, chip, locale, tags, config, save, router],
   );
 
   return (
@@ -1448,6 +1450,8 @@ export function ImageImportView() {
                   onLocaleChange={setLocale}
                   source={source}
                   onSourceChange={setSource}
+                  tags={tags}
+                  onTagsChange={setTags}
                 />
 
                 {/* Navigation */}

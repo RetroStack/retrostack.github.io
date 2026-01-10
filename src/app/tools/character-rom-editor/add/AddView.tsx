@@ -51,6 +51,7 @@ export function AddView() {
   const [chip, setChip] = useState("");
   const [locale, setLocale] = useState("");
   const [source, setSource] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
 
   // Step 2: Source mode
   const [sourceMode, setSourceMode] = useState<SourceMode>("new");
@@ -221,6 +222,7 @@ export function AddView() {
           system: system.trim(),
           chip: chip.trim(),
           locale: locale.trim(),
+          tags,
           createdAt: now,
           updatedAt: now,
           isBuiltIn: false,
@@ -244,6 +246,7 @@ export function AddView() {
     system,
     chip,
     locale,
+    tags,
     config,
     sourceMode,
     selectedSource,
@@ -313,6 +316,8 @@ export function AddView() {
                   onLocaleChange={setLocale}
                   source={source}
                   onSourceChange={setSource}
+                  tags={tags}
+                  onTagsChange={setTags}
                   autoFocusName
                 />
 
