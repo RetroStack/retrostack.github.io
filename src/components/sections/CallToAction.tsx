@@ -1,3 +1,18 @@
+/**
+ * Call To Action Section
+ *
+ * Homepage section encouraging community engagement with RetroStack.
+ * Features:
+ * - Gradient background glow effect
+ * - "Join the Community" heading with NeonText
+ * - Description about open source nature
+ * - CTA buttons for GitHub and Patreon with social icons
+ * - Trust indicators showing project count, open source status, and license
+ *
+ * Uses social links from site constants.
+ *
+ * @module components/sections/CallToAction
+ */
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";
 import { SOCIAL_LINKS } from "@/lib/constants";

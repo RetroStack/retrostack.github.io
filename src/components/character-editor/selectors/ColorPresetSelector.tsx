@@ -1,3 +1,16 @@
+/**
+ * Color Preset Selector Component
+ *
+ * A dropdown selector for foreground/background color combinations.
+ * Features:
+ * - Preset color schemes (Classic Green, Amber, Blue, etc.)
+ * - Custom color picker with RGB inputs
+ * - Live preview swatches
+ * - Persists selection to localStorage
+ * - Drop-up mode for bottom-positioned toolbars
+ *
+ * @module components/character-editor/selectors/ColorPresetSelector
+ */
 "use client";
 
 import { useState, useCallback, useEffect } from "react";

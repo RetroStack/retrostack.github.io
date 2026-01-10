@@ -1,3 +1,17 @@
+/**
+ * Overflow Menu Component
+ *
+ * A dropdown menu triggered by a three-dot button, commonly used for
+ * additional actions that don't fit in the main UI. Features:
+ * - Default three-dot trigger or custom trigger element
+ * - Support for links and buttons
+ * - Danger variant for destructive actions
+ * - Left or right alignment
+ * - Keyboard navigation support
+ * - Click-outside to close
+ *
+ * @module components/ui/OverflowMenu
+ */
 "use client";
 
 import Link from "next/link";

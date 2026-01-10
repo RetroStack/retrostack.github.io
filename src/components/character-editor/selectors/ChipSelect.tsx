@@ -1,3 +1,17 @@
+/**
+ * Chip Select Component
+ *
+ * A dropdown selector for ROM chip part numbers. Shows chips
+ * grouped by manufacturer with filtering and search.
+ * Features:
+ * - Editable text input for custom chip names
+ * - 3D picker button to open dropdown
+ * - Chips grouped by manufacturer (e.g., Intel, Texas Instruments)
+ * - Common chips highlighted (8x8, 8x16 patterns)
+ * - Clear button to reset selection
+ *
+ * @module components/character-editor/selectors/ChipSelect
+ */
 "use client";
 
 import { useMemo } from "react";

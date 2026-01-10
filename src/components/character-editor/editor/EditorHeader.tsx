@@ -1,3 +1,15 @@
+/**
+ * Editor Header Component
+ *
+ * Consolidated header bar for the character editor containing:
+ * - Back button to return to library
+ * - Character set name with dirty indicator
+ * - Current character info (index, ASCII value, control char name)
+ * - Zoom controls with slider
+ * - Color preset selector for foreground/background colors
+ *
+ * @module components/character-editor/editor/EditorHeader
+ */
 "use client";
 
 import { ColorPresetSelector } from "../selectors/ColorPresetSelector";

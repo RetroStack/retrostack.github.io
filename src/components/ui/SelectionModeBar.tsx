@@ -1,3 +1,18 @@
+/**
+ * Selection Mode Bar Component
+ *
+ * A floating action bar for multi-selection mode on touch devices.
+ * Appears at the bottom of the screen when selection mode is active.
+ * Features:
+ * - Selection count badge
+ * - All/None bulk selection buttons
+ * - Custom action buttons (e.g., delete, copy)
+ * - Done button to exit selection mode
+ * - Slide-up animation
+ * - Safe area inset support for mobile
+ *
+ * @module components/ui/SelectionModeBar
+ */
 "use client";
 
 import { ReactNode } from "react";

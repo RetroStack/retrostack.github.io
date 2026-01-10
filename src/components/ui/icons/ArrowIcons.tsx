@@ -1,3 +1,17 @@
+/**
+ * Arrow Icons
+ *
+ * Directional arrow icons for navigation and UI feedback.
+ * All icons use consistent sizing via IconProps and getIconClass utility.
+ *
+ * Icons included:
+ * - ArrowUpIcon: Points upward (chevron style)
+ * - ArrowDownIcon: Points downward (chevron style)
+ * - ArrowLeftIcon: Points left (chevron style)
+ * - ArrowRightIcon: Points right (chevron style)
+ *
+ * @module components/ui/icons/ArrowIcons
+ */
 import { IconProps, getIconClass } from "./types";
 
 /**

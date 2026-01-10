@@ -1,3 +1,18 @@
+/**
+ * Character Set Overview Component
+ *
+ * A canvas-based compact overview of all characters in a set.
+ * Used as a navigation aid and for quick character selection.
+ * Features:
+ * - Single canvas rendering for performance
+ * - Click to select characters
+ * - Long press for selection mode on touch devices
+ * - Batch selection highlight
+ * - Collapsible panel support
+ * - Auto-scrolls to keep selected character visible
+ *
+ * @module components/character-editor/character/CharacterSetOverview
+ */
 "use client";
 
 import { useRef, useEffect, useCallback, useState } from "react";

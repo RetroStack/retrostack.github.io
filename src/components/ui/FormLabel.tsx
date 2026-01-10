@@ -1,3 +1,16 @@
+/**
+ * Form Label Component
+ *
+ * A styled form label following the retro design system. Features:
+ * - Consistent gray text color
+ * - Optional required indicator (asterisk)
+ * - Optional description text
+ * - Configurable spacing variants
+ *
+ * Also exports FORM_LABEL_STYLES constant for inline usage.
+ *
+ * @module components/ui/FormLabel
+ */
 import { type LabelHTMLAttributes, type ReactNode } from "react";
 
 /**

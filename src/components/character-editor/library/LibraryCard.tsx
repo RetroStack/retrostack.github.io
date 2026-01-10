@@ -1,3 +1,21 @@
+/**
+ * Library Card Components
+ *
+ * Card components for displaying character sets in the library.
+ * Components:
+ * - LibraryCard: Full card with preview, metadata, and action menu
+ * - LibraryCardCompact: Smaller selectable card for dialogs
+ * - LibraryCardEmpty: Placeholder for adding new character sets
+ *
+ * Features:
+ * - Character preview thumbnail
+ * - Metadata display (name, manufacturer, system, chip)
+ * - Overflow menu with edit, export, duplicate, delete actions
+ * - Pin to top functionality
+ * - Built-in badge for system presets
+ *
+ * @module components/character-editor/library/LibraryCard
+ */
 "use client";
 
 import { useMemo } from "react";

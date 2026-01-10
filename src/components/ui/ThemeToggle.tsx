@@ -1,3 +1,15 @@
+/**
+ * Theme Toggle Component
+ *
+ * A button that toggles between light and dark themes.
+ * Features:
+ * - Sun icon in dark mode, moon icon in light mode
+ * - Tooltip showing which mode will be activated
+ * - Hydration-safe rendering (waits for mount)
+ * - Uses useTheme hook for state management
+ *
+ * @module components/ui/ThemeToggle
+ */
 "use client";
 
 import { useTheme } from "@/hooks/useTheme";

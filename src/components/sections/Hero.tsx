@@ -1,3 +1,19 @@
+/**
+ * Hero Section
+ *
+ * The primary hero section displayed at the top of the homepage.
+ * Features:
+ * - Animated grid background with overlay
+ * - RetroStack logo with neon glow effect
+ * - Site name with NeonText styling
+ * - Tagline and description from site config
+ * - Call-to-action buttons (Explore Systems, Try Our Tools)
+ * - Animated scroll indicator
+ *
+ * Uses fluid typography and responsive layout for all screen sizes.
+ *
+ * @module components/sections/Hero
+ */
 "use client";
 
 import Image from "next/image";

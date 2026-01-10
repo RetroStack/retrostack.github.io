@@ -1,3 +1,28 @@
+/**
+ * Neon Flicker Effect
+ *
+ * An advanced neon text effect that simulates an aging neon sign with
+ * individual letter flickering. Features:
+ * - Per-character flicker control
+ * - Configurable flicker frequency (often, sometimes, seldom)
+ * - Deterministic animation using seeded random for SSR compatibility
+ * - Polymorphic component supporting multiple HTML tags
+ *
+ * Default configuration makes 'r' flicker often, 'a' sometimes, and 'S' seldom,
+ * creating an authentic old neon sign feel.
+ *
+ * @module components/effects/NeonFlicker
+ *
+ * @example
+ * ```tsx
+ * <NeonFlicker
+ *   text="RetroStack"
+ *   color="pink"
+ *   as="h1"
+ *   flickerChars={{ r: "often", a: "sometimes" }}
+ * />
+ * ```
+ */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";

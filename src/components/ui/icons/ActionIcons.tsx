@@ -1,3 +1,18 @@
+/**
+ * Action Icons
+ *
+ * Icons for common actions like copy, delete, clear, fill, and invert.
+ * Used throughout the character editor and other tool interfaces.
+ *
+ * Icons included:
+ * - CopyIcon: Duplicate/copy to clipboard
+ * - DeleteIcon: Delete/trash with lid and lines
+ * - ClearIcon: Empty/hollow square (clear to empty)
+ * - FillIcon: Solid filled square (fill with content)
+ * - InvertIcon: Moon/contrast symbol (invert colors)
+ *
+ * @module components/ui/icons/ActionIcons
+ */
 import { IconProps, getIconClass } from "./types";
 
 /**

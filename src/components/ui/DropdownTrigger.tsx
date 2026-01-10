@@ -1,3 +1,17 @@
+/**
+ * Dropdown Trigger Component
+ *
+ * A 3D raised button style for dropdown triggers. Provides the
+ * consistent "picker button" appearance used throughout the app.
+ * Features:
+ * - 3D raised appearance with gradient and shadow
+ * - Cyan accent color
+ * - Press-in effect on click
+ * - Open state styling
+ * - Proper disabled state
+ *
+ * @module components/ui/DropdownTrigger
+ */
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
 /**

@@ -1,3 +1,16 @@
+/**
+ * Manufacturer System Select Component
+ *
+ * A dual-input selector for manufacturer and system metadata.
+ * Features:
+ * - Two editable text inputs (manufacturer and system)
+ * - 3D picker button opens dropdown with known values
+ * - Systems auto-filter based on selected manufacturer
+ * - Clear button to reset both fields
+ * - Custom values allowed via direct text input
+ *
+ * @module components/character-editor/selectors/ManufacturerSystemSelect
+ */
 "use client";
 
 import { useMemo } from "react";

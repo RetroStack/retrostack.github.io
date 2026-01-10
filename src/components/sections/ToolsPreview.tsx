@@ -1,3 +1,18 @@
+/**
+ * Tools Preview Section
+ *
+ * Homepage section showcasing featured browser-based development tools.
+ * Displays a grid of tool cards with:
+ * - SVG icon representing the tool
+ * - Tool name with hover effects
+ * - Description of functionality
+ * - "Launch Tool" indicator with animated arrow
+ *
+ * Currently features Character ROM Editor, Z80 Emulator, and Schematic Viewer.
+ * Uses glass morphism styling with gradient background.
+ *
+ * @module components/sections/ToolsPreview
+ */
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";

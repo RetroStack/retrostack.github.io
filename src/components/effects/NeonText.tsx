@@ -1,3 +1,24 @@
+/**
+ * Neon Text Effect
+ *
+ * A typography component that applies neon-style glow effects to text.
+ * Features:
+ * - Multiple color options: pink, cyan, violet, amber
+ * - Optional pulse animation
+ * - Optional glow effect (on by default)
+ * - Polymorphic component supporting multiple HTML tags
+ *
+ * Styles are defined in globals.css using CSS classes like neon-pink, neon-glow-cyan, etc.
+ *
+ * @module components/effects/NeonText
+ *
+ * @example
+ * ```tsx
+ * <NeonText as="h1" color="pink" glow>
+ *   RetroStack
+ * </NeonText>
+ * ```
+ */
 import { HTMLAttributes } from "react";
 
 type NeonColor = "pink" | "cyan" | "violet" | "amber";

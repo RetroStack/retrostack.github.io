@@ -1,3 +1,19 @@
+/**
+ * Editor Sidebar Component
+ *
+ * Character selection panel for the editor with two view modes:
+ * - Grid view: Full character grid with shift-click multi-select
+ * - Overview view: Compact canvas overview with long-press selection
+ *
+ * Features:
+ * - Toggle between grid and overview views
+ * - Touch-friendly selection mode with floating action bar
+ * - Add new character button
+ * - Context menu support
+ * - Batch selection with select all/none
+ *
+ * @module components/character-editor/editor/EditorSidebar
+ */
 "use client";
 
 import { useCallback, useState } from "react";

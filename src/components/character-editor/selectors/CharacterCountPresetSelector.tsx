@@ -1,3 +1,16 @@
+/**
+ * Character Count Preset Selector Component
+ *
+ * An adaptive preset selector for character set sizes (number of characters).
+ * Shows common counts as buttons with overflow in a dropdown.
+ * Features:
+ * - Common presets: 128, 256, 512, etc.
+ * - Priority-based visibility (most common shown first)
+ * - Dropdown sections for system-specific and chip-specific presets
+ * - Tooltip showing which systems use each count
+ *
+ * @module components/character-editor/selectors/CharacterCountPresetSelector
+ */
 "use client";
 
 import { useCallback } from "react";

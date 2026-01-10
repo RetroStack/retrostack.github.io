@@ -1,3 +1,18 @@
+/**
+ * Character Context Menu
+ *
+ * A right-click context menu for character actions in the editor.
+ * Features:
+ * - Positioned at click location with viewport bounds checking
+ * - Keyboard shortcut display
+ * - Danger variant for destructive actions
+ * - Divider support for grouping
+ * - Close on Escape or click outside
+ *
+ * Also exports useContextMenu hook for state management.
+ *
+ * @module components/character-editor/character/CharacterContextMenu
+ */
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";

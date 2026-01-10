@@ -1,3 +1,17 @@
+/**
+ * Dimension Preset Selector Component
+ *
+ * An adaptive preset selector for character dimensions (width x height).
+ * Shows common sizes as buttons with overflow in a dropdown.
+ * Features:
+ * - Common presets: 8x8, 8x16, 8x12, etc.
+ * - Priority-based visibility (most common shown first)
+ * - Dropdown sections for system-specific and chip-specific presets
+ * - Tooltip showing which systems use each dimension
+ * - Optional font size in callback for font import
+ *
+ * @module components/character-editor/selectors/DimensionPresetSelector
+ */
 "use client";
 
 import { useCallback } from "react";

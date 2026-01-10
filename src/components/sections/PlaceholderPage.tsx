@@ -1,3 +1,29 @@
+/**
+ * Placeholder Page Component
+ *
+ * A reusable "coming soon" page template for features not yet implemented.
+ * Displays:
+ * - Optional icon
+ * - Page title with NeonText styling
+ * - Description text
+ * - Animated "Coming Soon" badge
+ * - Back navigation link
+ *
+ * Use this component to create placeholder pages for planned features
+ * that maintain consistent styling with the rest of the site.
+ *
+ * @module components/sections/PlaceholderPage
+ *
+ * @example
+ * ```tsx
+ * <PlaceholderPage
+ *   title="Binary ROM Editor"
+ *   description="Edit and analyze binary ROM files."
+ *   backLink="/tools"
+ *   backLabel="Back to Tools"
+ * />
+ * ```
+ */
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";

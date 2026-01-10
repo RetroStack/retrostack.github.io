@@ -1,3 +1,19 @@
+/**
+ * Adaptive Preset Selector Component
+ *
+ * A generic responsive preset selector that automatically adapts to container width.
+ * Shows high-priority presets as buttons with overflow items in a dropdown.
+ * Features:
+ * - ResizeObserver for dynamic button count adjustment
+ * - Priority-based visibility (highest priority shown first)
+ * - "More" dropdown for overflow presets
+ * - Custom dropdown sections via render prop
+ * - Generic type support for any preset shape
+ *
+ * Also re-exports DropdownPrimitives with Preset* naming for backward compatibility.
+ *
+ * @module components/ui/AdaptivePresetSelector
+ */
 "use client";
 
 import { useRef, useState, useEffect, useCallback, type ReactNode } from "react";

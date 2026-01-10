@@ -1,3 +1,17 @@
+/**
+ * Responsive Toolbar Component
+ *
+ * A toolbar that automatically adapts to container width by moving lower-priority
+ * actions into an overflow menu. Features:
+ * - ResizeObserver for dynamic item hiding
+ * - Priority-based collapse (lowest priority hidden first)
+ * - Tooltip support with keyboard shortcuts
+ * - Separator support between action groups
+ * - Optional sticky positioning
+ * - Icon-only buttons with overflow labels in menu
+ *
+ * @module components/ui/ResponsiveToolbar
+ */
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- DOM measurement requires effect */
 

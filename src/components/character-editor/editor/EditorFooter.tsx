@@ -1,3 +1,15 @@
+/**
+ * Editor Footer Component
+ *
+ * Status bar at the bottom of the character editor showing:
+ * - Keyboard shortcuts reference (centered)
+ * - Current mouse pixel coordinates (right side)
+ *
+ * Provides quick reference for common keyboard shortcuts like
+ * navigation, selection, delete, save, and undo/redo.
+ *
+ * @module components/character-editor/editor/EditorFooter
+ */
 "use client";
 
 export interface EditorFooterProps {

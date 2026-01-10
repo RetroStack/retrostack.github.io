@@ -1,3 +1,17 @@
+/**
+ * Text Input Component
+ *
+ * A styled text input following the retro design system. Features:
+ * - Dark background with cyan focus border
+ * - Optional label and helper text
+ * - Error state with red styling
+ * - Start/end adornments for icons
+ * - forwardRef for form integration
+ *
+ * Also exports TEXT_INPUT_STYLES constant for custom use cases.
+ *
+ * @module components/ui/TextInput
+ */
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 
 /**

@@ -1,3 +1,21 @@
+/**
+ * Library Filters Components
+ *
+ * Filter and sort controls for the character set library.
+ * Components:
+ * - LibraryFilters: Full filter bar with search, sort, and multi-select filters
+ * - LibraryFiltersCompact: Minimal search-only version for small spaces
+ *
+ * Filter options:
+ * - Search by name/description
+ * - Width and height dimension filters
+ * - Character count filter
+ * - Manufacturer, system, chip, locale metadata filters
+ * - Sort by various fields (date, name, size, etc.)
+ * - Sort direction toggle (ascending/descending)
+ *
+ * @module components/character-editor/library/LibraryFilters
+ */
 "use client";
 
 import { useCallback, useMemo } from "react";

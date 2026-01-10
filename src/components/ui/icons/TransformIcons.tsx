@@ -1,3 +1,19 @@
+/**
+ * Transform Icons
+ *
+ * Icons for image/pixel transformation operations.
+ * Used in the character editor toolbar for manipulating characters.
+ *
+ * Icons included:
+ * - RotateLeftIcon: Counter-clockwise rotation
+ * - RotateRightIcon: Clockwise rotation (mirrored left icon)
+ * - FlipHorizontalIcon: Mirror left-right
+ * - FlipVerticalIcon: Mirror top-bottom
+ * - ScaleIcon: Resize/scale with corner arrows
+ * - CenterIcon: Center/align with crosshair
+ *
+ * @module components/ui/icons/TransformIcons
+ */
 import { IconProps, getIconClass } from "./types";
 
 /**

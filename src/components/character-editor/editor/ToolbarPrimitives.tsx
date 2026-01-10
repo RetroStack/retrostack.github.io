@@ -1,3 +1,16 @@
+/**
+ * Toolbar Primitives
+ *
+ * Low-level building blocks for editor toolbars.
+ * Components:
+ * - ToolbarButton: Icon button with tooltip and optional preview
+ * - ToolbarDivider: Vertical separator between button groups
+ *
+ * These primitives are used by TransformToolbar and other
+ * toolbar components for consistent styling.
+ *
+ * @module components/character-editor/editor/ToolbarPrimitives
+ */
 "use client";
 
 import { ReactNode } from "react";

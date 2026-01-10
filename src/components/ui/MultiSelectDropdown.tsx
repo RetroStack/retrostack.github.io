@@ -1,3 +1,16 @@
+/**
+ * Multi-Select Dropdown Component
+ *
+ * A dropdown component allowing multiple selections with checkboxes.
+ * Features:
+ * - Checkbox-based multi-selection
+ * - Selected items displayed as removable chips
+ * - Optional "All" option to clear selection
+ * - Generic type support for string or number values
+ * - Click-outside to close via useDropdown hook
+ *
+ * @module components/ui/MultiSelectDropdown
+ */
 "use client";
 
 import { useCallback } from "react";

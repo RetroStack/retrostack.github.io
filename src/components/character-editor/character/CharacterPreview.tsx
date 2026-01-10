@@ -1,3 +1,21 @@
+/**
+ * Character Preview Components
+ *
+ * Compact character set preview components for thumbnails and cards.
+ * Components:
+ * - CharacterPreview: Grid thumbnail fitting within specified dimensions
+ * - SingleCharacterPreview: Single character with optional label
+ * - ASCIIPreview: Sample of ASCII letters and digits
+ *
+ * Features:
+ * - Auto-calculated layout based on max dimensions
+ * - Combined pixel grid rendering for efficiency
+ * - Optional character borders overlay
+ * - Remaining count badge when truncated
+ * - Force column count option
+ *
+ * @module components/character-editor/character/CharacterPreview
+ */
 "use client";
 
 import { useMemo } from "react";

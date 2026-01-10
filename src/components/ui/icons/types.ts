@@ -1,3 +1,17 @@
+/**
+ * Icon Types and Utilities
+ *
+ * Shared types and helper functions for the icon component system.
+ * Provides consistent sizing and styling across all icon components.
+ *
+ * Exports:
+ * - IconProps: Base interface extending SVGProps with size option
+ * - ICON_SIZE_CLASSES: Tailwind class mappings for sm/md/lg/xl sizes
+ * - DEFAULT_ICON_CLASS: Default size (medium, w-5 h-5)
+ * - getIconClass: Helper to resolve size prop or className to CSS class
+ *
+ * @module components/ui/icons/types
+ */
 import { SVGProps } from "react";
 
 /**

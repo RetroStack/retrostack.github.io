@@ -1,3 +1,19 @@
+/**
+ * Systems Preview Section
+ *
+ * Homepage section showcasing featured vintage computer systems.
+ * Displays a grid of system cards with:
+ * - System icon/badge
+ * - Category label (Computers, Game Consoles, etc.)
+ * - System name with hover effects
+ * - Brief description
+ *
+ * Currently features TRS-80, Apple I, and Sorcerer systems.
+ * Uses fluid grid layout that adapts from single column on mobile
+ * to multi-column on larger screens.
+ *
+ * @module components/sections/SystemsPreview
+ */
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";
