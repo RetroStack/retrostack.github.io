@@ -893,6 +893,220 @@ function MyComponent() {
 
 3. **For large data**, use IndexedDB with migration support
 
+### Testing Requirements for New Features
+
+**IMPORTANT**: Every new feature or tool MUST include comprehensive testing. Follow this checklist:
+
+#### 1. Extract Business Logic for Testability
+
+Before implementing UI, extract all business logic into pure functions in `/lib/`:
+
+```typescript
+// ✗ Avoid - logic in component
+function MyComponent() {
+  const handleProcess = () => {
+    const result = data.filter(x => x.valid).map(x => transform(x));
+    // ... more logic
+  };
+}
+
+// ✓ Good - extracted to lib/
+// /src/lib/my-tool/processing.ts
+export function processData(data: DataType[]): ResultType[] {
+  return data.filter(x => x.valid).map(x => transform(x));
+}
+
+// Component just calls the function
+import { processData } from "@/lib/my-tool/processing";
+```
+
+#### 2. Use Dependency Injection for Storage/External Data
+
+All hooks that use storage or external data MUST accept injectable dependencies:
+
+```typescript
+// /src/hooks/my-tool/useMyData.ts
+export interface UseMyDataOptions {
+  storage?: IMyStorage;  // Optional - defaults to real implementation
+}
+
+export function useMyData(options?: UseMyDataOptions) {
+  const storage = options?.storage ?? realStorage;
+  // ... implementation
+}
+```
+
+Create in-memory implementations for testing:
+
+```typescript
+// /src/lib/my-tool/storage/memoryStorage.ts
+export class InMemoryMyStorage implements IMyStorage {
+  private data: Map<string, MyData> = new Map();
+
+  async save(item: MyData): Promise<string> {
+    const id = generateId();
+    this.data.set(id, item);
+    return id;
+  }
+  // ... other methods
+}
+```
+
+#### 3. Use Agents for Test Implementation
+
+Use the `test-generator` agent to create comprehensive unit tests:
+
+```
+Task: test-generator
+Prompt: Create tests for /src/lib/my-tool/processing.ts covering all functions
+```
+
+Use the `e2e-generator` agent for Playwright tests:
+
+```
+Task: e2e-generator
+Prompt: Create E2E tests for the new my-tool feature at /tools/my-tool
+```
+
+Use the `coverage-analyzer` agent to verify coverage:
+
+```
+Task: coverage-analyzer
+Prompt: Analyze test coverage for src/lib/my-tool and identify gaps
+```
+
+#### 4. Verify UI with Playwright MCP Server
+
+After implementing a feature, use the Playwright MCP server to verify it works:
+
+```typescript
+// Use mcp__playwright tools to:
+// 1. Navigate to the feature page
+// 2. Interact with UI elements
+// 3. Verify expected behavior
+// 4. Check responsive layouts (mobile, tablet, desktop)
+```
+
+Manual verification checklist:
+- [ ] Feature loads without errors
+- [ ] All interactive elements respond correctly
+- [ ] Form validation works as expected
+- [ ] Error states display properly
+- [ ] Mobile/touch interactions work
+- [ ] Keyboard navigation functions
+
+#### 5. Add E2E Tests for New Features
+
+Every new feature MUST have E2E tests in `/e2e/`:
+
+```typescript
+// /e2e/my-tool.spec.ts
+import { test, expect } from "@playwright/test";
+
+test.describe("My Tool", () => {
+  test("loads and displays initial state", async ({ page }) => {
+    await page.goto("/tools/my-tool");
+    await expect(page.getByRole("heading", { name: /my tool/i })).toBeVisible();
+  });
+
+  test("performs core functionality", async ({ page }) => {
+    await page.goto("/tools/my-tool");
+    // Test the main user workflow
+  });
+
+  test("handles errors gracefully", async ({ page }) => {
+    await page.goto("/tools/my-tool");
+    // Test error scenarios
+  });
+
+  test("works on mobile", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "Mobile only");
+    await page.goto("/tools/my-tool");
+    // Test mobile-specific interactions
+  });
+});
+```
+
+#### 6. Add/Update Visual Regression Tests
+
+New features need visual regression coverage:
+
+```typescript
+// /e2e/visual-my-tool.spec.ts
+import { test, expect } from "@playwright/test";
+
+test.describe("My Tool Visual", () => {
+  test("default state", async ({ page }) => {
+    await page.goto("/tools/my-tool");
+    await page.waitForLoadState("networkidle");
+    await expect(page).toHaveScreenshot("my-tool-default.png", { fullPage: true });
+  });
+
+  test("with data loaded", async ({ page }) => {
+    await page.goto("/tools/my-tool");
+    // Load some data
+    await expect(page).toHaveScreenshot("my-tool-with-data.png");
+  });
+
+  test("mobile view", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/tools/my-tool");
+    await expect(page).toHaveScreenshot("my-tool-mobile.png", { fullPage: true });
+  });
+});
+```
+
+#### 7. New Feature Testing Checklist
+
+Before considering a feature complete:
+
+- [ ] **Unit Tests**: All pure functions in `/lib/` have tests (>90% coverage)
+- [ ] **Hook Tests**: All custom hooks have tests with mock dependencies
+- [ ] **E2E Tests**: Core user workflows are covered
+- [ ] **Visual Tests**: Key states have screenshot baselines
+- [ ] **UI Verification**: Manually verified with Playwright MCP or browser
+- [ ] **Mobile Testing**: Touch interactions and responsive layout verified
+- [ ] **Error Handling**: Error states are tested
+- [ ] **Tests Pass**: `npm run test && npm run test:e2e` both pass
+
+#### 8. Recommended Agent Workflow for New Features
+
+```
+1. Plan the feature architecture
+   → Use Plan agent to design testable structure
+
+2. Implement business logic in /lib/
+   → Extract pure functions
+   → Create storage interfaces
+
+3. Generate unit tests
+   → Use test-generator agent
+   → Target >90% coverage for new code
+
+4. Implement UI components and hooks
+   → Use dependency injection
+   → Keep components thin
+
+5. Generate E2E tests
+   → Use e2e-generator agent
+   → Cover core workflows
+
+6. Verify with Playwright MCP
+   → Navigate and interact with feature
+   → Check all viewports
+
+7. Add visual regression tests
+   → Capture key states
+   → Include mobile screenshots
+
+8. Run full test suite
+   → npm run validate
+   → Fix any failures
+
+9. Review with code-reviewer agent
+   → Check patterns and conventions
+```
+
 ## Selection Mode Pattern
 
 For touch-friendly multi-selection in grids and lists. This is the standard pattern for all selectable items.
@@ -1153,3 +1367,478 @@ test('saves and retrieves character set', async () => {
   expect(retrieved?.metadata.name).toBe(sampleCharacterSet.metadata.name);
 });
 ```
+
+## Testing
+
+### Test Structure
+
+```
+src/
+├── lib/
+│   └── character-editor/
+│       ├── __tests__/
+│       │   ├── transforms.test.ts      # Pure function tests
+│       │   ├── utils.test.ts
+│       │   ├── types.test.ts
+│       │   ├── presets.test.ts
+│       │   ├── exports.test.ts
+│       │   ├── testUtils.ts            # Mock factories
+│       │   └── fixtures.ts             # Sample test data
+│       ├── library/__tests__/
+│       │   └── filters.test.ts
+│       ├── import/__tests__/
+│       │   ├── binary.test.ts
+│       │   ├── imageImport.test.ts
+│       │   ├── fontImport.test.ts
+│       │   ├── textImport.test.ts
+│       │   └── integration.test.ts
+│       └── storage/__tests__/
+│           └── memoryStorage.test.ts
+├── hooks/
+│   ├── __tests__/
+│   │   ├── useOutsideClick.test.ts     # Generic hook tests
+│   │   ├── useMediaQuery.test.ts
+│   │   ├── useTheme.test.ts
+│   │   ├── useLongPress.test.ts
+│   │   └── useDragSelect.test.ts
+│   └── character-editor/__tests__/
+│       ├── useUndoRedo.test.ts         # Feature-specific hook tests
+│       ├── useSelectionMode.test.ts
+│       ├── useChangeLog.test.ts
+│       └── useAutoSave.test.ts
+├── components/
+│   └── ui/__tests__/
+│       └── Button.test.tsx             # Component tests
+├── e2e/
+│   ├── home.spec.ts                    # Page E2E tests
+│   ├── character-editor.spec.ts
+│   ├── pages.spec.ts
+│   ├── visual.spec.ts                  # Visual regression tests
+│   └── visual-character-editor.spec.ts
+└── test-fixtures/                      # Shared test assets (project root)
+    ├── cyber.bin                       # Binary character set
+    ├── cyber.png                       # Character sheet image
+    ├── cyber-wide.png
+    ├── OpenDyslexic3-Regular.ttf       # Font files for testing
+    ├── OpenDyslexic-Regular.otf
+    ├── OpenDyslexic-Regular.woff
+    ├── OpenDyslexic-Regular.woff2
+    └── OpenDyslexic-Regular.eot
+```
+
+### Test File Naming
+
+- **Unit tests**: `<module>.test.ts` co-located in `__tests__/` folder
+- **Component tests**: `<Component>.test.tsx`
+- **E2E tests**: `<feature>.spec.ts` in `e2e/` folder
+- **Visual tests**: `visual-<feature>.spec.ts` or `visual.spec.ts`
+
+### Unit Testing Pure Functions
+
+Test pure functions directly without mocking:
+
+```typescript
+import { rotateCharacter, flipHorizontal } from "@/lib/character-editor/transforms";
+import { createTestCharacter } from "@/lib/character-editor/__tests__/testUtils";
+
+describe("rotateCharacter", () => {
+  it("rotates 90 degrees clockwise", () => {
+    const char = createTestCharacter([
+      [true, false],
+      [true, false],
+    ]);
+
+    const result = rotateCharacter(char, "cw");
+
+    expect(result.pixels).toEqual([
+      [true, true],
+      [false, false],
+    ]);
+  });
+
+  it("rotating 4 times returns original", () => {
+    const original = createTestCharacter([
+      [true, false, true],
+      [false, true, false],
+    ]);
+
+    let result = original;
+    for (let i = 0; i < 4; i++) {
+      result = rotateCharacter(result, "cw");
+    }
+
+    expect(result.pixels).toEqual(original.pixels);
+  });
+});
+```
+
+### Hook Testing with renderHook
+
+Use `@testing-library/react` for testing hooks:
+
+```typescript
+import { renderHook, act } from "@testing-library/react";
+import { useUndoRedo } from "@/hooks/character-editor/useUndoRedo";
+
+describe("useUndoRedo", () => {
+  it("tracks state history", () => {
+    const { result } = renderHook(() => useUndoRedo({ count: 0 }));
+
+    act(() => {
+      result.current.setState({ count: 1 });
+    });
+
+    act(() => {
+      result.current.setState({ count: 2 });
+    });
+
+    expect(result.current.state.count).toBe(2);
+    expect(result.current.canUndo).toBe(true);
+
+    act(() => {
+      result.current.undo();
+    });
+
+    expect(result.current.state.count).toBe(1);
+  });
+
+  it("supports batched operations", () => {
+    const { result } = renderHook(() => useUndoRedo({ value: 0 }));
+
+    act(() => {
+      result.current.startBatch();
+      result.current.setState({ value: 1 });
+      result.current.setState({ value: 2 });
+      result.current.setState({ value: 3 });
+      result.current.endBatch();
+    });
+
+    // All three changes = one undo entry
+    act(() => {
+      result.current.undo();
+    });
+
+    expect(result.current.state.value).toBe(0);
+  });
+});
+```
+
+### Mocking Browser APIs
+
+#### localStorage Mock
+
+```typescript
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: jest.fn((key: string) => store[key] ?? null),
+    setItem: jest.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: jest.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: jest.fn(() => {
+      store = {};
+    }),
+  };
+})();
+
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
+
+beforeEach(() => {
+  localStorageMock.clear();
+  jest.clearAllMocks();
+});
+```
+
+#### matchMedia Mock
+
+```typescript
+function createMatchMediaMock(matches: boolean) {
+  return jest.fn().mockImplementation((query: string) => ({
+    matches,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  }));
+}
+
+// Use in tests
+window.matchMedia = createMatchMediaMock(true); // matches
+window.matchMedia = createMatchMediaMock(false); // doesn't match
+```
+
+#### Timer Mocks
+
+```typescript
+beforeEach(() => {
+  jest.useFakeTimers();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
+
+it("debounces calls", () => {
+  const callback = jest.fn();
+  const debounced = debounce(callback, 100);
+
+  debounced();
+  debounced();
+  debounced();
+
+  expect(callback).not.toHaveBeenCalled();
+
+  jest.advanceTimersByTime(100);
+
+  expect(callback).toHaveBeenCalledTimes(1);
+});
+```
+
+#### Document/DOM Mocks
+
+```typescript
+// Mock classList for theme testing
+const classListMock = {
+  add: jest.fn(),
+  remove: jest.fn(),
+  contains: jest.fn(),
+};
+Object.defineProperty(document.documentElement, "classList", {
+  value: classListMock,
+  writable: true,
+});
+
+// Mock event listeners
+const listeners: Record<string, EventListener[]> = {};
+document.addEventListener = jest.fn((event, cb) => {
+  listeners[event] = listeners[event] || [];
+  listeners[event].push(cb as EventListener);
+});
+document.removeEventListener = jest.fn((event, cb) => {
+  listeners[event] = (listeners[event] || []).filter((l) => l !== cb);
+});
+
+// Trigger events in tests
+function fireEvent(event: string, eventObj: Event) {
+  listeners[event]?.forEach((cb) => cb(eventObj));
+}
+```
+
+### MockImageData for Image Tests
+
+For testing image import without browser canvas:
+
+```typescript
+class MockImageData implements ImageData {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+  colorSpace: PredefinedColorSpace = "srgb";
+
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+    this.data = new Uint8ClampedArray(width * height * 4);
+  }
+
+  setPixel(x: number, y: number, r: number, g: number, b: number, a = 255): void {
+    const index = (y * this.width + x) * 4;
+    this.data[index] = r;
+    this.data[index + 1] = g;
+    this.data[index + 2] = b;
+    this.data[index + 3] = a;
+  }
+
+  fill(r: number, g: number, b: number, a = 255): void {
+    for (let i = 0; i < this.data.length; i += 4) {
+      this.data[i] = r;
+      this.data[i + 1] = g;
+      this.data[i + 2] = b;
+      this.data[i + 3] = a;
+    }
+  }
+}
+
+// Usage
+it("parses white image to empty characters", () => {
+  const imageData = new MockImageData(16, 16);
+  imageData.fill(255, 255, 255); // white background
+
+  const result = parseImageToCharacters(imageData, defaultOptions);
+
+  expect(result.characters[0].pixels.flat().every((p) => !p)).toBe(true);
+});
+```
+
+### Testing File Validation
+
+```typescript
+function createMockFile(name: string, type: string, size = 1024): File {
+  const content = new ArrayBuffer(size);
+  return new File([content], name, { type });
+}
+
+describe("isValidFontFile", () => {
+  it.each([
+    ["font.ttf", "font/ttf", true],
+    ["font.otf", "font/otf", true],
+    ["font.woff", "font/woff", true],
+    ["font.woff2", "font/woff2", true],
+    ["image.png", "image/png", false],
+    ["doc.pdf", "application/pdf", false],
+  ])("validates %s (%s) as %s", (name, type, expected) => {
+    const file = createMockFile(name, type);
+    expect(isValidFontFile(file)).toBe(expected);
+  });
+});
+```
+
+### E2E Testing with Playwright
+
+#### Basic Page Test
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Character Editor", () => {
+  test("loads editor page", async ({ page }) => {
+    await page.goto("/tools/character-rom-editor");
+    await expect(page.getByRole("heading", { name: /character/i })).toBeVisible();
+  });
+
+  test("navigates characters with keyboard", async ({ page }) => {
+    await page.goto("/tools/character-rom-editor");
+    await page.keyboard.press("ArrowRight");
+    // Assert selection moved
+  });
+});
+```
+
+#### Responsive Testing
+
+```typescript
+test("mobile menu opens and closes", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "Only run on mobile");
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /open menu/i }).click();
+
+  const menu = page.getByRole("dialog", { name: /navigation menu/i });
+  await expect(menu).toBeVisible();
+
+  await page.getByRole("button", { name: /close menu/i }).click();
+  await expect(menu).not.toBeVisible();
+});
+```
+
+#### File Upload Testing
+
+```typescript
+test("imports binary file", async ({ page }) => {
+  await page.goto("/tools/character-rom-editor");
+
+  // Open import dialog
+  await page.getByRole("button", { name: /import/i }).click();
+
+  // Upload file
+  const fileInput = page.locator('input[type="file"]');
+  await fileInput.setInputFiles("test-fixtures/cyber.bin");
+
+  // Verify import success
+  await expect(page.getByText(/imported/i)).toBeVisible();
+});
+```
+
+### Visual Regression Testing
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Visual Regression", () => {
+  test("home page screenshot", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveScreenshot("home.png", {
+      fullPage: true,
+    });
+  });
+
+  test("editor default state", async ({ page }) => {
+    await page.goto("/tools/character-rom-editor");
+    await page.waitForLoadState("networkidle");
+
+    await expect(page).toHaveScreenshot("editor-default.png", {
+      fullPage: true,
+    });
+  });
+
+  test("editor with selection", async ({ page }) => {
+    await page.goto("/tools/character-rom-editor");
+    await page.click('[data-testid="character-grid"] >> nth=5');
+
+    await expect(page).toHaveScreenshot("editor-selected.png");
+  });
+});
+```
+
+### Test Commands
+
+```bash
+npm run test              # Run all Jest unit tests
+npm run test:watch        # Watch mode for development
+npm run test:coverage     # Generate coverage report
+
+npm run test:e2e          # Run Playwright E2E tests
+npm run test:e2e:ui       # Run with Playwright UI
+npm run test:visual       # Run visual regression tests
+npm run test:visual -- --update-snapshots  # Update baseline screenshots
+
+npm run test:all          # Run all tests (unit + E2E)
+npm run validate          # Full validation (lint + typecheck + tests)
+```
+
+### Coverage Goals
+
+Target coverage for business logic:
+
+| Category | Target |
+|----------|--------|
+| Pure functions (`lib/`) | >90% |
+| Hooks | >80% |
+| Components | >70% |
+| Overall | >80% |
+
+### Test Data Fixtures
+
+Use the shared `test-fixtures/` directory at project root for binary test assets:
+
+```typescript
+import * as fs from "fs";
+import * as path from "path";
+
+// Read binary fixture
+const binaryPath = path.join(process.cwd(), "test-fixtures", "cyber.bin");
+const binaryData = fs.readFileSync(binaryPath);
+
+// For font validation tests
+const fontFixtures = [
+  "OpenDyslexic3-Regular.ttf",
+  "OpenDyslexic-Regular.otf",
+  "OpenDyslexic-Regular.woff",
+  "OpenDyslexic-Regular.woff2",
+  "OpenDyslexic-Regular.eot",
+];
+```
+
+### Writing Testable Code
+
+1. **Extract pure functions** - Move logic out of components into `/lib/`
+2. **Use dependency injection** - Accept storage/services as optional parameters
+3. **Avoid side effects** - Return new objects instead of mutating
+4. **Small, focused functions** - Each function does one thing
+5. **Explicit dependencies** - No hidden globals or singletons

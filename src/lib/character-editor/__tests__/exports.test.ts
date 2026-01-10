@@ -1,0 +1,688 @@
+/**
+ * Character ROM Editor - Export Functions Tests
+ *
+ * Tests for export functionality including C header generation,
+ * assembly output, hex preview, and bit layout visualization.
+ */
+
+// Mock jsPDF to avoid TextEncoder issues in test environment
+jest.mock("jspdf", () => ({
+  jsPDF: jest.fn(),
+}));
+
+import {
+  exportToCHeader,
+  exportToAssembly,
+  getHexPreview,
+  getBitLayoutVisualization,
+  getDefaultCHeaderOptions,
+  getDefaultAssemblyOptions,
+  type CHeaderOptions,
+  type AssemblyOptions,
+} from "@/lib/character-editor/exports";
+import {
+  createMockCharacter,
+  createMockCharacters,
+  createMockConfig,
+} from "@/lib/character-editor/__tests__/testUtils";
+import type { Character, CharacterSetConfig } from "@/lib/character-editor/types";
+
+describe("getDefaultCHeaderOptions", () => {
+  it("returns valid default options", () => {
+    const options = getDefaultCHeaderOptions("TestCharset");
+
+    expect(options).toEqual({
+      arrayName: "TESTCHARSET",
+      includeGuards: true,
+      includeComments: true,
+      bytesPerLine: 8,
+    });
+  });
+
+  it("sanitizes name for C identifier", () => {
+    const options = getDefaultCHeaderOptions("My Charset-2024");
+
+    expect(options.arrayName).toBe("MY_CHARSET_2024");
+  });
+
+  it("prefixes names starting with numbers", () => {
+    const options = getDefaultCHeaderOptions("123charset");
+
+    expect(options.arrayName).toBe("_123CHARSET");
+  });
+
+  it("handles special characters in name", () => {
+    const options = getDefaultCHeaderOptions("test@charset#v1.0");
+
+    expect(options.arrayName).toBe("TEST_CHARSET_V1_0");
+  });
+
+  it("handles empty name with fallback", () => {
+    const options = getDefaultCHeaderOptions("");
+
+    expect(options.arrayName).toBe("CHARSET");
+  });
+
+  it("replaces all-special-character names with underscores", () => {
+    // The implementation replaces special chars with underscores, so "@#$%" becomes "____"
+    const options = getDefaultCHeaderOptions("@#$%");
+
+    expect(options.arrayName).toBe("____");
+  });
+});
+
+describe("getDefaultAssemblyOptions", () => {
+  it("returns valid default options", () => {
+    const options = getDefaultAssemblyOptions("TestCharset");
+
+    expect(options).toEqual({
+      labelName: "testcharset",
+      directive: ".byte",
+      useHex: true,
+      includeComments: true,
+      bytesPerLine: 8,
+    });
+  });
+
+  it("sanitizes name for assembly label", () => {
+    const options = getDefaultAssemblyOptions("My Charset-2024");
+
+    expect(options.labelName).toBe("my_charset_2024");
+  });
+
+  it("prefixes names starting with numbers", () => {
+    const options = getDefaultAssemblyOptions("123charset");
+
+    expect(options.labelName).toBe("_123charset");
+  });
+
+  it("handles empty name with fallback", () => {
+    const options = getDefaultAssemblyOptions("");
+
+    expect(options.labelName).toBe("charset");
+  });
+
+  it("converts to lowercase", () => {
+    const options = getDefaultAssemblyOptions("UPPERCASE_NAME");
+
+    expect(options.labelName).toBe("uppercase_name");
+  });
+});
+
+describe("exportToCHeader", () => {
+  let characters: Character[];
+  let config: CharacterSetConfig;
+  let defaultOptions: CHeaderOptions;
+
+  beforeEach(() => {
+    // Create simple 8x8 characters with known patterns
+    characters = [
+      createMockCharacter(8, 8, "filled"),
+      createMockCharacter(8, 8, "empty"),
+    ];
+    config = createMockConfig({ width: 8, height: 8 });
+    defaultOptions = getDefaultCHeaderOptions("TestCharset");
+  });
+
+  it("contains #ifndef guard", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    expect(output).toContain("#ifndef TESTCHARSET_H");
+    expect(output).toContain("#define TESTCHARSET_H");
+    expect(output).toContain("#endif /* TESTCHARSET_H */");
+  });
+
+  it("contains array declaration with correct size", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    // 2 characters * 8 bytes each = 16 bytes total
+    expect(output).toContain("const unsigned char TESTCHARSET[16] = {");
+    expect(output).toContain("};");
+  });
+
+  it("formats hex values correctly", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    // Filled character should have 0xFF bytes
+    expect(output).toContain("0xFF");
+    // Empty character should have 0x00 bytes
+    expect(output).toContain("0x00");
+  });
+
+  it("includes character comments when enabled", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    expect(output).toContain("/* Char 0 */");
+    expect(output).toContain("/* Char 1 */");
+  });
+
+  it("includes header comment when enabled", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    expect(output).toContain("/**");
+    expect(output).toContain(" * TESTCHARSET - Character ROM Data");
+    expect(output).toContain(" * Generated by RetroStack Character ROM Editor");
+    expect(output).toContain(" * Character dimensions: 8x8");
+    expect(output).toContain(" * Total characters: 2");
+    expect(output).toContain(" * Bytes per character: 8");
+    expect(output).toContain(" */");
+  });
+
+  it("excludes comments when disabled", () => {
+    const options: CHeaderOptions = {
+      ...defaultOptions,
+      includeComments: false,
+    };
+    const output = exportToCHeader(characters, config, options);
+
+    expect(output).not.toContain("/**");
+    expect(output).not.toContain("/* Char 0 */");
+  });
+
+  it("excludes include guards when disabled", () => {
+    const options: CHeaderOptions = {
+      ...defaultOptions,
+      includeGuards: false,
+    };
+    const output = exportToCHeader(characters, config, options);
+
+    expect(output).not.toContain("#ifndef");
+    expect(output).not.toContain("#define");
+    expect(output).not.toContain("#endif");
+  });
+
+  it("uses custom array name", () => {
+    const options: CHeaderOptions = {
+      ...defaultOptions,
+      arrayName: "MY_CUSTOM_CHARSET",
+    };
+    const output = exportToCHeader(characters, config, options);
+
+    expect(output).toContain("const unsigned char MY_CUSTOM_CHARSET[16] = {");
+    expect(output).toContain("#ifndef MY_CUSTOM_CHARSET_H");
+  });
+
+  it("respects bytesPerLine option", () => {
+    const options: CHeaderOptions = {
+      ...defaultOptions,
+      bytesPerLine: 4,
+      includeComments: false,
+    };
+    const output = exportToCHeader(characters, config, options);
+
+    // With 4 bytes per line, 8-byte character should span 2 lines
+    const lines = output.split("\n").filter(line => line.includes("0x"));
+    // Each 8-byte character needs 2 lines at 4 bytes per line
+    // Plus array closing, so we expect data lines
+    expect(lines.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("handles larger characters correctly", () => {
+    const largeChars = createMockCharacters(1, 16, 16, ["diagonal"]);
+    const largeConfig = createMockConfig({ width: 16, height: 16 });
+    const output = exportToCHeader(largeChars, largeConfig, defaultOptions);
+
+    // 16-wide needs 2 bytes per line, 16 rows = 32 bytes per character
+    expect(output).toContain("const unsigned char TESTCHARSET[32] = {");
+  });
+
+  it("handles empty character array", () => {
+    const output = exportToCHeader([], config, defaultOptions);
+
+    expect(output).toContain("const unsigned char TESTCHARSET[0] = {");
+    expect(output).toContain("};");
+  });
+
+  it("does not add trailing comma after last byte", () => {
+    const output = exportToCHeader(characters, config, defaultOptions);
+
+    // Find the last line with hex values before the closing brace
+    const lines = output.split("\n");
+    const closingBraceIndex = lines.findIndex(line => line.trim() === "};");
+    const lastDataLine = lines[closingBraceIndex - 1];
+
+    // The last data line should not end with a comma before the comment or newline
+    expect(lastDataLine).not.toMatch(/,\s*$/);
+    expect(lastDataLine).not.toMatch(/,\s*\/\*.*\*\/\s*$/);
+  });
+});
+
+describe("exportToAssembly", () => {
+  let characters: Character[];
+  let config: CharacterSetConfig;
+  let defaultOptions: AssemblyOptions;
+
+  beforeEach(() => {
+    characters = [
+      createMockCharacter(8, 8, "filled"),
+      createMockCharacter(8, 8, "empty"),
+    ];
+    config = createMockConfig({ width: 8, height: 8 });
+    defaultOptions = getDefaultAssemblyOptions("TestCharset");
+  });
+
+  it("contains label", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    expect(output).toContain("testcharset:");
+  });
+
+  it("uses .byte directive by default", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    expect(output).toContain(".byte $");
+  });
+
+  it("uses db directive when specified", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      directive: "db",
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).toContain("db $");
+    expect(output).not.toContain(".byte");
+  });
+
+  it("uses .db directive when specified", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      directive: ".db",
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).toContain(".db $");
+  });
+
+  it("uses DC.B directive when specified (Motorola syntax)", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      directive: "DC.B",
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).toContain("DC.B $");
+  });
+
+  it("formats hex values with $ prefix", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    // Filled character should have $FF bytes
+    expect(output).toContain("$FF");
+    // Empty character should have $00 bytes
+    expect(output).toContain("$00");
+  });
+
+  it("uses decimal when hex is disabled", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      useHex: false,
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    // Filled character should have 255 (not $FF)
+    expect(output).toContain("255");
+    expect(output).not.toContain("$FF");
+    // Empty character should have 0 (not $00)
+    expect(output).toMatch(/\b0\b/);
+  });
+
+  it("includes character comments when enabled", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    expect(output).toContain("; Char 0");
+    expect(output).toContain("; Char 1");
+  });
+
+  it("includes header comment when enabled", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    expect(output).toContain("; " + "=".repeat(60));
+    expect(output).toContain("; testcharset - Character ROM Data");
+    expect(output).toContain("; Generated by RetroStack Character ROM Editor");
+    expect(output).toContain("; Character dimensions: 8x8");
+    expect(output).toContain("; Total characters: 2");
+    expect(output).toContain("; Bytes per character: 8");
+  });
+
+  it("excludes comments when disabled", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      includeComments: false,
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).not.toContain("; " + "=".repeat(60));
+    expect(output).not.toContain("; Char 0");
+    expect(output).not.toContain("; Generated by");
+  });
+
+  it("uses custom label name", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      labelName: "my_custom_font",
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).toContain("my_custom_font:");
+  });
+
+  it("respects bytesPerLine option", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      bytesPerLine: 4,
+      includeComments: false,
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    // Count lines with directive
+    const directiveLines = output.split("\n").filter(line =>
+      line.includes(".byte")
+    );
+    // Each 8-byte character needs 2 lines at 4 bytes per line = 4 lines for 2 characters
+    expect(directiveLines.length).toBe(4);
+  });
+
+  it("handles empty character array", () => {
+    const output = exportToAssembly([], config, defaultOptions);
+
+    expect(output).toContain("testcharset:");
+    // Should still have label but no data lines with directive
+    const directiveLines = output.split("\n").filter(line =>
+      line.includes(".byte")
+    );
+    expect(directiveLines.length).toBe(0);
+  });
+
+  it("handles 6502 style ($ prefix for hex)", () => {
+    const output = exportToAssembly(characters, config, defaultOptions);
+
+    // Should use $ for hex values (6502 convention)
+    expect(output).toMatch(/\$[0-9A-F]{2}/);
+  });
+
+  it("handles Z80 style directive", () => {
+    const options: AssemblyOptions = {
+      ...defaultOptions,
+      directive: "db",
+    };
+    const output = exportToAssembly(characters, config, options);
+
+    expect(output).toContain("db $");
+  });
+});
+
+describe("getHexPreview", () => {
+  let config: CharacterSetConfig;
+
+  beforeEach(() => {
+    config = createMockConfig({ width: 8, height: 8 });
+  });
+
+  it("returns hex string for first N bytes", () => {
+    const characters = [createMockCharacter(8, 8, "filled")];
+    const preview = getHexPreview(characters, config, 8);
+
+    // Filled character should have all FF bytes
+    expect(preview).toBe("FF FF FF FF FF FF FF FF");
+  });
+
+  it("shows first 16 bytes by default", () => {
+    const characters = [
+      createMockCharacter(8, 8, "filled"),
+      createMockCharacter(8, 8, "filled"),
+    ];
+    const preview = getHexPreview(characters, config);
+
+    // Should have 16 hex pairs separated by spaces
+    const hexPairs = preview.split(" ");
+    expect(hexPairs.length).toBe(16);
+  });
+
+  it("truncates to maxBytes", () => {
+    const characters = [createMockCharacter(8, 8, "filled")];
+    const preview = getHexPreview(characters, config, 4);
+
+    const hexPairs = preview.split(" ");
+    expect(hexPairs.length).toBe(4);
+  });
+
+  it("returns empty string for empty character array", () => {
+    const preview = getHexPreview([], config);
+
+    expect(preview).toBe("");
+  });
+
+  it("formats bytes with uppercase hex", () => {
+    const characters = [createMockCharacter(8, 8, "filled")];
+    const preview = getHexPreview(characters, config, 2);
+
+    expect(preview).toMatch(/^[0-9A-F]{2} [0-9A-F]{2}$/);
+  });
+
+  it("pads single-digit hex with leading zero", () => {
+    const characters = [createMockCharacter(8, 8, "empty")];
+    const preview = getHexPreview(characters, config, 2);
+
+    expect(preview).toBe("00 00");
+  });
+
+  it("handles multiple characters correctly", () => {
+    const characters = [
+      createMockCharacter(8, 8, "filled"),
+      createMockCharacter(8, 8, "empty"),
+    ];
+    const preview = getHexPreview(characters, config, 16);
+
+    // First 8 bytes should be FF (filled), last 8 should be 00 (empty)
+    const bytes = preview.split(" ");
+    expect(bytes.slice(0, 8).every(b => b === "FF")).toBe(true);
+    expect(bytes.slice(8, 16).every(b => b === "00")).toBe(true);
+  });
+
+  it("handles partial character when maxBytes is mid-character", () => {
+    const characters = [createMockCharacter(8, 8, "filled")];
+    const preview = getHexPreview(characters, config, 3);
+
+    expect(preview).toBe("FF FF FF");
+  });
+
+  it("stops at end of available data", () => {
+    const characters = [createMockCharacter(8, 8, "filled")];
+    const preview = getHexPreview(characters, config, 100);
+
+    // Should only have 8 bytes (one 8x8 character)
+    const hexPairs = preview.split(" ");
+    expect(hexPairs.length).toBe(8);
+  });
+});
+
+describe("getBitLayoutVisualization", () => {
+  let config: CharacterSetConfig;
+
+  beforeEach(() => {
+    config = createMockConfig({
+      width: 8,
+      height: 8,
+      padding: "right",
+      bitDirection: "ltr",
+    });
+  });
+
+  it("returns bits, hex, and padding info", () => {
+    const character = createMockCharacter(8, 8, "filled");
+    const result = getBitLayoutVisualization(character, config, 0);
+
+    expect(result).toHaveProperty("bits");
+    expect(result).toHaveProperty("hex");
+    expect(result).toHaveProperty("padding");
+  });
+
+  it("shows correct bit representation for filled row", () => {
+    const character = createMockCharacter(8, 8, "filled");
+    const result = getBitLayoutVisualization(character, config, 0);
+
+    expect(result.bits).toBe("11111111");
+    expect(result.hex).toBe("FF");
+  });
+
+  it("shows correct bit representation for empty row", () => {
+    const character = createMockCharacter(8, 8, "empty");
+    const result = getBitLayoutVisualization(character, config, 0);
+
+    expect(result.bits).toBe("00000000");
+    expect(result.hex).toBe("00");
+  });
+
+  it("describes right padding correctly", () => {
+    const rightPadConfig = createMockConfig({
+      width: 6,
+      height: 8,
+      padding: "right",
+    });
+    const character = createMockCharacter(6, 8, "filled");
+    const result = getBitLayoutVisualization(character, rightPadConfig, 0);
+
+    // 6 data bits + 2 padding bits, right padding means data first
+    expect(result.padding).toBe("DDDDDDPP");
+  });
+
+  it("describes left padding correctly", () => {
+    const leftPadConfig = createMockConfig({
+      width: 6,
+      height: 8,
+      padding: "left",
+    });
+    const character = createMockCharacter(6, 8, "filled");
+    const result = getBitLayoutVisualization(character, leftPadConfig, 0);
+
+    // 2 padding bits + 6 data bits, left padding means padding first
+    expect(result.padding).toBe("PPDDDDDD");
+  });
+
+  it("handles 8-bit width with no padding", () => {
+    const character = createMockCharacter(8, 8, "filled");
+    const result = getBitLayoutVisualization(character, config, 0);
+
+    // All 8 bits are data
+    expect(result.padding).toBe("DDDDDDDD");
+  });
+
+  it("shows hex for different rows", () => {
+    const character = createMockCharacter(8, 8, "diagonal");
+    const result0 = getBitLayoutVisualization(character, config, 0);
+    const result4 = getBitLayoutVisualization(character, config, 4);
+
+    // Diagonal pattern: row 0 has first bit set, row 4 has 5th bit set
+    // Row 0: 10000000 = 0x80
+    expect(result0.hex).toBe("80");
+    // Row 4: 00001000 = 0x08
+    expect(result4.hex).toBe("08");
+  });
+
+  it("handles 16-bit wide characters", () => {
+    const wideConfig = createMockConfig({
+      width: 16,
+      height: 8,
+      padding: "right",
+    });
+    const character = createMockCharacter(16, 8, "filled");
+    const result = getBitLayoutVisualization(character, wideConfig, 0);
+
+    // 16 bits = 2 bytes
+    expect(result.bits).toBe("1111111111111111");
+    expect(result.hex).toBe("FF FF");
+    expect(result.padding).toBe("DDDDDDDDDDDDDDDD");
+  });
+
+  it("handles partial-byte width (5 pixels)", () => {
+    const narrowConfig = createMockConfig({
+      width: 5,
+      height: 8,
+      padding: "right",
+    });
+    const character = createMockCharacter(5, 8, "filled");
+    const result = getBitLayoutVisualization(character, narrowConfig, 0);
+
+    // 5 data bits + 3 padding bits = 8 bits total
+    expect(result.bits.length).toBe(8);
+    expect(result.padding).toBe("DDDDDPPP");
+  });
+
+  it("respects rtl bit direction in hex output", () => {
+    const rtlConfig = createMockConfig({
+      width: 8,
+      height: 8,
+      bitDirection: "rtl",
+    });
+
+    // Create character with specific pattern: first pixel on
+    const character: Character = {
+      pixels: Array(8).fill(null).map(() => {
+        const row = Array(8).fill(false);
+        row[0] = true; // First pixel on
+        return row;
+      }),
+    };
+
+    const result = getBitLayoutVisualization(character, rtlConfig, 0);
+
+    // In RTL mode, the first pixel (index 0) maps to bit 0 (LSB)
+    // So binary should be 00000001 = 0x01
+    expect(result.hex).toBe("01");
+  });
+
+  it("handles checkerboard pattern", () => {
+    const character = createMockCharacter(8, 8, "checkerboard");
+    const result = getBitLayoutVisualization(character, config, 0);
+
+    // Row 0 of checkerboard: 10101010 = 0xAA
+    expect(result.bits).toBe("10101010");
+    expect(result.hex).toBe("AA");
+  });
+
+  it("handles out-of-bounds row gracefully", () => {
+    const character = createMockCharacter(8, 8, "filled");
+    // Request row beyond character height - should still return valid structure
+    const result = getBitLayoutVisualization(character, config, 10);
+
+    expect(result).toHaveProperty("bits");
+    expect(result).toHaveProperty("hex");
+    expect(result).toHaveProperty("padding");
+  });
+});
+
+describe("integration tests", () => {
+  it("C header and assembly produce consistent data", () => {
+    const characters = createMockCharacters(4, 8, 8, ["filled", "empty", "checkerboard", "diagonal"]);
+    const config = createMockConfig();
+
+    const cHeader = exportToCHeader(characters, config, getDefaultCHeaderOptions("test"));
+    const assembly = exportToAssembly(characters, config, getDefaultAssemblyOptions("test"));
+
+    // Extract hex values from C header (0xNN format)
+    const cHexMatches = cHeader.match(/0x[0-9A-Fa-f]{2}/g) || [];
+    const cHexValues = cHexMatches.map(h => h.slice(2).toUpperCase());
+
+    // Extract hex values from assembly ($NN format)
+    const asmHexMatches = assembly.match(/\$[0-9A-Fa-f]{2}/g) || [];
+    const asmHexValues = asmHexMatches.map(h => h.slice(1).toUpperCase());
+
+    // Both should produce the same bytes
+    expect(cHexValues).toEqual(asmHexValues);
+  });
+
+  it("hex preview matches first bytes of C header output", () => {
+    const characters = createMockCharacters(2, 8, 8, ["filled", "empty"]);
+    const config = createMockConfig();
+
+    const preview = getHexPreview(characters, config, 8);
+    const cHeader = exportToCHeader(characters, config, getDefaultCHeaderOptions("test"));
+
+    // Extract first 8 hex values from C header
+    const cHexMatches = cHeader.match(/0x[0-9A-Fa-f]{2}/g) || [];
+    const cFirstEight = cHexMatches.slice(0, 8).map(h => h.slice(2).toUpperCase()).join(" ");
+
+    expect(preview).toBe(cFirstEight);
+  });
+});
