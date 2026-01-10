@@ -98,6 +98,9 @@ export function EditView() {
   // Reset confirmation state
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
+  // Clear history confirmation state
+  const [showClearHistoryConfirm, setShowClearHistoryConfirm] = useState(false);
+
   // Delete character confirmation state (for deleting individual characters)
   const [showDeleteCharacterConfirm, setShowDeleteCharacterConfirm] = useState(false);
 
@@ -277,6 +280,18 @@ export function EditView() {
     }
     setShowResetConfirm(false);
   }, [characterSet, editor, toast]);
+
+  // Handle clear history
+  const handleClearHistory = useCallback(() => {
+    setShowClearHistoryConfirm(true);
+  }, []);
+
+  // Confirm clear history
+  const confirmClearHistory = useCallback(() => {
+    editor.clearHistory();
+    toast.info("History cleared");
+    setShowClearHistoryConfirm(false);
+  }, [editor, toast]);
 
   // Handle resize
   const handleResize = useCallback(
@@ -1114,6 +1129,7 @@ export function EditView() {
           onJump={editor.jumpToHistory}
           canRedo={editor.canRedo}
           totalEntries={editor.totalHistoryEntries}
+          onClear={handleClearHistory}
         />
 
         {/* Keyboard shortcuts footer */}
@@ -1381,6 +1397,18 @@ export function EditView() {
           </div>
         </div>
       )}
+
+      {/* Clear history confirmation dialog */}
+      <ConfirmDialog
+        isOpen={showClearHistoryConfirm}
+        title="Clear History?"
+        message="This will clear all undo/redo history. You will not be able to undo any previous changes after this action."
+        confirmLabel="Clear History"
+        cancelLabel="Cancel"
+        variant="warning"
+        onConfirm={confirmClearHistory}
+        onCancel={() => setShowClearHistoryConfirm(false)}
+      />
 
       {/* Leave confirmation dialog (for unsaved changes) */}
       <ConfirmDialog

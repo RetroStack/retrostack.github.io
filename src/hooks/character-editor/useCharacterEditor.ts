@@ -59,6 +59,8 @@ export interface UseCharacterEditorResult
   startBatch: () => void;
   /** End batching and commit as single history entry */
   endBatch: (label?: string) => void;
+  /** Clear all history entries */
+  clearHistory: () => void;
 }
 
 /**
@@ -98,6 +100,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
     totalHistoryEntries,
     startBatch,
     endBatch,
+    clearHistory,
   } = useUndoRedo<EditorState>(initialState);
 
   // Dirty state tracking
@@ -111,7 +114,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
       setEditorState(newState, label);
       setIsDirty(true);
     },
-    [editorState, setEditorState]
+    [editorState, setEditorState],
   );
 
   // Selection management
@@ -153,7 +156,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
       setIsDirty(false);
       setLastSavedState(null);
     },
-    [resetEditorState, selection]
+    [resetEditorState, selection],
   );
 
   return {
@@ -204,6 +207,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
     totalHistoryEntries,
     startBatch,
     endBatch,
+    clearHistory,
 
     // Dirty state
     isDirty,

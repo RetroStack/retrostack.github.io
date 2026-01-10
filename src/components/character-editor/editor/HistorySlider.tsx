@@ -14,6 +14,8 @@ interface HistorySliderProps<T> {
   canRedo?: boolean;
   /** Total entries including future */
   totalEntries?: number;
+  /** Callback when user wants to clear history */
+  onClear?: () => void;
 }
 
 /**
@@ -26,6 +28,7 @@ export function HistorySlider<T>({
   onJump,
   canRedo = false,
   totalEntries,
+  onClear,
 }: HistorySliderProps<T>) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
@@ -42,7 +45,7 @@ export function HistorySlider<T>({
       if (maxIndex === 0) return 50;
       return (index / maxIndex) * 100;
     },
-    [maxIndex]
+    [maxIndex],
   );
 
   // Calculate index from client X position
@@ -54,7 +57,7 @@ export function HistorySlider<T>({
       const index = Math.round(position * maxIndex);
       return Math.max(0, Math.min(maxIndex, index));
     },
-    [maxIndex]
+    [maxIndex],
   );
 
   // Store onJump in a ref so window event handlers always have the latest version
@@ -102,7 +105,7 @@ export function HistorySlider<T>({
       const index = getIndexFromClientX(e.clientX);
       onJump(index);
     },
-    [getIndexFromClientX, onJump]
+    [getIndexFromClientX, onJump],
   );
 
   // Handle hover (only when not dragging)
@@ -116,7 +119,7 @@ export function HistorySlider<T>({
         setTooltipPosition(e.clientX - rect.left);
       }
     },
-    [getIndexFromClientX]
+    [getIndexFromClientX],
   );
 
   const handlePointerLeave = useCallback(() => {
@@ -129,7 +132,7 @@ export function HistorySlider<T>({
       if (index < 0 || index >= history.length) return null;
       return history[index]?.label || `State ${index}`;
     },
-    [history]
+    [history],
   );
 
   // Keyboard navigation
@@ -149,7 +152,7 @@ export function HistorySlider<T>({
         onJump(maxIndex);
       }
     },
-    [currentIndex, maxIndex, onJump]
+    [currentIndex, maxIndex, onJump],
   );
 
   // Don't render if no history
@@ -245,9 +248,41 @@ export function HistorySlider<T>({
       </div>
 
       {/* Current operation label */}
-      <div className="text-[10px] text-gray-400 w-32 flex-shrink-0 truncate text-right" title={currentLabel || undefined}>
+      <div
+        className="text-[10px] text-gray-400 w-32 flex-shrink-0 truncate text-right"
+        title={currentLabel || undefined}
+      >
         {currentLabel || "—"}
       </div>
+
+      {/* Clear history button */}
+      {onClear && history.length > 1 && (
+        <button
+          type="button"
+          onClick={onClear}
+          className="flex-shrink-0 p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+          title="Clear history"
+          aria-label="Clear history"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
