@@ -1,3 +1,18 @@
+/**
+ * Selection Mode Hook
+ *
+ * Manages touch-friendly selection mode for the character grid.
+ * Provides a unified interface for both mobile (selection mode with
+ * tap-to-toggle) and desktop (shift+click, ctrl+click) patterns.
+ *
+ * Typically used with useLongPress (to enter selection mode on long press)
+ * and useDragSelect (for drag-to-select multiple items).
+ *
+ * Selection mode is the state where tapping items toggles their selection
+ * rather than making them the active item for editing.
+ *
+ * @module hooks/character-editor/useSelectionMode
+ */
 "use client";
 
 import { useCallback, useState, useMemo } from "react";

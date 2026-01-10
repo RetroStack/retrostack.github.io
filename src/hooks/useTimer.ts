@@ -1,3 +1,18 @@
+/**
+ * Timer Management Hooks
+ *
+ * Provides useTimer for setTimeout and useInterval for setInterval
+ * with automatic cleanup on unmount. Prevents memory leaks and
+ * ensures only one timer/interval is active at a time per hook instance.
+ *
+ * Common use cases:
+ * - Debounced actions (e.g., search input)
+ * - Long press detection
+ * - Auto-save intervals
+ * - Animation delays
+ *
+ * @module hooks/useTimer
+ */
 "use client";
 
 import { useRef, useCallback, useEffect } from "react";

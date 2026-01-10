@@ -1,3 +1,15 @@
+/**
+ * Resize Observer Hooks
+ *
+ * Provides hooks for observing element size changes using ResizeObserver:
+ * - useResizeObserver: Returns a ref and tracks element size
+ * - useElementSize: Takes an existing ref and returns size
+ * - useItemsFit: Calculates how many items fit in a container
+ *
+ * Useful for container-based responsive behavior rather than viewport-based.
+ *
+ * @module hooks/useResizeObserver
+ */
 "use client";
 
 import { useState, useEffect, useRef, RefObject, useCallback } from "react";

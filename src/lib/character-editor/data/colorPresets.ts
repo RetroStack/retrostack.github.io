@@ -1,7 +1,16 @@
 /**
  * Character ROM Editor - Color Presets
  *
- * Classic retro color schemes for character display.
+ * Classic retro color schemes for character display. These presets replicate
+ * the iconic phosphor colors of vintage CRT monitors and terminals:
+ * - White, green, and amber phosphor displays
+ * - C64 blue and light blue color schemes
+ * - Apple II green, ZX Spectrum blue, IBM CGA cyan
+ * - VT100 terminal green
+ *
+ * Also handles custom color persistence via localStorage.
+ *
+ * @module lib/character-editor/data/colorPresets
  */
 
 export interface ColorPreset {

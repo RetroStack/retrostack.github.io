@@ -1,3 +1,17 @@
+/**
+ * Keyboard Shortcuts Hook
+ *
+ * Manages global keyboard shortcuts for the character editor.
+ * Provides utilities for:
+ * - Registering keyboard shortcuts with modifiers (Ctrl, Shift, Alt)
+ * - Formatting shortcuts for display (cross-platform: ⌘ on Mac, Ctrl on others)
+ * - Creating predefined editor shortcuts (undo, transforms, navigation)
+ *
+ * Ignores shortcuts when typing in input/textarea/select elements
+ * (except when modifier keys are held).
+ *
+ * @module hooks/character-editor/useKeyboardShortcuts
+ */
 "use client";
 
 import { useEffect, useCallback, useRef } from "react";

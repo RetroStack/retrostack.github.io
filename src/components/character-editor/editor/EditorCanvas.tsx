@@ -1,3 +1,19 @@
+/**
+ * Editor Canvas Component
+ *
+ * Main editing surface for character pixels. The central component where
+ * users draw/edit individual character bitmaps.
+ *
+ * Features:
+ * - Click/drag painting with left mouse (toggle/set on)
+ * - Right-click drag painting (set off/erase)
+ * - Ctrl/Cmd+scroll wheel for zooming
+ * - Pinch-to-zoom on touch devices
+ * - Batch editing mode with mixed-pixel visualization
+ * - Overlay layer for tracing from another character set
+ *
+ * @module components/character-editor/editor/EditorCanvas
+ */
 "use client";
 
 import { useMemo, useCallback, useRef, useState, useEffect } from "react";

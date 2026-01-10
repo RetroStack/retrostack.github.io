@@ -24,13 +24,6 @@ const FEATURED_SYSTEMS = [
     href: "/systems/computers",
     icon: "S",
   },
-  {
-    name: "BitStack",
-    category: "Trainer Boards",
-    description: "Educational trainer boards including DigiTrainer and DigiMind for learning digital electronics.",
-    href: "/systems/trainer-boards",
-    icon: "B",
-  },
 ];
 
 export function SystemsPreview() {
@@ -68,11 +61,7 @@ export function SystemsPreview() {
           }}
         >
           {FEATURED_SYSTEMS.map((system) => (
-            <Link
-              key={system.name}
-              href={system.href}
-              className="card-retro p-4 sm:p-6 hover-glow-pink group block"
-            >
+            <Link key={system.name} href={system.href} className="card-retro p-4 sm:p-6 hover-glow-pink group block">
               {/* Icon/Badge */}
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded bg-retro-purple/50 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-retro-pink/20 transition-colors duration-300">
                 <span className="font-display text-xl sm:text-2xl text-retro-cyan group-hover:text-retro-pink transition-colors duration-300">
@@ -91,9 +80,7 @@ export function SystemsPreview() {
               </h3>
 
               {/* Description */}
-              <p className="text-gray-400 text-xs sm:text-sm">
-                {system.description}
-              </p>
+              <p className="text-gray-400 text-xs sm:text-sm">{system.description}</p>
             </Link>
           ))}
         </div>

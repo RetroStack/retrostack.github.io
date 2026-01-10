@@ -1,3 +1,18 @@
+/**
+ * Change Log Hook
+ *
+ * Tracks operations performed in the editor for debugging and user feedback.
+ * Maintains a rolling log of changes with:
+ * - Operation type (edit, add, delete, transform, etc.)
+ * - Human-readable description
+ * - Affected character indices
+ * - Timestamps
+ *
+ * Provides export functionality for sharing/debugging and color/icon
+ * helpers for UI display.
+ *
+ * @module hooks/character-editor/useChangeLog
+ */
 "use client";
 
 import { useState, useCallback, useRef } from "react";

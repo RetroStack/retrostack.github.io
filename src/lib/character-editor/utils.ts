@@ -1,5 +1,18 @@
 /**
  * Character ROM Editor - Utility Functions
+ *
+ * General-purpose utility functions for the character editor:
+ * - File size and dimension formatting for display
+ * - Configuration validation
+ * - Filename generation for exports
+ * - File type validation for imports
+ * - Common helpers (debounce, throttle, clamp)
+ * - Character comparison utilities
+ *
+ * @module lib/character-editor/utils
+ *
+ * These are pure functions with no side effects, making them
+ * easy to test and reuse across components and hooks.
  */
 
 import { CharacterSetConfig } from "./types";

@@ -1,3 +1,21 @@
+/**
+ * Modal State Management Hook
+ *
+ * Manages multiple modal states with single-modal enforcement - only one
+ * modal can be open at a time. Opening a new modal automatically closes
+ * any existing one.
+ *
+ * Replaces multiple individual useState calls for modals with a cleaner,
+ * type-safe API that prevents modal overlap issues.
+ *
+ * @module hooks/useModalManager
+ *
+ * @example
+ * type EditorModal = 'settings' | 'export' | 'help';
+ * const modals = useModalManager<EditorModal>();
+ * modals.open('settings');
+ * modals.isOpen('settings'); // true
+ */
 "use client";
 
 import { useState, useCallback, useMemo } from "react";

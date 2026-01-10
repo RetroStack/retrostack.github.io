@@ -1,3 +1,20 @@
+/**
+ * Site Header Component
+ *
+ * Fixed header with glassmorphism effect on scroll. Contains:
+ * - RetroStack logo with neon flicker effect
+ * - Desktop navigation (hidden on mobile/tablet)
+ * - Tablet navigation (compact pills, hidden on mobile)
+ * - Theme toggle and bug report link
+ * - Hamburger menu trigger for mobile
+ *
+ * Responsive breakpoints:
+ * - Mobile (<768px): Logo + hamburger only
+ * - Tablet (768-1024px): Logo + TabletNavigation + hamburger
+ * - Desktop (>1024px): Logo + full Navigation + actions
+ *
+ * @module components/layout/Header
+ */
 "use client";
 
 import { useState, useEffect } from "react";

@@ -1,3 +1,17 @@
+/**
+ * Library Grid Components
+ *
+ * Grid layout for displaying character sets in the library.
+ * Shows LibraryCard components in a responsive fluid grid.
+ *
+ * Components:
+ * - LibraryGrid: Main grid layout
+ * - LibraryGridEmptyResults: Empty state for filtered results
+ * - LibraryGridError: Error state with retry
+ * - LibraryCardSkeleton: Loading placeholder
+ *
+ * @module components/character-editor/library/LibraryGrid
+ */
 "use client";
 
 import { LibraryCard, LibraryCardEmpty } from "./LibraryCard";

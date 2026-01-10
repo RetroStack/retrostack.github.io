@@ -1,3 +1,16 @@
+/**
+ * Root Layout
+ *
+ * The top-level layout for the entire application. Provides:
+ * - Font loading (VT323 for terminal, Press Start 2P for headings, Orbitron for UI)
+ * - Global CSS via globals.css
+ * - ToastProvider for notifications
+ * - SEO metadata
+ *
+ * All pages inherit from this layout.
+ *
+ * @module app/layout
+ */
 import type { Metadata } from "next";
 import { VT323, Press_Start_2P, Orbitron } from "next/font/google";
 import "./globals.css";

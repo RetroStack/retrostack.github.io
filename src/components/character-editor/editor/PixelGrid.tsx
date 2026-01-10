@@ -1,3 +1,19 @@
+/**
+ * Pixel Grid Component
+ *
+ * Canvas-based pixel rendering engine for character display.
+ * Low-level component used by CharacterDisplay and EditorCanvas
+ * for efficient rendering of pixel bitmaps.
+ *
+ * Features:
+ * - Efficient canvas rendering (not DOM-based)
+ * - Optional grid lines between pixels
+ * - Click/drag interaction with mouse and touch
+ * - Mixed pixel pattern for batch editing visualization
+ * - Coordinate tracking for hover display
+ *
+ * @module components/character-editor/editor/PixelGrid
+ */
 "use client";
 
 import { useRef, useEffect, useCallback, useState } from "react";

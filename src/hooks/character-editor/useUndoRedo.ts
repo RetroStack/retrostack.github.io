@@ -1,3 +1,20 @@
+/**
+ * Undo/Redo History Hook
+ *
+ * Provides unlimited undo/redo functionality with a navigable timeline.
+ * Used by useCharacterEditor to track all state changes.
+ *
+ * Features:
+ * - Unlimited history (configurable max)
+ * - Timeline slider support (jumpToHistory)
+ * - Batching support for drag operations (startBatch/endBatch)
+ * - Labels for history entries
+ *
+ * Uses a single combined state object to prevent stale closure issues
+ * during rapid slider movement on touch devices.
+ *
+ * @module hooks/character-editor/useUndoRedo
+ */
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";

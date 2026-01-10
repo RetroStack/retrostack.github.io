@@ -1,3 +1,18 @@
+/**
+ * Long Press Detection Hook
+ *
+ * Detects long press gestures on both touch and mouse devices.
+ * Used for entering selection mode in grid views (iOS Photos-style).
+ *
+ * Features:
+ * - 500ms default threshold (configurable)
+ * - Cancels if finger/cursor moves more than 10px
+ * - Prevents context menu on mobile during long press
+ * - Distinguishes between long press and regular tap/click
+ * - Works with both touch (mobile) and mouse (desktop)
+ *
+ * @module hooks/useLongPress
+ */
 "use client";
 
 import { useCallback, useRef } from "react";

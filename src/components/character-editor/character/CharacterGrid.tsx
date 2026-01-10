@@ -1,3 +1,20 @@
+/**
+ * Character Grid Component
+ *
+ * Responsive grid layout for displaying all characters in a character set.
+ * Shows character thumbnails with optional indices and selection states.
+ *
+ * Auto-calculates optimal column count based on container width.
+ * For interactive selection (shift-click, context menu, etc.),
+ * use InteractiveCharacterGrid instead.
+ *
+ * Also re-exports related components:
+ * - CharacterPreviewGrid: For read-only preview displays
+ * - CharacterGridItem: Individual grid item with selection
+ * - InteractiveCharacterGrid: Full interactive version with selection
+ *
+ * @module components/character-editor/character/CharacterGrid
+ */
 "use client";
 
 import { useRef, useMemo } from "react";

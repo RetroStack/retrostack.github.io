@@ -1,3 +1,21 @@
+/**
+ * Character Selection State Hook
+ *
+ * Manages single and batch selection of characters in the grid:
+ * - Primary selection (selectedIndex): The "active" character being edited
+ * - Batch selection (batchSelection): Additional selected characters
+ * - Combined selection (selectedIndices): All selected characters
+ *
+ * Supports:
+ * - Click to select single
+ * - Shift+click for range selection
+ * - Cmd/Ctrl+click to toggle individual items
+ * - Select All functionality
+ *
+ * Used by useCharacterEditor to manage selection state.
+ *
+ * @module hooks/character-editor/useCharacterSelection
+ */
 "use client";
 
 import { useState, useCallback, useMemo } from "react";

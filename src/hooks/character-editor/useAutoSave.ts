@@ -1,3 +1,19 @@
+/**
+ * Auto-Save Hook for Character Editor
+ *
+ * Automatically saves editor state to localStorage at regular intervals
+ * when there are unsaved changes. Provides recovery data for crash protection.
+ *
+ * Features:
+ * - 30-second auto-save interval (when dirty)
+ * - Save on beforeunload (browser close/refresh)
+ * - Recovery data detection on mount
+ * - Clear on manual save
+ *
+ * Supports dependency injection for testing via IKeyValueStorage.
+ *
+ * @module hooks/character-editor/useAutoSave
+ */
 "use client";
 
 import { useEffect, useCallback, useRef, useState, useMemo } from "react";

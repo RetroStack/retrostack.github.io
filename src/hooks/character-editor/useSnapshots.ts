@@ -1,3 +1,20 @@
+/**
+ * Snapshots Management Hook
+ *
+ * Manages named snapshots of character sets stored in IndexedDB.
+ * Snapshots allow users to save and restore multiple versions of their work
+ * without creating separate character sets in the library.
+ *
+ * Features:
+ * - Save up to 10 snapshots per character set
+ * - Restore to a previous snapshot
+ * - Rename and delete snapshots
+ * - Capacity tracking and limits
+ *
+ * Supports dependency injection for testing via ISnapshotStorage.
+ *
+ * @module hooks/character-editor/useSnapshots
+ */
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";

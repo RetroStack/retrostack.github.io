@@ -1,3 +1,15 @@
+/**
+ * Card Components
+ *
+ * Retro-styled card with glassmorphism effect and optional hover glow.
+ * Provides Card, CardHeader, CardTitle, and CardContent sub-components
+ * for consistent layout.
+ *
+ * Used throughout the site for content sections, tool previews,
+ * and library items.
+ *
+ * @module components/ui/Card
+ */
 import { HTMLAttributes, forwardRef } from "react";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {

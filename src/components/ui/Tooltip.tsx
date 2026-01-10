@@ -1,3 +1,20 @@
+/**
+ * Tooltip Components
+ *
+ * Provides hover/focus tooltips with smart positioning that auto-flips
+ * to stay within viewport bounds. Uses portal rendering for proper
+ * z-index stacking.
+ *
+ * Features:
+ * - Auto-flip when near viewport edges
+ * - Configurable delay (default 300ms)
+ * - Keyboard shortcut display support
+ * - Both string and ReactNode content
+ *
+ * Also exports TooltipButton for convenient icon button + tooltip combo.
+ *
+ * @module components/ui/Tooltip
+ */
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- SSR-safe client detection */
 

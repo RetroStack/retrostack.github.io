@@ -1,3 +1,17 @@
+/**
+ * Toast Notification Provider
+ *
+ * Context provider for the toast notification system. Wrap your app
+ * with this provider to enable toast notifications via useToast hook.
+ *
+ * Features:
+ * - Automatic stacking (max 5 toasts visible)
+ * - Convenience methods: success(), error(), info(), warning()
+ * - Positioned at bottom-right of viewport
+ * - Auto-dismissal with configurable duration
+ *
+ * @module components/ui/ToastProvider
+ */
 "use client";
 
 import { createContext, useCallback, useState, ReactNode } from "react";

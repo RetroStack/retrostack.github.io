@@ -1,3 +1,21 @@
+/**
+ * Drag Select Hook
+ *
+ * Enables iOS Photos-style drag-select in grids. When in selection mode,
+ * users can drag across multiple items to select/toggle them in one motion.
+ *
+ * Features:
+ * - Tracks touched items to avoid re-toggling same item
+ * - Supports both touch (mobile) and mouse (desktop)
+ * - Threshold before drag is recognized to avoid accidental drags
+ * - Coordinates with existing tap/click handlers
+ * - Prevents click events after drag ends
+ *
+ * Typically used with useSelectionMode and useLongPress for a complete
+ * selection experience.
+ *
+ * @module hooks/useDragSelect
+ */
 "use client";
 
 import { useCallback, useRef, useState } from "react";

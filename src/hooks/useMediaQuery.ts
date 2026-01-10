@@ -1,3 +1,17 @@
+/**
+ * Media Query Hook
+ *
+ * Tracks whether a CSS media query matches, with SSR safety.
+ * Includes predefined hooks for common breakpoints matching Tailwind CSS:
+ * - useIsMobile: max-width 639px
+ * - useIsTablet: 640px to 1023px
+ * - useIsDesktop: min-width 1024px
+ * - useIsWideDesktop: min-width 1280px
+ * - usePrefersTouch: pointer: coarse (touch devices)
+ * - usePrefersReducedMotion: prefers-reduced-motion: reduce
+ *
+ * @module hooks/useMediaQuery
+ */
 "use client";
 
 import { useState, useEffect } from "react";

@@ -1,3 +1,14 @@
+/**
+ * Navigation Components
+ *
+ * Desktop and tablet navigation for the site header:
+ * - Navigation: Full desktop nav with dropdown menus (lg+)
+ * - TabletNavigation: Condensed top-level links only (md to lg)
+ *
+ * Both read from NAV_ITEMS in constants.ts for consistent structure.
+ *
+ * @module components/layout/Navigation
+ */
 "use client";
 
 import { useState } from "react";

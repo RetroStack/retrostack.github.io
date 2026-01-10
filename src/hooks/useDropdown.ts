@@ -1,3 +1,18 @@
+/**
+ * Dropdown State Management Hook
+ *
+ * Combines useState for visibility with useOutsideClick for auto-closing.
+ * Provides a complete solution for dropdown menus, popovers, and tooltips
+ * with automatic cleanup on click outside or Escape key.
+ *
+ * @module hooks/useDropdown
+ *
+ * @example
+ * const dropdown = useDropdown<HTMLDivElement>();
+ * // dropdown.ref - attach to container
+ * // dropdown.isOpen - current state
+ * // dropdown.toggle() / dropdown.open() / dropdown.close()
+ */
 "use client";
 
 import { useState, useCallback, RefObject } from "react";

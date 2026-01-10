@@ -1,3 +1,16 @@
+/**
+ * Character Editor Display Context
+ *
+ * Context for sharing display settings across editor components.
+ * Provides foreground/background colors, grid settings, and zoom level
+ * without requiring prop drilling through the component tree.
+ *
+ * Two access patterns:
+ * - useEditorDisplay(): Returns defaults if outside provider (safe fallback)
+ * - useEditorDisplayRequired(): Throws if outside provider (strict mode)
+ *
+ * @module contexts/CharacterEditorContext
+ */
 "use client";
 
 import { createContext, useContext, ReactNode } from "react";

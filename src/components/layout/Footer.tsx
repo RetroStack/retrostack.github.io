@@ -1,3 +1,17 @@
+/**
+ * Site Footer Component
+ *
+ * Displays navigation links, social media links, and copyright.
+ * Uses the NAV_ITEMS from constants for consistent navigation
+ * structure with the header.
+ *
+ * Responsive layout:
+ * - Mobile: Single column
+ * - Tablet: 2 columns
+ * - Desktop: 4 columns (brand + nav sections)
+ *
+ * @module components/layout/Footer
+ */
 "use client";
 
 import Link from "next/link";

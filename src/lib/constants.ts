@@ -1,3 +1,23 @@
+/**
+ * Site Configuration and Navigation Constants
+ *
+ * Central configuration file for the RetroStack website. Contains:
+ * - Navigation menu structure with nested dropdowns
+ * - Site metadata (title, description, tagline)
+ * - Social media links
+ *
+ * @module lib/constants
+ *
+ * Usage:
+ * - Import NAV_ITEMS for header/footer navigation
+ * - Import SITE_CONFIG for SEO and metadata
+ * - Import SOCIAL_LINKS for social media buttons
+ *
+ * To add a new page:
+ * 1. Add the route to the appropriate section in NAV_ITEMS
+ * 2. Create the corresponding page in /src/app/
+ */
+
 export interface NavChild {
   label: string;
   href: string;
@@ -12,8 +32,8 @@ export interface NavItem {
 
 export const title: string = "RetroStack - Vintage Computing Hardware & Software";
 export const description: string =
-  "Open-source hardware replicas, information, and development tools for vintage computing enthusiasts.";
-
+  "Explore vintage computing with open-source hardware replicas, documentation, and modern development tools for classic systems.";
+export const tagline: string = "Vintage Computing, Modern Tools";
 export const NAV_ITEMS: NavItem[] = [
   {
     label: "Home",

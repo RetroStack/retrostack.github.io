@@ -1,3 +1,19 @@
+/**
+ * Toast Notification Component
+ *
+ * Animated toast notification with slide-in/fade-out animations.
+ * Used via the ToastProvider context and useToast hook.
+ *
+ * Variants:
+ * - success: Green - successful operations
+ * - error: Red - errors and failures
+ * - warning: Yellow/amber - warnings
+ * - info: Cyan - informational messages
+ *
+ * Auto-dismisses after duration (default 4s), clickable to dismiss early.
+ *
+ * @module components/ui/Toast
+ */
 "use client";
 
 import { useCallback, useEffect, useState } from "react";

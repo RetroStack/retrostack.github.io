@@ -1,3 +1,18 @@
+/**
+ * Modal Dialog Components
+ *
+ * Reusable modal system with backdrop, keyboard handling, and sizing options.
+ * Provides compositional sub-components for flexible layouts:
+ * - Modal: Main wrapper with backdrop and keyboard handling
+ * - ModalHeader: Title area with optional close button
+ * - ModalContent: Main content area (optionally scrollable)
+ * - ModalFooter: Custom footer content
+ * - ModalActions: Standard Cancel/Confirm button pattern
+ *
+ * Supports Escape to close and optional Enter to confirm.
+ *
+ * @module components/ui/Modal
+ */
 "use client";
 
 import { useCallback, type ReactNode, type KeyboardEvent } from "react";

@@ -1,3 +1,17 @@
+/**
+ * Container Component
+ *
+ * Responsive container with max-width constraints and consistent padding.
+ * Used to wrap page content and maintain readable line lengths.
+ *
+ * Sizes:
+ * - narrow: max-w-4xl (768px) - focused content
+ * - default: max-w-7xl (1280px) - standard pages
+ * - wide: max-w-[1600px] - wide layouts
+ * - full: no max-width
+ *
+ * @module components/ui/Container
+ */
 import { HTMLAttributes, forwardRef } from "react";
 
 interface ContainerProps extends HTMLAttributes<HTMLDivElement> {

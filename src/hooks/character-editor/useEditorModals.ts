@@ -1,3 +1,17 @@
+/**
+ * Editor Modal State Management Hook
+ *
+ * Manages all modal dialogs in the character editor:
+ * - Feature modals (mutually exclusive): shortcuts, metadata, resize,
+ *   import, copy, reorder, scale, goTo, asciiMap, textPreview, etc.
+ * - Confirmation dialogs (independent): delete, reset, leave
+ * - Save As dialog (with form state): name input, saving state
+ *
+ * Uses useModalManager internally for feature modals to ensure
+ * only one feature modal is open at a time.
+ *
+ * @module hooks/character-editor/useEditorModals
+ */
 "use client";
 
 import { useState, useCallback } from "react";

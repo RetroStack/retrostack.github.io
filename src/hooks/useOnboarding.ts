@@ -1,3 +1,20 @@
+/**
+ * Onboarding Tour Hook
+ *
+ * Manages multi-step onboarding tours with localStorage persistence.
+ * Tracks whether tours have been completed or dismissed, and auto-starts
+ * for first-time users.
+ *
+ * Features:
+ * - Step-by-step navigation (next/prev)
+ * - Skip/dismiss with "don't show again"
+ * - Reset to show tour again
+ * - Optional element targeting for highlighting
+ *
+ * Supports dependency injection for testing via IKeyValueStorage.
+ *
+ * @module hooks/useOnboarding
+ */
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- SSR-safe hydration from localStorage */
 

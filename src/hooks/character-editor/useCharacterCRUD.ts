@@ -1,3 +1,19 @@
+/**
+ * Character CRUD Operations Hook
+ *
+ * Provides create, read, update, and delete operations for characters:
+ * - addCharacter: Add empty character at the end
+ * - addCharacters: Add multiple characters (from import)
+ * - deleteSelected: Delete selected character(s)
+ * - copyCharacter: Copy character from one position to another
+ * - resizeCharacters: Resize all characters with anchor positioning
+ * - updateCharacter: Update a single character
+ * - setCharacters: Replace all characters
+ *
+ * Works with the undo/redo system via the updateState callback.
+ *
+ * @module hooks/character-editor/useCharacterCRUD
+ */
 "use client";
 
 import { useCallback } from "react";

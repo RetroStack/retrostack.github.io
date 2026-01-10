@@ -1,3 +1,19 @@
+/**
+ * Dropdown Primitive Components
+ *
+ * Reusable building blocks for dropdown menus and pickers:
+ * - DropdownPanel: Container with positioning and scroll
+ * - DropdownSection/SectionHeader: Labeled sections within dropdown
+ * - DropdownGroup: Grouped items with header
+ * - DropdownChipButton: Chip-style selection buttons
+ * - DropdownClearButton: Clear selection action
+ * - Picker3DButton: 3D raised trigger button
+ * - pickerInputClasses: Standard text input styles
+ *
+ * Used by ManufacturerSystemSelect, ChipSelect, and other picker components.
+ *
+ * @module components/ui/DropdownPrimitives
+ */
 "use client";
 
 import { forwardRef, type ReactNode, type ButtonHTMLAttributes } from "react";

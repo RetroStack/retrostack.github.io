@@ -1,3 +1,15 @@
+/**
+ * Toggle Switch Component
+ *
+ * iOS-style toggle switch with retro color scheme:
+ * - Pink when on (active state)
+ * - Purple when off (inactive state)
+ *
+ * Used instead of checkboxes throughout the app for
+ * better touch targets and visual consistency.
+ *
+ * @module components/ui/ToggleSwitch
+ */
 "use client";
 
 export interface ToggleSwitchProps {

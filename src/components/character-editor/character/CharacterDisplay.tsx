@@ -1,3 +1,16 @@
+/**
+ * Character Display Components
+ *
+ * Components for rendering individual character bitmaps:
+ * - CharacterDisplay: Main display component with two modes
+ *   - small: Thumbnail view for grids (1:1 or scaled, no grid lines)
+ *   - large: Editing view with grid lines and interaction
+ * - EmptyCharacterDisplay: Placeholder for "add new" button
+ *
+ * Uses PixelGrid internally for canvas-based rendering.
+ *
+ * @module components/character-editor/character/CharacterDisplay
+ */
 "use client";
 
 import { useMemo } from "react";

@@ -1,3 +1,21 @@
+/**
+ * Editor Action Handlers Hook
+ *
+ * Manages high-level editor operations and navigation:
+ * - Save: Persist current changes to storage
+ * - Save As: Create a copy with a new name
+ * - Delete: Remove character set from library
+ * - Reset: Discard unsaved changes
+ * - Recover: Restore from auto-save data
+ * - Resize: Change character dimensions
+ * - Metadata Update: Edit name, description, etc.
+ * - Navigation: Back button handling with unsaved changes check
+ *
+ * Extracts action logic from EditView to reduce component complexity.
+ * Coordinates with useCharacterEditor, useCharacterLibrary, and useAutoSave.
+ *
+ * @module hooks/character-editor/useEditorActions
+ */
 "use client";
 
 import { useState, useCallback } from "react";

@@ -1,3 +1,22 @@
+/**
+ * Character ROM Editor - Edit View
+ *
+ * The main editing interface for character sets. This is the largest and
+ * most complex view in the character editor, orchestrating:
+ * - Pixel editing canvas (EditorCanvas)
+ * - Character grid sidebar (EditorSidebar)
+ * - Transform toolbar (rotate, flip, shift, etc.)
+ * - History slider for undo/redo navigation
+ * - Multiple modals (resize, import, copy, scale, etc.)
+ * - Keyboard shortcuts for all operations
+ * - Auto-save with recovery
+ * - Snapshots for version management
+ *
+ * Uses useCharacterEditor hook for state management and coordinates
+ * with useCharacterLibrary for persistence.
+ *
+ * @module app/tools/character-rom-editor/edit/EditView
+ */
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";

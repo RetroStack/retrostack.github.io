@@ -1,3 +1,18 @@
+/**
+ * Main Character Editor State Management Hook
+ *
+ * The central orchestration hook for the character editor. Coordinates:
+ * - Character selection (single + batch) via useCharacterSelection
+ * - Pixel/transform operations via useCharacterTransforms
+ * - CRUD operations (add/delete/copy) via useCharacterCRUD
+ * - Undo/redo history with timeline slider via useUndoRedo
+ * - Dirty state tracking for unsaved changes detection
+ *
+ * This is the primary hook used by EditView to manage the entire
+ * editor state. All other character-editor hooks are composed here.
+ *
+ * @module hooks/character-editor/useCharacterEditor
+ */
 "use client";
 
 import { useState, useCallback } from "react";

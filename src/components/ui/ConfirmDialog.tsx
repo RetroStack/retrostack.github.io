@@ -1,3 +1,18 @@
+/**
+ * Confirmation Dialog Component
+ *
+ * Modal dialog for confirming destructive or important actions.
+ * Provides cancel/confirm buttons with keyboard support (Escape to cancel).
+ *
+ * Variants:
+ * - danger: Red - destructive actions (delete, discard)
+ * - warning: Orange - potentially risky actions
+ * - info: Cyan - informational confirmations
+ *
+ * Works reliably across all platforms including iOS/iPad.
+ *
+ * @module components/ui/ConfirmDialog
+ */
 "use client";
 
 import { useEffect, useRef } from "react";

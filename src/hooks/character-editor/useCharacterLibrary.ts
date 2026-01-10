@@ -1,3 +1,19 @@
+/**
+ * Character Library Management Hook
+ *
+ * Manages the IndexedDB-backed library of character sets. Handles:
+ * - CRUD operations (create, read, update, delete)
+ * - Search and filtering (by name, size, manufacturer, system)
+ * - Pinned items management
+ * - Auto-initialization of built-in and external character sets
+ *
+ * On first load, imports built-in character sets (C64, Apple II, etc.)
+ * and fetches external character sets from the data directory.
+ *
+ * Supports dependency injection for testing via ICharacterSetStorage.
+ *
+ * @module hooks/character-editor/useCharacterLibrary
+ */
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";

@@ -1,3 +1,19 @@
+/**
+ * Tool Page Layout Components
+ *
+ * Layout wrapper for tool pages (character-rom-editor, etc.).
+ * Provides consistent structure with header, optional toolbar,
+ * main content area, and optional footer.
+ *
+ * Components:
+ * - ToolLayout: Full page wrapper with viewport locking
+ * - ToolContent: Content area with optional sidebars (left, right, or both)
+ *
+ * Designed for full-height tool interfaces that shouldn't scroll
+ * the page, only their internal content areas.
+ *
+ * @module components/layout/ToolLayout
+ */
 "use client";
 
 import { Header } from "./Header";

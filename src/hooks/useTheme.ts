@@ -1,3 +1,19 @@
+/**
+ * Theme Management Hook
+ *
+ * Manages dark/light mode with localStorage persistence and system
+ * preference detection. Supports three modes:
+ * - "dark": Always dark mode
+ * - "light": Always light mode
+ * - "system": Follows OS/browser preference
+ *
+ * Automatically applies theme class to document.documentElement and
+ * updates meta theme-color for mobile browsers.
+ *
+ * Supports dependency injection for testing via IKeyValueStorage.
+ *
+ * @module hooks/useTheme
+ */
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- SSR-safe hydration from localStorage */
 

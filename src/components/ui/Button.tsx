@@ -1,3 +1,19 @@
+/**
+ * Button Component
+ *
+ * Primary action button with neon glow effects. Supports multiple
+ * color variants and sizes matching the retro aesthetic.
+ *
+ * Variants:
+ * - pink: Primary actions (submit, confirm)
+ * - cyan: Secondary actions
+ * - violet: Tertiary actions
+ * - ghost: Text-only, no background
+ *
+ * Can render as a button or anchor via the href prop.
+ *
+ * @module components/ui/Button
+ */
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
 type ButtonVariant = "pink" | "cyan" | "violet" | "ghost";

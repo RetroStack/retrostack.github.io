@@ -1,3 +1,18 @@
+/**
+ * Mobile Menu Components
+ *
+ * Full-screen slide-in menu for mobile/small tablet viewports.
+ * Triggered by HamburgerButton in the header.
+ *
+ * Features:
+ * - Accordion-style expandable sections
+ * - Body scroll lock when open
+ * - Escape key to close
+ * - Theme toggle in header
+ * - Social links in footer
+ *
+ * @module components/layout/MobileMenu
+ */
 "use client";
 
 import { useState, useEffect } from "react";

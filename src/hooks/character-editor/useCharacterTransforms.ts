@@ -1,3 +1,21 @@
+/**
+ * Character Transform Operations Hook
+ *
+ * Provides all pixel-level and character-level transformations:
+ * - Pixel operations: toggle, set, get state (for batch editing)
+ * - Rotate: 90° left or right
+ * - Shift: up/down/left/right with optional wrap
+ * - Flip: horizontal or vertical mirroring
+ * - Invert: toggle all pixels
+ * - Clear/Fill: all pixels off or on
+ * - Center: auto-center content within bounds
+ * - Scale: enlarge/shrink with anchor positioning
+ *
+ * All operations support batch editing on multiple selected characters.
+ * Works with the undo/redo system via the updateState callback.
+ *
+ * @module hooks/character-editor/useCharacterTransforms
+ */
 "use client";
 
 import { useCallback } from "react";

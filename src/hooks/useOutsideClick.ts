@@ -1,3 +1,14 @@
+/**
+ * Outside Click Detection Hook
+ *
+ * Detects clicks outside of a specified element and Escape key presses.
+ * Essential for closing dropdowns, modals, and popovers when user
+ * clicks elsewhere or presses Escape.
+ *
+ * Uses mousedown/touchstart for faster response than click events.
+ *
+ * @module hooks/useOutsideClick
+ */
 "use client";
 
 import { useEffect, useRef, RefObject } from "react";
