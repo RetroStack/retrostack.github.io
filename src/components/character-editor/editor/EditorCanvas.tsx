@@ -206,7 +206,7 @@ export function EditorCanvas({
         setIsDragging(true);
       }
     },
-    [isDragging, onPixelToggle, onPixelSet, onDragStart, character]
+    [isDragging, onPixelToggle, onPixelSet, onDragStart, character],
   );
 
   const handlePixelDrag = useCallback(
@@ -215,7 +215,7 @@ export function EditorCanvas({
         onPixelSet(row, col, dragValue);
       }
     },
-    [isDragging, dragValue, onPixelSet]
+    [isDragging, dragValue, onPixelSet],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -241,7 +241,7 @@ export function EditorCanvas({
         }
       }
     },
-    [zoom, minZoom, maxZoom, onZoomChange]
+    [zoom, minZoom, maxZoom, onZoomChange],
   );
 
   // Calculate distance between two touch points
@@ -261,7 +261,7 @@ export function EditorCanvas({
         lastPinchDistanceRef.current = getTouchDistance(e.touches);
       }
     },
-    [getTouchDistance]
+    [getTouchDistance],
   );
 
   const handleTouchMove = useCallback(
@@ -280,7 +280,7 @@ export function EditorCanvas({
         }
       }
     },
-    [getTouchDistance, zoom, minZoom, maxZoom, onZoomChange]
+    [getTouchDistance, zoom, minZoom, maxZoom, onZoomChange],
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -310,12 +310,7 @@ export function EditorCanvas({
     return (
       <div className={`flex items-center justify-center h-full ${className}`}>
         <div className="text-center text-gray-500">
-          <svg
-            className="w-16 h-16 mx-auto mb-4 opacity-50"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -332,18 +327,14 @@ export function EditorCanvas({
   return (
     <div
       ref={containerRef}
-      className={`flex items-center justify-center w-full h-full overflow-hidden bg-black/20 ${className}`}
+      className={`flex items-center justify-center w-full h-full overflow-hidden ${className}`}
       tabIndex={0}
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div
-        className="inline-block"
-        onMouseLeave={handleDragEnd}
-        onMouseUp={handleDragEnd}
-      >
+      <div className="inline-block" onMouseLeave={handleDragEnd} onMouseUp={handleDragEnd}>
         <div className="relative">
           <CharacterDisplay
             character={character}
@@ -362,23 +353,25 @@ export function EditorCanvas({
             mixedPixels={mixedPixels}
           />
           {/* Overlay canvas for tracing another character set (not shown in side-by-side mode) */}
-          {overlayConfig && overlayMode !== "side-by-side" && (() => {
-            const cellSize = zoom + gridThickness;
-            const w = config.width * cellSize + gridThickness;
-            const h = config.height * cellSize + gridThickness;
-            return (
-              <canvas
-                ref={overlayCanvasRef}
-                className="absolute top-0 left-0 pointer-events-none"
-                style={{
-                  imageRendering: "pixelated",
-                  zIndex: 10,
-                  width: w,
-                  height: h,
-                }}
-              />
-            );
-          })()}
+          {overlayConfig &&
+            overlayMode !== "side-by-side" &&
+            (() => {
+              const cellSize = zoom + gridThickness;
+              const w = config.width * cellSize + gridThickness;
+              const h = config.height * cellSize + gridThickness;
+              return (
+                <canvas
+                  ref={overlayCanvasRef}
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{
+                    imageRendering: "pixelated",
+                    zIndex: 10,
+                    width: w,
+                    height: h,
+                  }}
+                />
+              );
+            })()}
         </div>
       </div>
     </div>
