@@ -163,10 +163,17 @@ placeholder-gray-500 focus:outline-none focus:border-retro-cyan
 
 ### Dropdowns/Selects
 
-```css
-bg-retro-navy/50 border border-retro-grid/50 rounded text-sm text-gray-200
-focus:border-retro-cyan
+**Do NOT use native `<select>` elements.** Use these components instead:
+
+- `SingleSelectDropdown` - For selecting one option from a list
+- `MultiSelectDropdown` - For selecting multiple options from a list
+
+```typescript
+import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
+import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 ```
+
+These components provide consistent styling and behavior across the app.
 
 ### Selected Chips
 
@@ -352,23 +359,26 @@ After implementing UI features, verify they work correctly:
 3. Extend HTML attributes
 4. Export `displayName`
 
-### Testing Checklist (Required for All Features)
+### Testing Checklist (REQUIRED for All Features)
 
-**Unit Tests:**
+**IMPORTANT:** All new features MUST include both unit tests AND E2E tests. Features without tests are incomplete.
+
+**Unit Tests (Required):**
 
 - [ ] Extract business logic to `/lib/` as pure functions
 - [ ] Add unit tests for pure functions (>90% coverage)
 - [ ] Add hook tests with mock dependencies (use dependency injection)
 - [ ] Use `test-generator` agent for comprehensive test coverage
 
-**E2E Tests:**
+**E2E Tests (Required):**
 
 - [ ] Add E2E tests for all user workflows (`e2e/<feature>.spec.ts`)
-- [ ] Use `e2e-generator` agent to create Playwright tests
+- [ ] Test the complete user flow from start to finish
 - [ ] Test on multiple device profiles (desktop, tablet, mobile)
-- [ ] Include error states and edge cases
+- [ ] Include error states, edge cases, and persistence (localStorage)
+- [ ] Use `e2e-generator` agent to create Playwright tests
 
-**Visual Tests:**
+**Visual Tests (Recommended):**
 
 - [ ] Add visual regression tests (`e2e/visual-<feature>.spec.ts`)
 - [ ] Update existing visual tests if UI changes affect them

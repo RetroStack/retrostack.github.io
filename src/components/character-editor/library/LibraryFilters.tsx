@@ -21,6 +21,11 @@
 import { useCallback, useMemo } from "react";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
+import {
+  PAGE_SIZE_OPTIONS,
+  type PageSize,
+  type PaginatedResult,
+} from "@/lib/character-editor/library/filters";
 
 export type SortField =
   | "name"
@@ -109,6 +114,12 @@ export interface LibraryFiltersProps {
   totalCount: number;
   /** Filtered count of items */
   filteredCount: number;
+  /** Pagination state (optional - only shown when provided) */
+  pagination?: PaginatedResult<unknown>;
+  /** Callback when page size changes */
+  onPageSizeChange?: (pageSize: PageSize) => void;
+  /** Callback when page changes */
+  onPageChange?: (page: number) => void;
 }
 
 /**
@@ -142,6 +153,9 @@ export function LibraryFilters({
   onSortDirectionToggle,
   totalCount,
   filteredCount,
+  pagination,
+  onPageSizeChange,
+  onPageChange,
 }: LibraryFiltersProps) {
   // Get all manufacturers from the library
   const allManufacturers = useMemo(() => {
@@ -349,18 +363,95 @@ export function LibraryFilters({
         )}
       </div>
 
-      {/* Results count and clear button */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>
-          {hasActiveFilters
-            ? `Showing ${filteredCount} of ${totalCount} character sets`
-            : `${totalCount} character set${totalCount !== 1 ? "s" : ""}`}
-        </span>
+      {/* Results count, pagination, and clear button */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2">
+          <span>
+            {hasActiveFilters
+              ? `Showing ${filteredCount} of ${totalCount} character sets`
+              : `${totalCount} character set${totalCount !== 1 ? "s" : ""}`}
+          </span>
 
-        {hasActiveFilters && (
-          <button onClick={handleClearFilters} className="text-retro-cyan hover:text-retro-pink transition-colors">
-            Clear filters
-          </button>
+          {hasActiveFilters && (
+            <button onClick={handleClearFilters} className="text-retro-cyan hover:text-retro-pink transition-colors">
+              Clear filters
+            </button>
+          )}
+        </div>
+
+        {/* Pagination controls - show when there are enough items to paginate */}
+        {pagination && onPageSizeChange && onPageChange && pagination.totalItems >= 20 && (
+          <div className="flex items-center gap-3">
+            {/* Page size selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-gray-500">Show:</span>
+              <SingleSelectDropdown
+                options={PAGE_SIZE_OPTIONS.map((size) => ({
+                  value: size,
+                  label: size === "all" ? "All" : String(size),
+                }))}
+                value={pagination.pageSize}
+                onChange={(value) => onPageSizeChange(value as PageSize)}
+                ariaLabel="Items per page"
+                className="min-w-[70px]"
+              />
+            </div>
+
+            {/* Page navigation - only show when there are multiple pages */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onPageChange(1)}
+                  disabled={!pagination.hasPreviousPage}
+                  className="p-1 text-gray-400 hover:text-retro-cyan disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+                  aria-label="First page"
+                  title="First page"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => onPageChange(pagination.currentPage - 1)}
+                  disabled={!pagination.hasPreviousPage}
+                  className="p-1 text-gray-400 hover:text-retro-cyan disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Previous page"
+                  title="Previous page"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <span className="px-2 text-gray-300">
+                  {pagination.currentPage} / {pagination.totalPages}
+                </span>
+
+                <button
+                  onClick={() => onPageChange(pagination.currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="p-1 text-gray-400 hover:text-retro-cyan disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Next page"
+                  title="Next page"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => onPageChange(pagination.totalPages)}
+                  disabled={!pagination.hasNextPage}
+                  className="p-1 text-gray-400 hover:text-retro-cyan disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Last page"
+                  title="Last page"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

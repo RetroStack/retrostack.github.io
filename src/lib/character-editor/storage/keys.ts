@@ -54,3 +54,6 @@ export const CHARACTER_EDITOR_STORAGE_KEY_SORT_FIELD = "retrostack-character-edi
 
 /** localStorage key for library sort direction */
 export const CHARACTER_EDITOR_STORAGE_KEY_SORT_DIRECTION = "retrostack-character-editor-sort-direction";
+
+/** localStorage key for library page size */
+export const CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE = "retrostack-character-editor-page-size";

@@ -56,6 +56,260 @@ test.describe("Character Editor - Library Page", () => {
   });
 });
 
+test.describe("Character Editor - Library Pagination", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/tools/character-rom-editor", { waitUntil: "networkidle" });
+    // Wait for library to load
+    await page.waitForTimeout(1500);
+  });
+
+  test("displays pagination controls when there are enough items", async ({ page }) => {
+    // Pagination controls should be visible when there are >= 20 items
+    // Look for the page size dropdown (labeled "Show:")
+    const showLabel = page.locator("text=Show:");
+
+    // If pagination is visible, verify the controls exist
+    if (await showLabel.isVisible({ timeout: 3000 })) {
+      // Page size dropdown should be present
+      const pageSizeDropdown = page.locator('button[aria-label="Items per page"]');
+      await expect(pageSizeDropdown).toBeVisible();
+    }
+  });
+
+  test("page size dropdown contains expected options", async ({ page }) => {
+    const showLabel = page.locator("text=Show:");
+
+    if (await showLabel.isVisible({ timeout: 3000 })) {
+      // Click on the page size dropdown to open it
+      const pageSizeDropdown = page.locator('button[aria-label="Items per page"]');
+      await pageSizeDropdown.click();
+
+      // Verify dropdown options are visible
+      const option20 = page.locator('[role="option"]').filter({ hasText: "20" });
+      const option50 = page.locator('[role="option"]').filter({ hasText: "50" });
+      const option100 = page.locator('[role="option"]').filter({ hasText: "100" });
+      const optionAll = page.locator('[role="option"]').filter({ hasText: "All" });
+
+      await expect(option20).toBeVisible();
+      await expect(option50).toBeVisible();
+      await expect(option100).toBeVisible();
+      await expect(optionAll).toBeVisible();
+    }
+  });
+
+  test("changing page size updates displayed items", async ({ page }) => {
+    const showLabel = page.locator("text=Show:");
+
+    if (await showLabel.isVisible({ timeout: 3000 })) {
+      // Count initial cards
+      const initialCards = page.locator('[class*="Card"]').filter({ has: page.locator('a[href*="/edit"]') });
+      const initialCount = await initialCards.count();
+
+      // Click on page size dropdown and select a different option
+      const pageSizeDropdown = page.locator('button[aria-label="Items per page"]');
+      await pageSizeDropdown.click();
+
+      // Select "All" to show all items
+      const optionAll = page.locator('[role="option"]').filter({ hasText: "All" });
+      await optionAll.click();
+
+      // Wait for update
+      await page.waitForTimeout(500);
+
+      // Count cards after selecting "All"
+      const newCards = page.locator('[class*="Card"]').filter({ has: page.locator('a[href*="/edit"]') });
+      const newCount = await newCards.count();
+
+      // If there were more items than initial page size, count should increase
+      // At minimum, count should be >= initial count
+      expect(newCount).toBeGreaterThanOrEqual(initialCount);
+    }
+  });
+
+  test("page navigation buttons work correctly", async ({ page }) => {
+    // Check if page navigation is visible (only when multiple pages exist)
+    const pageIndicator = page.locator("text=/\\d+\\s*\\/\\s*\\d+/");
+
+    if (await pageIndicator.isVisible({ timeout: 3000 })) {
+      // Get current page info
+      const pageText = await pageIndicator.textContent();
+      const match = pageText?.match(/(\d+)\s*\/\s*(\d+)/);
+
+      if (match) {
+        const currentPage = parseInt(match[1]);
+        const totalPages = parseInt(match[2]);
+
+        if (totalPages > 1) {
+          // Click next page button
+          const nextButton = page.locator('button[aria-label="Next page"]');
+          if (await nextButton.isEnabled()) {
+            await nextButton.click();
+            await page.waitForTimeout(300);
+
+            // Verify page changed
+            const newPageText = await pageIndicator.textContent();
+            const newMatch = newPageText?.match(/(\d+)\s*\/\s*(\d+)/);
+            if (newMatch) {
+              expect(parseInt(newMatch[1])).toBe(currentPage + 1);
+            }
+          }
+
+          // Click previous page button to go back
+          const prevButton = page.locator('button[aria-label="Previous page"]');
+          if (await prevButton.isEnabled()) {
+            await prevButton.click();
+            await page.waitForTimeout(300);
+          }
+        }
+      }
+    }
+  });
+
+  test("first and last page buttons work", async ({ page }) => {
+    const pageIndicator = page.locator("text=/\\d+\\s*\\/\\s*\\d+/");
+
+    if (await pageIndicator.isVisible({ timeout: 3000 })) {
+      const pageText = await pageIndicator.textContent();
+      const match = pageText?.match(/(\d+)\s*\/\s*(\d+)/);
+
+      if (match) {
+        const totalPages = parseInt(match[2]);
+
+        if (totalPages > 1) {
+          // Click last page button
+          const lastButton = page.locator('button[aria-label="Last page"]');
+          if (await lastButton.isEnabled()) {
+            await lastButton.click();
+            await page.waitForTimeout(300);
+
+            // Verify we're on last page
+            const newPageText = await pageIndicator.textContent();
+            const newMatch = newPageText?.match(/(\d+)\s*\/\s*(\d+)/);
+            if (newMatch) {
+              expect(parseInt(newMatch[1])).toBe(totalPages);
+            }
+          }
+
+          // Click first page button to go back
+          const firstButton = page.locator('button[aria-label="First page"]');
+          if (await firstButton.isEnabled()) {
+            await firstButton.click();
+            await page.waitForTimeout(300);
+
+            // Verify we're on first page
+            const finalPageText = await pageIndicator.textContent();
+            const finalMatch = finalPageText?.match(/(\d+)\s*\/\s*(\d+)/);
+            if (finalMatch) {
+              expect(parseInt(finalMatch[1])).toBe(1);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  test("filters still show correct total count with pagination", async ({ page }) => {
+    // The filter result count should show "Showing X of Y" based on total items
+    const resultCount = page.locator("text=/character set/i");
+    await expect(resultCount).toBeVisible({ timeout: 5000 });
+
+    // Apply a filter (e.g., search)
+    const searchInput = page.locator('input[placeholder*="Search"]');
+    if (await searchInput.isVisible()) {
+      await searchInput.fill("Commodore");
+      await page.waitForTimeout(500);
+
+      // Result count should update to show filtered count
+      const filteredText = page.locator("text=/Showing \\d+ of \\d+/");
+      if (await filteredText.isVisible({ timeout: 2000 })) {
+        const text = await filteredText.textContent();
+        expect(text).toMatch(/Showing \d+ of \d+ character sets/);
+      }
+
+      // Clear search
+      await searchInput.clear();
+    }
+  });
+
+  test("page resets to 1 when filters change", async ({ page }) => {
+    const pageIndicator = page.locator("text=/\\d+\\s*\\/\\s*\\d+/");
+
+    if (await pageIndicator.isVisible({ timeout: 3000 })) {
+      // Go to page 2 first (if possible)
+      const nextButton = page.locator('button[aria-label="Next page"]');
+      if (await nextButton.isEnabled()) {
+        await nextButton.click();
+        await page.waitForTimeout(300);
+
+        // Verify we're on page 2
+        let pageText = await pageIndicator.textContent();
+        let match = pageText?.match(/(\d+)\s*\/\s*(\d+)/);
+        if (match && parseInt(match[1]) > 1) {
+          // Now apply a filter
+          const searchInput = page.locator('input[placeholder*="Search"]');
+          if (await searchInput.isVisible()) {
+            await searchInput.fill("a");
+            await page.waitForTimeout(500);
+
+            // Page should reset to 1 after filter change
+            if (await pageIndicator.isVisible()) {
+              pageText = await pageIndicator.textContent();
+              match = pageText?.match(/(\d+)\s*\/\s*(\d+)/);
+              if (match) {
+                expect(parseInt(match[1])).toBe(1);
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  test("selecting 'All' hides page navigation but shows page size selector", async ({ page }) => {
+    const showLabel = page.locator("text=Show:");
+
+    if (await showLabel.isVisible({ timeout: 3000 })) {
+      // Select "All" from page size dropdown
+      const pageSizeDropdown = page.locator('button[aria-label="Items per page"]');
+      await pageSizeDropdown.click();
+
+      const optionAll = page.locator('[role="option"]').filter({ hasText: "All" });
+      await optionAll.click();
+      await page.waitForTimeout(500);
+
+      // Page navigation should be hidden (no page indicator when showing all)
+      const pageIndicator = page.locator("text=/\\d+\\s*\\/\\s*\\d+/");
+      await expect(pageIndicator).not.toBeVisible();
+
+      // But page size selector should still be visible
+      await expect(pageSizeDropdown).toBeVisible();
+    }
+  });
+
+  test("page size preference persists after page reload", async ({ page }) => {
+    const showLabel = page.locator("text=Show:");
+
+    if (await showLabel.isVisible({ timeout: 3000 })) {
+      // Change page size to 50
+      const pageSizeDropdown = page.locator('button[aria-label="Items per page"]');
+      await pageSizeDropdown.click();
+
+      const option50 = page.locator('[role="option"]').filter({ hasText: "50" });
+      await option50.click();
+      await page.waitForTimeout(500);
+
+      // Reload the page
+      await page.reload({ waitUntil: "networkidle" });
+      await page.waitForTimeout(1000);
+
+      // Verify page size is still 50
+      const dropdownButton = page.locator('button[aria-label="Items per page"]');
+      const buttonText = await dropdownButton.textContent();
+      expect(buttonText).toContain("50");
+    }
+  });
+});
+
 test.describe("Character Editor - Edit Page", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to library first

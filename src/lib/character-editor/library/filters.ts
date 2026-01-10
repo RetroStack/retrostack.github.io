@@ -82,10 +82,7 @@ export function hasActiveFilters(filters: LibraryFilterState): boolean {
  * Check if a character set matches the search query
  * Searches across name, description, source, manufacturer, system, chip, and locale
  */
-export function matchesSearchQuery(
-  set: SerializedCharacterSet,
-  query: string
-): boolean {
+export function matchesSearchQuery(set: SerializedCharacterSet, query: string): boolean {
   if (!query.trim()) return true;
 
   const lowerQuery = query.toLowerCase();
@@ -106,7 +103,7 @@ export function matchesSearchQuery(
 export function matchesSizeFilters(
   set: SerializedCharacterSet,
   widthFilters: number[],
-  heightFilters: number[]
+  heightFilters: number[],
 ): boolean {
   if (widthFilters.length > 0 && !widthFilters.includes(set.config.width)) {
     return false;
@@ -120,37 +117,23 @@ export function matchesSizeFilters(
 /**
  * Check if a character set matches the manufacturer filter
  */
-export function matchesManufacturerFilter(
-  set: SerializedCharacterSet,
-  manufacturerFilters: string[]
-): boolean {
+export function matchesManufacturerFilter(set: SerializedCharacterSet, manufacturerFilters: string[]): boolean {
   if (manufacturerFilters.length === 0) return true;
-  return (
-    !!set.metadata.manufacturer &&
-    manufacturerFilters.includes(set.metadata.manufacturer)
-  );
+  return !!set.metadata.manufacturer && manufacturerFilters.includes(set.metadata.manufacturer);
 }
 
 /**
  * Check if a character set matches the system filter
  */
-export function matchesSystemFilter(
-  set: SerializedCharacterSet,
-  systemFilters: string[]
-): boolean {
+export function matchesSystemFilter(set: SerializedCharacterSet, systemFilters: string[]): boolean {
   if (systemFilters.length === 0) return true;
-  return (
-    !!set.metadata.system && systemFilters.includes(set.metadata.system)
-  );
+  return !!set.metadata.system && systemFilters.includes(set.metadata.system);
 }
 
 /**
  * Check if a character set matches the chip filter
  */
-export function matchesChipFilter(
-  set: SerializedCharacterSet,
-  chipFilters: string[]
-): boolean {
+export function matchesChipFilter(set: SerializedCharacterSet, chipFilters: string[]): boolean {
   if (chipFilters.length === 0) return true;
   return !!set.metadata.chip && chipFilters.includes(set.metadata.chip);
 }
@@ -158,10 +141,7 @@ export function matchesChipFilter(
 /**
  * Check if a character set matches the locale filter
  */
-export function matchesLocaleFilter(
-  set: SerializedCharacterSet,
-  localeFilters: string[]
-): boolean {
+export function matchesLocaleFilter(set: SerializedCharacterSet, localeFilters: string[]): boolean {
   if (localeFilters.length === 0) return true;
   return !!set.metadata.locale && localeFilters.includes(set.metadata.locale);
 }
@@ -169,10 +149,7 @@ export function matchesLocaleFilter(
 /**
  * Check if a character set matches the character count filter
  */
-export function matchesCharacterCountFilter(
-  set: SerializedCharacterSet,
-  characterCountFilters: number[]
-): boolean {
+export function matchesCharacterCountFilter(set: SerializedCharacterSet, characterCountFilters: number[]): boolean {
   if (characterCountFilters.length === 0) return true;
   return characterCountFilters.includes(getCharacterCount(set));
 }
@@ -180,10 +157,7 @@ export function matchesCharacterCountFilter(
 /**
  * Check if a character set matches all filters
  */
-export function matchesAllFilters(
-  set: SerializedCharacterSet,
-  filters: LibraryFilterState
-): boolean {
+export function matchesAllFilters(set: SerializedCharacterSet, filters: LibraryFilterState): boolean {
   return (
     matchesSearchQuery(set, filters.searchQuery) &&
     matchesSizeFilters(set, filters.widthFilters, filters.heightFilters) &&
@@ -200,7 +174,7 @@ export function matchesAllFilters(
  */
 export function filterCharacterSets(
   sets: SerializedCharacterSet[],
-  filters: LibraryFilterState
+  filters: LibraryFilterState,
 ): SerializedCharacterSet[] {
   return sets.filter((set) => matchesAllFilters(set, filters));
 }
@@ -208,18 +182,12 @@ export function filterCharacterSets(
 /**
  * Compare two character sets by the specified field
  */
-export function compareByField(
-  a: SerializedCharacterSet,
-  b: SerializedCharacterSet,
-  field: SortField
-): number {
+export function compareByField(a: SerializedCharacterSet, b: SerializedCharacterSet, field: SortField): number {
   switch (field) {
     case "name":
       return a.metadata.name.localeCompare(b.metadata.name);
     case "description":
-      return (a.metadata.description || "").localeCompare(
-        b.metadata.description || ""
-      );
+      return (a.metadata.description || "").localeCompare(b.metadata.description || "");
     case "source":
       return (a.metadata.source || "").localeCompare(b.metadata.source || "");
     case "updatedAt":
@@ -238,9 +206,7 @@ export function compareByField(
     case "characters":
       return getCharacterCount(a) - getCharacterCount(b);
     case "manufacturer":
-      return (a.metadata.manufacturer || "").localeCompare(
-        b.metadata.manufacturer || ""
-      );
+      return (a.metadata.manufacturer || "").localeCompare(b.metadata.manufacturer || "");
     case "system":
       return (a.metadata.system || "").localeCompare(b.metadata.system || "");
     case "chip":
@@ -259,7 +225,7 @@ export function compareByField(
 export function sortCharacterSets(
   sets: SerializedCharacterSet[],
   field: SortField,
-  direction: SortDirection
+  direction: SortDirection,
 ): SerializedCharacterSet[] {
   return [...sets].sort((a, b) => {
     // Pinned items always come first
@@ -280,7 +246,7 @@ export function filterAndSortCharacterSets(
   sets: SerializedCharacterSet[],
   filters: LibraryFilterState,
   sortField: SortField,
-  sortDirection: SortDirection
+  sortDirection: SortDirection,
 ): SerializedCharacterSet[] {
   const filtered = filterCharacterSets(sets, filters);
   return sortCharacterSets(filtered, sortField, sortDirection);
@@ -293,9 +259,7 @@ export function filterAndSortCharacterSets(
 /**
  * Get unique manufacturers from character sets
  */
-export function getAvailableManufacturers(
-  sets: SerializedCharacterSet[]
-): string[] {
+export function getAvailableManufacturers(sets: SerializedCharacterSet[]): string[] {
   const manufacturers = new Set<string>();
   for (const set of sets) {
     if (set.metadata.manufacturer) {
@@ -309,18 +273,11 @@ export function getAvailableManufacturers(
  * Get unique systems from character sets
  * If manufacturerFilters is provided, only returns systems for those manufacturers
  */
-export function getAvailableSystems(
-  sets: SerializedCharacterSet[],
-  manufacturerFilters?: string[]
-): string[] {
+export function getAvailableSystems(sets: SerializedCharacterSet[], manufacturerFilters?: string[]): string[] {
   const systems = new Set<string>();
   const setsToCheck =
     manufacturerFilters && manufacturerFilters.length > 0
-      ? sets.filter(
-          (set) =>
-            set.metadata.manufacturer &&
-            manufacturerFilters.includes(set.metadata.manufacturer)
-        )
+      ? sets.filter((set) => set.metadata.manufacturer && manufacturerFilters.includes(set.metadata.manufacturer))
       : sets;
 
   for (const set of setsToCheck) {
@@ -360,9 +317,7 @@ export function getAvailableLocales(sets: SerializedCharacterSet[]): string[] {
 /**
  * Get unique character counts from character sets
  */
-export function getAvailableCharacterCounts(
-  sets: SerializedCharacterSet[]
-): number[] {
+export function getAvailableCharacterCounts(sets: SerializedCharacterSet[]): number[] {
   const counts = new Set<number>();
   for (const set of sets) {
     counts.add(getCharacterCount(set));
@@ -376,7 +331,7 @@ export function getAvailableCharacterCounts(
  */
 export function getValidSystemsForManufacturers(
   sets: SerializedCharacterSet[],
-  manufacturerFilters: string[]
+  manufacturerFilters: string[],
 ): Set<string> {
   if (manufacturerFilters.length === 0) {
     return new Set(getAvailableSystems(sets));
@@ -384,11 +339,7 @@ export function getValidSystemsForManufacturers(
 
   const validSystems = new Set<string>();
   for (const set of sets) {
-    if (
-      set.metadata.manufacturer &&
-      manufacturerFilters.includes(set.metadata.manufacturer) &&
-      set.metadata.system
-    ) {
+    if (set.metadata.manufacturer && manufacturerFilters.includes(set.metadata.manufacturer) && set.metadata.system) {
       validSystems.add(set.metadata.system);
     }
   }
@@ -401,7 +352,7 @@ export function getValidSystemsForManufacturers(
 export function filterInvalidSystems(
   currentSystemFilters: string[],
   sets: SerializedCharacterSet[],
-  manufacturerFilters: string[]
+  manufacturerFilters: string[],
 ): string[] {
   if (manufacturerFilters.length === 0) {
     return currentSystemFilters;
@@ -409,4 +360,90 @@ export function filterInvalidSystems(
 
   const validSystems = getValidSystemsForManufacturers(sets, manufacturerFilters);
   return currentSystemFilters.filter((s) => validSystems.has(s));
+}
+
+// ============================================================================
+// Pagination
+// ============================================================================
+
+/**
+ * Available page size options
+ * "all" means show all items without pagination
+ */
+export const PAGE_SIZE_OPTIONS = [20, 50, 100, "all"] as const;
+export type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+
+/**
+ * Default page size
+ */
+export const DEFAULT_PAGE_SIZE: PageSize = 20;
+
+/**
+ * Pagination state
+ */
+export interface PaginationState {
+  currentPage: number;
+  pageSize: PageSize;
+}
+
+/**
+ * Pagination result with metadata
+ */
+export interface PaginatedResult<T> {
+  items: T[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: PageSize;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+/**
+ * Apply pagination to an array of items
+ */
+export function paginateItems<T>(items: T[], currentPage: number, pageSize: PageSize): PaginatedResult<T> {
+  const totalItems = items.length;
+
+  // "all" means show all items without pagination
+  if (pageSize === "all") {
+    return {
+      items,
+      totalItems,
+      totalPages: 1,
+      currentPage: 1,
+      pageSize,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    };
+  }
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  // Ensure current page is within valid range
+  const validatedPage = Math.max(1, Math.min(currentPage, totalPages));
+  const startIndex = (validatedPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  return {
+    items: items.slice(startIndex, endIndex),
+    totalItems,
+    totalPages,
+    currentPage: validatedPage,
+    pageSize,
+    hasNextPage: validatedPage < totalPages,
+    hasPreviousPage: validatedPage > 1,
+  };
+}
+
+/**
+ * Validate and parse page size from storage
+ */
+export function parsePageSize(value: string | null): PageSize {
+  if (!value) return DEFAULT_PAGE_SIZE;
+  if (value === "all") return "all";
+  const parsed = parseInt(value, 10);
+  if (PAGE_SIZE_OPTIONS.includes(parsed as PageSize)) {
+    return parsed as PageSize;
+  }
+  return DEFAULT_PAGE_SIZE;
 }

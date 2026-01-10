@@ -27,9 +27,14 @@ import {
   filterInvalidSystems,
   hasActiveFilters,
   createEmptyFilterState,
+  paginateItems,
+  parsePageSize,
+  PAGE_SIZE_OPTIONS,
+  DEFAULT_PAGE_SIZE,
   type LibraryFilterState,
   type SortField,
   type SortDirection,
+  type PageSize,
 } from "@/lib/character-editor/library/filters";
 
 import {
@@ -1041,5 +1046,209 @@ describe("Edge Cases", () => {
     const result2 = filterCharacterSets(sampleCharacterSets, complexFilter);
 
     expect(result1).toEqual(result2);
+  });
+});
+
+// ============================================================================
+// Pagination
+// ============================================================================
+
+describe("paginateItems", () => {
+  // Create test data
+  const testItems = Array.from({ length: 75 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
+
+  describe("basic pagination", () => {
+    it("returns first page of items with correct metadata", () => {
+      const result = paginateItems(testItems, 1, 20);
+
+      expect(result.items).toHaveLength(20);
+      expect(result.items[0]).toEqual({ id: 1, name: "Item 1" });
+      expect(result.items[19]).toEqual({ id: 20, name: "Item 20" });
+      expect(result.totalItems).toBe(75);
+      expect(result.totalPages).toBe(4);
+      expect(result.currentPage).toBe(1);
+      expect(result.pageSize).toBe(20);
+      expect(result.hasNextPage).toBe(true);
+      expect(result.hasPreviousPage).toBe(false);
+    });
+
+    it("returns second page of items", () => {
+      const result = paginateItems(testItems, 2, 20);
+
+      expect(result.items).toHaveLength(20);
+      expect(result.items[0]).toEqual({ id: 21, name: "Item 21" });
+      expect(result.items[19]).toEqual({ id: 40, name: "Item 40" });
+      expect(result.currentPage).toBe(2);
+      expect(result.hasNextPage).toBe(true);
+      expect(result.hasPreviousPage).toBe(true);
+    });
+
+    it("returns last page with partial items", () => {
+      const result = paginateItems(testItems, 4, 20);
+
+      expect(result.items).toHaveLength(15); // 75 - 60 = 15 remaining
+      expect(result.items[0]).toEqual({ id: 61, name: "Item 61" });
+      expect(result.items[14]).toEqual({ id: 75, name: "Item 75" });
+      expect(result.currentPage).toBe(4);
+      expect(result.hasNextPage).toBe(false);
+      expect(result.hasPreviousPage).toBe(true);
+    });
+  });
+
+  describe("page size options", () => {
+    it("handles 50 items per page", () => {
+      const result = paginateItems(testItems, 1, 50);
+
+      expect(result.items).toHaveLength(50);
+      expect(result.totalPages).toBe(2);
+      expect(result.pageSize).toBe(50);
+    });
+
+    it("handles 100 items per page", () => {
+      const result = paginateItems(testItems, 1, 100);
+
+      expect(result.items).toHaveLength(75); // All items fit on one page
+      expect(result.totalPages).toBe(1);
+      expect(result.pageSize).toBe(100);
+      expect(result.hasNextPage).toBe(false);
+      expect(result.hasPreviousPage).toBe(false);
+    });
+  });
+
+  describe("all option", () => {
+    it("returns all items when pageSize is 'all'", () => {
+      const result = paginateItems(testItems, 1, "all");
+
+      expect(result.items).toHaveLength(75);
+      expect(result.items).toEqual(testItems);
+      expect(result.totalItems).toBe(75);
+      expect(result.totalPages).toBe(1);
+      expect(result.currentPage).toBe(1);
+      expect(result.pageSize).toBe("all");
+      expect(result.hasNextPage).toBe(false);
+      expect(result.hasPreviousPage).toBe(false);
+    });
+
+    it("ignores currentPage when pageSize is 'all'", () => {
+      const result = paginateItems(testItems, 5, "all");
+
+      expect(result.items).toHaveLength(75);
+      expect(result.currentPage).toBe(1);
+    });
+
+    it("works with empty array and 'all' pageSize", () => {
+      const result = paginateItems([], 1, "all");
+
+      expect(result.items).toHaveLength(0);
+      expect(result.totalItems).toBe(0);
+      expect(result.totalPages).toBe(1);
+    });
+  });
+
+  describe("edge cases", () => {
+    it("handles empty array", () => {
+      const result = paginateItems([], 1, 20);
+
+      expect(result.items).toHaveLength(0);
+      expect(result.totalItems).toBe(0);
+      expect(result.totalPages).toBe(1);
+      expect(result.currentPage).toBe(1);
+      expect(result.hasNextPage).toBe(false);
+      expect(result.hasPreviousPage).toBe(false);
+    });
+
+    it("clamps page to valid range when page is 0", () => {
+      const result = paginateItems(testItems, 0, 20);
+
+      expect(result.currentPage).toBe(1);
+      expect(result.items[0]).toEqual({ id: 1, name: "Item 1" });
+    });
+
+    it("clamps page to valid range when page is negative", () => {
+      const result = paginateItems(testItems, -5, 20);
+
+      expect(result.currentPage).toBe(1);
+      expect(result.items[0]).toEqual({ id: 1, name: "Item 1" });
+    });
+
+    it("clamps page to valid range when page exceeds total", () => {
+      const result = paginateItems(testItems, 100, 20);
+
+      expect(result.currentPage).toBe(4); // Last valid page
+      expect(result.items[0]).toEqual({ id: 61, name: "Item 61" });
+    });
+
+    it("handles single item", () => {
+      const result = paginateItems([{ id: 1 }], 1, 20);
+
+      expect(result.items).toHaveLength(1);
+      expect(result.totalItems).toBe(1);
+      expect(result.totalPages).toBe(1);
+    });
+
+    it("handles exact page boundary", () => {
+      const exactItems = Array.from({ length: 40 }, (_, i) => ({ id: i + 1 }));
+      const result = paginateItems(exactItems, 2, 20);
+
+      expect(result.items).toHaveLength(20);
+      expect(result.totalPages).toBe(2);
+      expect(result.hasNextPage).toBe(false);
+      expect(result.hasPreviousPage).toBe(true);
+    });
+  });
+});
+
+describe("parsePageSize", () => {
+  it("returns default page size for null value", () => {
+    expect(parsePageSize(null)).toBe(DEFAULT_PAGE_SIZE);
+  });
+
+  it("returns default page size for empty string", () => {
+    expect(parsePageSize("")).toBe(DEFAULT_PAGE_SIZE);
+  });
+
+  it("parses valid numeric page sizes", () => {
+    expect(parsePageSize("20")).toBe(20);
+    expect(parsePageSize("50")).toBe(50);
+    expect(parsePageSize("100")).toBe(100);
+  });
+
+  it("parses 'all' string", () => {
+    expect(parsePageSize("all")).toBe("all");
+  });
+
+  it("returns default for invalid numeric values", () => {
+    expect(parsePageSize("25")).toBe(DEFAULT_PAGE_SIZE); // Not in options
+    expect(parsePageSize("0")).toBe(DEFAULT_PAGE_SIZE);
+    expect(parsePageSize("-1")).toBe(DEFAULT_PAGE_SIZE);
+    expect(parsePageSize("999")).toBe(DEFAULT_PAGE_SIZE);
+  });
+
+  it("returns default for non-numeric strings", () => {
+    expect(parsePageSize("abc")).toBe(DEFAULT_PAGE_SIZE);
+    expect(parsePageSize("twenty")).toBe(DEFAULT_PAGE_SIZE);
+  });
+});
+
+describe("PAGE_SIZE_OPTIONS", () => {
+  it("contains expected values", () => {
+    expect(PAGE_SIZE_OPTIONS).toContain(20);
+    expect(PAGE_SIZE_OPTIONS).toContain(50);
+    expect(PAGE_SIZE_OPTIONS).toContain(100);
+    expect(PAGE_SIZE_OPTIONS).toContain("all");
+  });
+
+  it("has 4 options", () => {
+    expect(PAGE_SIZE_OPTIONS).toHaveLength(4);
+  });
+});
+
+describe("DEFAULT_PAGE_SIZE", () => {
+  it("is a valid page size option", () => {
+    expect(PAGE_SIZE_OPTIONS).toContain(DEFAULT_PAGE_SIZE);
+  });
+
+  it("is 20", () => {
+    expect(DEFAULT_PAGE_SIZE).toBe(20);
   });
 });

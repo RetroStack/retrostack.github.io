@@ -33,11 +33,16 @@ import {
   getAvailableLocales,
   getAvailableCharacterCounts,
   filterInvalidSystems,
+  paginateItems,
+  parsePageSize,
+  DEFAULT_PAGE_SIZE,
   type LibraryFilterState,
+  type PageSize,
 } from "@/lib/character-editor/library/filters";
 import {
   CHARACTER_EDITOR_STORAGE_KEY_SORT_FIELD,
   CHARACTER_EDITOR_STORAGE_KEY_SORT_DIRECTION,
+  CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE,
 } from "@/lib/character-editor/storage/keys";
 
 // Default sort settings
@@ -84,17 +89,25 @@ export function CharacterEditorLibrary() {
   const [sortField, setSortField] = useState<SortField>(DEFAULT_SORT_FIELD);
   const [sortDirection, setSortDirection] = useState<SortDirection>(DEFAULT_SORT_DIRECTION);
 
-  // Load sort preferences from localStorage on mount
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<PageSize>(DEFAULT_PAGE_SIZE);
+
+  // Load sort and pagination preferences from localStorage on mount
   useEffect(() => {
     try {
       const storedSortField = localStorage.getItem(CHARACTER_EDITOR_STORAGE_KEY_SORT_FIELD);
       const storedSortDirection = localStorage.getItem(CHARACTER_EDITOR_STORAGE_KEY_SORT_DIRECTION);
+      const storedPageSize = localStorage.getItem(CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE);
 
       if (storedSortField) {
         setSortField(storedSortField as SortField);
       }
       if (storedSortDirection) {
         setSortDirection(storedSortDirection as SortDirection);
+      }
+      if (storedPageSize) {
+        setPageSize(parsePageSize(storedPageSize));
       }
     } catch {
       // localStorage might not be available (e.g., private browsing)
@@ -156,6 +169,17 @@ export function CharacterEditorLibrary() {
     () => filterAndSortCharacterSets(characterSets, filterState, sortField, sortDirection),
     [characterSets, filterState, sortField, sortDirection],
   );
+
+  // Apply pagination to filtered results
+  const paginatedResult = useMemo(
+    () => paginateItems(filteredSets, currentPage, pageSize),
+    [filteredSets, currentPage, pageSize],
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterState]);
 
   // Handlers
   const handleEdit = useCallback(
@@ -329,6 +353,20 @@ export function CharacterEditorLibrary() {
     });
   }, []);
 
+  const handlePageSizeChange = useCallback((newPageSize: PageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when page size changes
+    try {
+      localStorage.setItem(CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE, String(newPageSize));
+    } catch {
+      // localStorage might not be available
+    }
+  }, []);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setWidthFilters([]);
@@ -451,6 +489,9 @@ export function CharacterEditorLibrary() {
               onSortDirectionToggle={handleSortDirectionToggle}
               totalCount={characterSets.length}
               filteredCount={filteredSets.length}
+              pagination={paginatedResult}
+              onPageSizeChange={handlePageSizeChange}
+              onPageChange={handlePageChange}
             />
           </div>
 
@@ -461,7 +502,7 @@ export function CharacterEditorLibrary() {
             <LibraryGridEmptyResults onClearFilters={handleClearFilters} />
           ) : (
             <LibraryGrid
-              characterSets={filteredSets}
+              characterSets={paginatedResult.items}
               loading={loading}
               onEdit={handleEdit}
               onExport={handleExport}
