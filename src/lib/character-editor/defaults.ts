@@ -42,6 +42,8 @@ export interface ChargenSourceData {
   bitDirection: "ltr" | "rtl";
   /** Padding direction: "left" = padding bits at start, "right" = padding bits at end (default: "right") */
   bitPadding?: "left" | "right";
+  /** Version number for built-in character sets (used for auto-updates) */
+  version: number;
   /** Raw character data - array of byte arrays per character */
   data: number[][];
 }
@@ -92,6 +94,7 @@ function createCharacterSetFromSource(
       createdAt: now,
       updatedAt: now,
       isBuiltIn: true,
+      builtInVersion: source.version,
     },
     config: {
       width: source.width,
@@ -132,6 +135,15 @@ export function getBuiltInCharacterSetById(id: string): SerializedCharacterSet |
  */
 export function isBuiltInCharacterSet(id: string): boolean {
   return builtinCharsets.some((source) => source.id === id);
+}
+
+/**
+ * Get the current version of a built-in character set
+ * Returns null if the ID is not a built-in character set
+ */
+export function getBuiltInVersion(id: string): number | null {
+  const source = builtinCharsets.find((s) => s.id === id);
+  return source?.version ?? null;
 }
 
 // =============================================================================

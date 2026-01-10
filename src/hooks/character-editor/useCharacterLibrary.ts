@@ -23,6 +23,7 @@ import { deserializeCharacterSet, serializeCharacterSet } from "@/lib/character-
 import {
   getBuiltInIds,
   getBuiltInCharacterSetById,
+  getBuiltInVersion,
   getExternalIds,
   getExternalCharacterSetById,
 } from "@/lib/character-editor/defaults";
@@ -103,13 +104,29 @@ export function useCharacterLibrary(options?: UseCharacterLibraryOptions): UseCh
 
       // Get all existing character set IDs from the database
       const existingSets = await storage.getAll();
-      const existingIds = new Set(existingSets.map((set) => set.metadata.id));
+      const existingById = new Map(existingSets.map((set) => [set.metadata.id, set]));
 
-      // Get all built-in IDs and find which ones are missing
+      // Get all built-in IDs and find which ones are missing or outdated
       const builtInIds = getBuiltInIds();
-      const missingBuiltInIds = builtInIds.filter((id) => !existingIds.has(id));
+      const missingBuiltInIds: string[] = [];
+      const outdatedBuiltInIds: string[] = [];
 
-      // Import only the missing built-in character sets
+      for (const id of builtInIds) {
+        const existing = existingById.get(id);
+        if (!existing) {
+          // Built-in doesn't exist in storage
+          missingBuiltInIds.push(id);
+        } else {
+          // Check if the built-in version is newer than stored version
+          const currentVersion = getBuiltInVersion(id);
+          const storedVersion = existing.metadata.builtInVersion ?? 0;
+          if (currentVersion !== null && currentVersion > storedVersion) {
+            outdatedBuiltInIds.push(id);
+          }
+        }
+      }
+
+      // Import missing built-in character sets
       if (missingBuiltInIds.length > 0) {
         for (const id of missingBuiltInIds) {
           const builtInSet = getBuiltInCharacterSetById(id);
@@ -119,9 +136,22 @@ export function useCharacterLibrary(options?: UseCharacterLibraryOptions): UseCh
         }
       }
 
+      // Update outdated built-in character sets (preserving pinned state)
+      if (outdatedBuiltInIds.length > 0) {
+        for (const id of outdatedBuiltInIds) {
+          const existing = existingById.get(id);
+          const builtInSet = getBuiltInCharacterSetById(id);
+          if (builtInSet && existing) {
+            // Preserve user preferences (pinned state)
+            builtInSet.metadata.isPinned = existing.metadata.isPinned;
+            await storage.save(builtInSet);
+          }
+        }
+      }
+
       // Fetch external character sets and import missing ones
       const externalIds = await getExternalIds();
-      const missingExternalIds = externalIds.filter((id) => !existingIds.has(id));
+      const missingExternalIds = externalIds.filter((id) => !existingById.has(id));
 
       if (missingExternalIds.length > 0) {
         for (const id of missingExternalIds) {
@@ -132,9 +162,9 @@ export function useCharacterLibrary(options?: UseCharacterLibraryOptions): UseCh
         }
       }
 
-      // Load all character sets (including newly added ones)
-      const hasNewSets = missingBuiltInIds.length > 0 || missingExternalIds.length > 0;
-      const sets = hasNewSets ? await storage.getAll() : existingSets;
+      // Load all character sets (including newly added or updated ones)
+      const hasChanges = missingBuiltInIds.length > 0 || outdatedBuiltInIds.length > 0 || missingExternalIds.length > 0;
+      const sets = hasChanges ? await storage.getAll() : existingSets;
       setCharacterSets(sets);
 
       // Get available sizes for filtering

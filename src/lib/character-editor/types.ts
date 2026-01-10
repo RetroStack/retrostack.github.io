@@ -71,6 +71,8 @@ export interface CharacterSetMetadata {
   isBuiltIn: boolean;
   /** Whether this character set is pinned to appear first in search results */
   isPinned?: boolean;
+  /** Version of the built-in character set (used for auto-updates, only for isBuiltIn: true) */
+  builtInVersion?: number;
 }
 
 /**
