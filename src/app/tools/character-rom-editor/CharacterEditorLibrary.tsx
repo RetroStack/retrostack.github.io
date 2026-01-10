@@ -8,9 +8,17 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { NeonText } from "@/components/effects/NeonText";
-import { LibraryGrid, LibraryGridEmptyResults, LibraryGridError } from "@/components/character-editor/library/LibraryGrid";
+import {
+  LibraryGrid,
+  LibraryGridEmptyResults,
+  LibraryGridError,
+} from "@/components/character-editor/library/LibraryGrid";
 import { MetadataEditModal } from "./edit/modals/MetadataEditModal";
-import { LibraryFilters, type SortField, type SortDirection } from "@/components/character-editor/library/LibraryFilters";
+import {
+  LibraryFilters,
+  type SortField,
+  type SortDirection,
+} from "@/components/character-editor/library/LibraryFilters";
 import { OnboardingTour } from "@/components/character-editor/help/OnboardingTour";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
@@ -94,30 +102,18 @@ export function CharacterEditorLibrary() {
   }, []);
 
   // Get available filter options from character sets using pure functions
-  const availableManufacturers = useMemo(
-    () => getAvailableManufacturers(characterSets),
-    [characterSets]
-  );
+  const availableManufacturers = useMemo(() => getAvailableManufacturers(characterSets), [characterSets]);
 
   const availableSystems = useMemo(
     () => getAvailableSystems(characterSets, manufacturerFilters),
-    [characterSets, manufacturerFilters]
+    [characterSets, manufacturerFilters],
   );
 
-  const availableChips = useMemo(
-    () => getAvailableChips(characterSets),
-    [characterSets]
-  );
+  const availableChips = useMemo(() => getAvailableChips(characterSets), [characterSets]);
 
-  const availableLocales = useMemo(
-    () => getAvailableLocales(characterSets),
-    [characterSets]
-  );
+  const availableLocales = useMemo(() => getAvailableLocales(characterSets), [characterSets]);
 
-  const availableCharacterCounts = useMemo(
-    () => getAvailableCharacterCounts(characterSets),
-    [characterSets]
-  );
+  const availableCharacterCounts = useMemo(() => getAvailableCharacterCounts(characterSets), [characterSets]);
 
   // Delete confirmation state
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -143,13 +139,22 @@ export function CharacterEditorLibrary() {
       chipFilters,
       localeFilters,
     }),
-    [searchQuery, widthFilters, heightFilters, characterCountFilters, manufacturerFilters, systemFilters, chipFilters, localeFilters]
+    [
+      searchQuery,
+      widthFilters,
+      heightFilters,
+      characterCountFilters,
+      manufacturerFilters,
+      systemFilters,
+      chipFilters,
+      localeFilters,
+    ],
   );
 
   // Filter and sort character sets using pure function
   const filteredSets = useMemo(
     () => filterAndSortCharacterSets(characterSets, filterState, sortField, sortDirection),
-    [characterSets, filterState, sortField, sortDirection]
+    [characterSets, filterState, sortField, sortDirection],
   );
 
   // Handlers
@@ -157,14 +162,14 @@ export function CharacterEditorLibrary() {
     (id: string) => {
       router.push(`/tools/character-rom-editor/edit?id=${id}`);
     },
-    [router]
+    [router],
   );
 
   const handleExport = useCallback(
     (id: string) => {
       router.push(`/tools/character-rom-editor/export?id=${id}`);
     },
-    [router]
+    [router],
   );
 
   const handleDelete = useCallback(async (id: string) => {
@@ -202,7 +207,7 @@ export function CharacterEditorLibrary() {
         toast.error("Failed to duplicate character set");
       }
     },
-    [getById, saveAs, router, toast]
+    [getById, saveAs, router, toast],
   );
 
   const handleImport = useCallback(() => {
@@ -213,37 +218,46 @@ export function CharacterEditorLibrary() {
     router.push("/tools/character-rom-editor/add");
   }, [router]);
 
-  const handleRename = useCallback((id: string) => {
-    const set = characterSets.find((s) => s.metadata.id === id);
-    if (set) {
-      setRenameId(id);
-      setRenameName(set.metadata.name);
-    }
-  }, [characterSets]);
+  const handleRename = useCallback(
+    (id: string) => {
+      const set = characterSets.find((s) => s.metadata.id === id);
+      if (set) {
+        setRenameId(id);
+        setRenameName(set.metadata.name);
+      }
+    },
+    [characterSets],
+  );
 
-  const handleTogglePinned = useCallback(async (id: string) => {
-    try {
-      await togglePinned(id);
-    } catch (e) {
-      console.error("Failed to toggle pinned:", e);
-    }
-  }, [togglePinned]);
+  const handleTogglePinned = useCallback(
+    async (id: string) => {
+      try {
+        await togglePinned(id);
+      } catch (e) {
+        console.error("Failed to toggle pinned:", e);
+      }
+    },
+    [togglePinned],
+  );
 
   const handleEditMetadata = useCallback((id: string) => {
     setEditMetadataId(id);
   }, []);
 
-  const handleSaveMetadata = useCallback(async (metadata: Parameters<typeof updateMetadata>[1]) => {
-    if (!editMetadataId) return;
+  const handleSaveMetadata = useCallback(
+    async (metadata: Parameters<typeof updateMetadata>[1]) => {
+      if (!editMetadataId) return;
 
-    try {
-      await updateMetadata(editMetadataId, metadata);
-      toast.success("Metadata updated");
-    } catch (e) {
-      console.error("Failed to update metadata:", e);
-      toast.error("Failed to update metadata");
-    }
-  }, [editMetadataId, updateMetadata, toast]);
+      try {
+        await updateMetadata(editMetadataId, metadata);
+        toast.success("Metadata updated");
+      } catch (e) {
+        console.error("Failed to update metadata:", e);
+        toast.error("Failed to update metadata");
+      }
+    },
+    [editMetadataId, updateMetadata, toast],
+  );
 
   const confirmRename = useCallback(async () => {
     if (!renameId || !renameName.trim()) return;
@@ -262,21 +276,21 @@ export function CharacterEditorLibrary() {
     }
   }, [renameId, renameName, rename, toast]);
 
-  const handleSizeFilterChange = useCallback(
-    (widths: number[], heights: number[]) => {
-      setWidthFilters(widths);
-      setHeightFilters(heights);
-    },
-    []
-  );
+  const handleSizeFilterChange = useCallback((widths: number[], heights: number[]) => {
+    setWidthFilters(widths);
+    setHeightFilters(heights);
+  }, []);
 
-  const handleManufacturerFilterChange = useCallback((manufacturers: string[]) => {
-    setManufacturerFilters(manufacturers);
-    // Clear system filters that are no longer valid for the selected manufacturers
-    if (manufacturers.length > 0) {
-      setSystemFilters((prev) => filterInvalidSystems(prev, characterSets, manufacturers));
-    }
-  }, [characterSets]);
+  const handleManufacturerFilterChange = useCallback(
+    (manufacturers: string[]) => {
+      setManufacturerFilters(manufacturers);
+      // Clear system filters that are no longer valid for the selected manufacturers
+      if (manufacturers.length > 0) {
+        setSystemFilters((prev) => filterInvalidSystems(prev, characterSets, manufacturers));
+      }
+    },
+    [characterSets],
+  );
 
   const handleSystemFilterChange = useCallback((systems: string[]) => {
     setSystemFilters(systems);
@@ -330,19 +344,13 @@ export function CharacterEditorLibrary() {
   const hasActiveFilters = checkActiveFilters(filterState);
 
   // Find the set being deleted for confirmation
-  const setToDelete = deleteId
-    ? characterSets.find((s) => s.metadata.id === deleteId)
-    : null;
+  const setToDelete = deleteId ? characterSets.find((s) => s.metadata.id === deleteId) : null;
 
   // Find the set being renamed
-  const setToRename = renameId
-    ? characterSets.find((s) => s.metadata.id === renameId)
-    : null;
+  const setToRename = renameId ? characterSets.find((s) => s.metadata.id === renameId) : null;
 
   // Find the set for metadata editing
-  const setToEditMetadata = editMetadataId
-    ? characterSets.find((s) => s.metadata.id === editMetadataId)
-    : null;
+  const setToEditMetadata = editMetadataId ? characterSets.find((s) => s.metadata.id === editMetadataId) : null;
 
   return (
     <div className="min-h-screen flex flex-col safe-top">
@@ -357,18 +365,8 @@ export function CharacterEditorLibrary() {
                 href="/tools"
                 className="text-xs text-gray-500 hover:text-retro-cyan transition-colors mb-2 inline-flex items-center gap-1"
               >
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Tools
               </Link>
@@ -376,8 +374,7 @@ export function CharacterEditorLibrary() {
                 <NeonText color="pink">Character ROM Editor</NeonText>
               </h1>
               <p className="text-sm text-gray-400 mt-2">
-                Design, edit, and export character sets for vintage display
-                systems
+                Design, edit, and export character sets for vintage computer systems
               </p>
             </div>
 
@@ -389,7 +386,12 @@ export function CharacterEditorLibrary() {
                     className="text-xs text-gray-500 hover:text-retro-cyan transition-colors flex items-center mr-2"
                   >
                     <svg className="w-4 h-4 min-[1120px]:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span className="hidden min-[1120px]:inline">Tour</span>
                   </button>
@@ -406,7 +408,12 @@ export function CharacterEditorLibrary() {
               <Tooltip content="Import from binary, image, font, or code" position="bottom">
                 <Button href="/tools/character-rom-editor/import" variant="cyan">
                   <svg className="w-4 h-4 min-[1120px]:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
                   </svg>
                   <span className="hidden min-[1120px]:inline">Import ROM</span>
                 </Button>
@@ -476,16 +483,11 @@ export function CharacterEditorLibrary() {
       {deleteId && setToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setDeleteId(null)}
-          />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setDeleteId(null)} />
 
           {/* Modal */}
           <div className="relative bg-retro-navy border border-retro-grid/50 rounded-lg p-6 max-w-md w-full shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-200 mb-2">
-              Delete Character Set
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-200 mb-2">Delete Character Set</h2>
             <p className="text-sm text-gray-400 mb-4">
               Are you sure you want to delete &quot;{setToDelete.metadata.name}
               &quot;? This action cannot be undone.
@@ -525,9 +527,7 @@ export function CharacterEditorLibrary() {
 
           {/* Modal */}
           <div className="relative bg-retro-navy border border-retro-grid/50 rounded-lg p-6 max-w-md w-full shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-200 mb-4">
-              Rename Character Set
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-200 mb-4">Rename Character Set</h2>
 
             <input
               type="text"

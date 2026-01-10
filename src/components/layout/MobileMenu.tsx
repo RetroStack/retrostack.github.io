@@ -87,53 +87,59 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </div>
 
         <nav className="p-3 sm:p-4" aria-label="Main navigation">
-          {NAV_ITEMS.map((item) => (
-            <div key={item.label} className="border-b border-retro-grid/50">
-              {item.children ? (
-                <>
-                  <button
-                    onClick={() =>
-                      setExpandedItem(expandedItem === item.label ? null : item.label)
-                    }
-                    className="w-full flex items-center justify-between touch-target font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
-                    aria-expanded={expandedItem === item.label}
+          {NAV_ITEMS.filter((item) => item.enabled).map((item) => {
+            // Filter children to only show enabled ones
+            const enabledChildren = item.children?.filter((child) => child.enabled);
+            const hasEnabledChildren = enabledChildren && enabledChildren.length > 0;
+
+            return (
+              <div key={item.label} className="border-b border-retro-grid/50">
+                {hasEnabledChildren ? (
+                  <>
+                    <button
+                      onClick={() =>
+                        setExpandedItem(expandedItem === item.label ? null : item.label)
+                      }
+                      className="w-full flex items-center justify-between touch-target font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
+                      aria-expanded={expandedItem === item.label}
+                    >
+                      {item.label}
+                      <span
+                        className={`text-retro-cyan transition-transform duration-200 ${
+                          expandedItem === item.label ? "rotate-180" : ""
+                        }`}
+                      >
+                        ▼
+                      </span>
+                    </button>
+
+                    {expandedItem === item.label && (
+                      <div className="pb-3 pl-4 space-y-1">
+                        {enabledChildren.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            onClick={onClose}
+                            className="block touch-target flex items-center text-sm text-gray-400 hover:text-retro-cyan transition-colors"
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    className="block touch-target flex items-center font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
                   >
                     {item.label}
-                    <span
-                      className={`text-retro-cyan transition-transform duration-200 ${
-                        expandedItem === item.label ? "rotate-180" : ""
-                      }`}
-                    >
-                      ▼
-                    </span>
-                  </button>
-
-                  {expandedItem === item.label && (
-                    <div className="pb-3 pl-4 space-y-1">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          onClick={onClose}
-                          className="block touch-target flex items-center text-sm text-gray-400 hover:text-retro-cyan transition-colors"
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <Link
-                  href={item.href}
-                  onClick={onClose}
-                  className="block touch-target flex items-center font-ui text-sm uppercase tracking-wider text-gray-300 hover:text-retro-cyan transition-colors"
-                >
-                  {item.label}
-                </Link>
-              )}
-            </div>
-          ))}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* Social Links */}

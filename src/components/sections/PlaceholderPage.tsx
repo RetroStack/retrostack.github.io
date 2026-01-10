@@ -6,7 +6,8 @@
  * - Optional icon
  * - Page title with NeonText styling
  * - Description text
- * - Animated "Coming Soon" badge
+ * - Optional list of enabled sub-page links
+ * - Animated "Coming Soon" badge (when no sub-pages)
  * - Back navigation link
  *
  * Use this component to create placeholder pages for planned features
@@ -30,12 +31,19 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";
 
+interface SubPageLink {
+  label: string;
+  href: string;
+  description: string;
+}
+
 interface PlaceholderPageProps {
   title: string;
   description: string;
   backLink: string;
   backLabel: string;
   icon?: React.ReactNode;
+  subPages?: SubPageLink[];
 }
 
 export function PlaceholderPage({
@@ -44,7 +52,10 @@ export function PlaceholderPage({
   backLink,
   backLabel,
   icon,
+  subPages,
 }: PlaceholderPageProps) {
+  const hasSubPages = subPages && subPages.length > 0;
+
   return (
     <>
       <Header />
@@ -67,13 +78,30 @@ export function PlaceholderPage({
             {description}
           </p>
 
-          {/* Coming Soon Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-retro-violet/50 bg-retro-purple/20 mb-12">
-            <span className="w-2 h-2 rounded-full bg-retro-cyan animate-pulse" />
-            <span className="text-retro-cyan text-sm font-ui uppercase tracking-wider">
-              Coming Soon
-            </span>
-          </div>
+          {/* Sub-pages grid or Coming Soon Badge */}
+          {hasSubPages ? (
+            <div className="grid gap-4 sm:gap-6 w-full max-w-2xl mb-12" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(250px, 100%), 1fr))" }}>
+              {subPages.map((page) => (
+                <Link
+                  key={page.href}
+                  href={page.href}
+                  className="card-retro p-4 sm:p-6 hover-glow-cyan group block text-left"
+                >
+                  <h3 className="font-ui text-base sm:text-lg text-white mb-2 group-hover:text-retro-cyan transition-colors duration-300">
+                    {page.label}
+                  </h3>
+                  <p className="text-gray-400 text-xs sm:text-sm">{page.description}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-retro-violet/50 bg-retro-purple/20 mb-12">
+              <span className="w-2 h-2 rounded-full bg-retro-cyan animate-pulse" />
+              <span className="text-retro-cyan text-sm font-ui uppercase tracking-wider">
+                Coming Soon
+              </span>
+            </div>
+          )}
 
           {/* Back Link */}
           <Link

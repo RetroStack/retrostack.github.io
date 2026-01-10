@@ -40,26 +40,31 @@ export function Footer() {
               </p>
             </div>
 
-            {/* Navigation Links */}
-            {NAV_ITEMS.filter((section) => section.children).map((section) => (
-              <div key={section.label}>
-                <h3 className="font-ui text-xs sm:text-sm uppercase tracking-wider text-retro-cyan mb-3 sm:mb-4">
-                  {section.label}
-                </h3>
-                <ul className="space-y-1 sm:space-y-2">
-                  {section.children?.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="inline-flex items-center min-h-[36px] sm:min-h-[32px] text-sm text-text-secondary hover:text-retro-pink transition-colors duration-200"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {/* Navigation Links - only show enabled sections with enabled children */}
+            {NAV_ITEMS.filter((section) => section.enabled && section.children).map((section) => {
+              const enabledChildren = section.children?.filter((child) => child.enabled);
+              if (!enabledChildren || enabledChildren.length === 0) return null;
+
+              return (
+                <div key={section.label}>
+                  <h3 className="font-ui text-xs sm:text-sm uppercase tracking-wider text-retro-cyan mb-3 sm:mb-4">
+                    {section.label}
+                  </h3>
+                  <ul className="space-y-1 sm:space-y-2">
+                    {enabledChildren.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="inline-flex items-center min-h-[36px] sm:min-h-[32px] text-sm text-text-secondary hover:text-retro-pink transition-colors duration-200"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
 
           {/* Bottom Bar */}

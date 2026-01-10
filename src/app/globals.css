@@ -9,7 +9,7 @@
   --retro-cyan: #00f5ff;
   --retro-violet: #9d4edd;
   --retro-amber: #ffb800;
-  --retro-grid: #2a2a5a;
+  --retro-grid: #5e5e99;
   --retro-pink-glow: rgba(255, 42, 109, 0.6);
   --retro-cyan-glow: rgba(0, 245, 255, 0.6);
   --retro-violet-glow: rgba(157, 78, 221, 0.6);
@@ -104,66 +104,43 @@ html.light .glass-dark {
 }
 
 html.light .card-retro {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(240, 240, 248, 0.9) 100%
-  );
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 248, 0.9) 100%);
   border: 1px solid var(--border-default);
 }
 
 html.light .card-retro:hover {
   border-color: var(--retro-violet);
-  box-shadow:
-    0 4px 20px rgba(107, 45, 158, 0.15),
-    0 0 0 1px var(--retro-violet);
+  box-shadow: 0 4px 20px rgba(107, 45, 158, 0.15), 0 0 0 1px var(--retro-violet);
 }
 
 html.light .gradient-overlay {
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(232, 224, 244, 0.4) 50%,
-    var(--retro-dark) 100%
-  );
+  background: linear-gradient(180deg, transparent 0%, rgba(232, 224, 244, 0.4) 50%, var(--retro-dark) 100%);
 }
 
 /* Light theme neon text - reduced glow, stronger contrast */
 html.light .neon-pink {
-  text-shadow:
-    0 0 2px var(--retro-pink-glow),
-    0 0 6px var(--retro-pink-glow);
+  text-shadow: 0 0 2px var(--retro-pink-glow), 0 0 6px var(--retro-pink-glow);
 }
 
 html.light .neon-cyan {
-  text-shadow:
-    0 0 2px var(--retro-cyan-glow),
-    0 0 6px var(--retro-cyan-glow);
+  text-shadow: 0 0 2px var(--retro-cyan-glow), 0 0 6px var(--retro-cyan-glow);
 }
 
 html.light .neon-violet {
-  text-shadow:
-    0 0 2px var(--retro-violet-glow),
-    0 0 6px var(--retro-violet-glow);
+  text-shadow: 0 0 2px var(--retro-violet-glow), 0 0 6px var(--retro-violet-glow);
 }
 
 html.light .neon-amber {
-  text-shadow:
-    0 0 2px var(--retro-amber-glow),
-    0 0 6px var(--retro-amber-glow);
+  text-shadow: 0 0 2px var(--retro-amber-glow), 0 0 6px var(--retro-amber-glow);
 }
 
 /* Light theme neon borders - softer glow */
 html.light .neon-border-pink {
-  box-shadow:
-    0 0 4px var(--retro-pink-glow),
-    0 0 8px var(--retro-pink-glow);
+  box-shadow: 0 0 4px var(--retro-pink-glow), 0 0 8px var(--retro-pink-glow);
 }
 
 html.light .neon-border-cyan {
-  box-shadow:
-    0 0 4px var(--retro-cyan-glow),
-    0 0 8px var(--retro-cyan-glow);
+  box-shadow: 0 0 4px var(--retro-cyan-glow), 0 0 8px var(--retro-cyan-glow);
 }
 
 /* Light theme buttons - adjusted hover states */
@@ -174,9 +151,7 @@ html.light .btn-neon-pink {
 html.light .btn-neon-pink:hover {
   background: var(--retro-pink);
   color: white;
-  box-shadow:
-    0 0 8px var(--retro-pink-glow),
-    0 0 15px var(--retro-pink-glow);
+  box-shadow: 0 0 8px var(--retro-pink-glow), 0 0 15px var(--retro-pink-glow);
 }
 
 html.light .btn-neon-cyan {
@@ -186,9 +161,7 @@ html.light .btn-neon-cyan {
 html.light .btn-neon-cyan:hover {
   background: var(--retro-cyan);
   color: white;
-  box-shadow:
-    0 0 8px var(--retro-cyan-glow),
-    0 0 15px var(--retro-cyan-glow);
+  box-shadow: 0 0 8px var(--retro-cyan-glow), 0 0 15px var(--retro-cyan-glow);
 }
 
 html.light .btn-neon-violet {
@@ -198,22 +171,16 @@ html.light .btn-neon-violet {
 html.light .btn-neon-violet:hover {
   background: var(--retro-violet);
   color: white;
-  box-shadow:
-    0 0 8px var(--retro-violet-glow),
-    0 0 15px var(--retro-violet-glow);
+  box-shadow: 0 0 8px var(--retro-violet-glow), 0 0 15px var(--retro-violet-glow);
 }
 
 /* Light theme hover glow effects */
 html.light .hover-glow-pink:hover {
-  box-shadow:
-    0 4px 16px rgba(196, 24, 80, 0.2),
-    0 0 0 1px var(--retro-pink);
+  box-shadow: 0 4px 16px rgba(196, 24, 80, 0.2), 0 0 0 1px var(--retro-pink);
 }
 
 html.light .hover-glow-cyan:hover {
-  box-shadow:
-    0 4px 16px rgba(0, 122, 133, 0.2),
-    0 0 0 1px var(--retro-cyan);
+  box-shadow: 0 4px 16px rgba(0, 122, 133, 0.2), 0 0 0 1px var(--retro-cyan);
 }
 
 /* Light theme grid background */
@@ -355,34 +322,22 @@ body {
 /* Neon Text Effects - Reduced glow for better readability */
 .neon-pink {
   color: var(--retro-pink);
-  text-shadow:
-    0 0 3px var(--retro-pink),
-    0 0 8px var(--retro-pink),
-    0 0 15px var(--retro-pink);
+  text-shadow: 0 0 3px var(--retro-pink), 0 0 8px var(--retro-pink), 0 0 15px var(--retro-pink);
 }
 
 .neon-cyan {
   color: var(--retro-cyan);
-  text-shadow:
-    0 0 3px var(--retro-cyan),
-    0 0 8px var(--retro-cyan),
-    0 0 15px var(--retro-cyan);
+  text-shadow: 0 0 3px var(--retro-cyan), 0 0 8px var(--retro-cyan), 0 0 15px var(--retro-cyan);
 }
 
 .neon-violet {
   color: var(--retro-violet);
-  text-shadow:
-    0 0 3px var(--retro-violet),
-    0 0 8px var(--retro-violet),
-    0 0 15px var(--retro-violet);
+  text-shadow: 0 0 3px var(--retro-violet), 0 0 8px var(--retro-violet), 0 0 15px var(--retro-violet);
 }
 
 .neon-amber {
   color: var(--retro-amber);
-  text-shadow:
-    0 0 3px var(--retro-amber),
-    0 0 8px var(--retro-amber),
-    0 0 15px var(--retro-amber);
+  text-shadow: 0 0 3px var(--retro-amber), 0 0 8px var(--retro-amber), 0 0 15px var(--retro-amber);
 }
 
 /* Neon Flicker Animations - Individual character control */
@@ -405,32 +360,75 @@ body {
 }
 
 @keyframes flickerFast {
-  0%, 100% { opacity: 1; }
-  49% { opacity: 1; }
-  49.5% { opacity: 0.2; }
-  50% { opacity: 1; }
-  50.3% { opacity: 0.3; }
-  50.6% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  49% {
+    opacity: 1;
+  }
+  49.5% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  50.3% {
+    opacity: 0.3;
+  }
+  50.6% {
+    opacity: 1;
+  }
 }
 
 @keyframes flickerMedium {
-  0%, 100% { opacity: 1; }
-  74% { opacity: 1; }
-  74.3% { opacity: 0.3; }
-  74.6% { opacity: 1; }
-  75% { opacity: 0.4; }
-  75.2% { opacity: 0.9; }
-  75.4% { opacity: 0.2; }
-  75.6% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  74% {
+    opacity: 1;
+  }
+  74.3% {
+    opacity: 0.3;
+  }
+  74.6% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.4;
+  }
+  75.2% {
+    opacity: 0.9;
+  }
+  75.4% {
+    opacity: 0.2;
+  }
+  75.6% {
+    opacity: 1;
+  }
 }
 
 @keyframes flickerSlow {
-  0%, 100% { opacity: 1; }
-  59% { opacity: 1; }
-  59.2% { opacity: 0.3; }
-  59.4% { opacity: 0.8; }
-  59.6% { opacity: 0.2; }
-  59.8% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  59% {
+    opacity: 1;
+  }
+  59.2% {
+    opacity: 0.3;
+  }
+  59.4% {
+    opacity: 0.8;
+  }
+  59.6% {
+    opacity: 0.2;
+  }
+  59.8% {
+    opacity: 1;
+  }
 }
 
 /* Neon Glow Animation - slow intensity variation with subtle shimmer */
@@ -454,89 +452,74 @@ body {
 }
 
 @keyframes glowPink {
-  0%, 100% {
-    text-shadow:
-      0 0 3px var(--retro-pink),
-      0 0 8px var(--retro-pink),
-      0 0 15px var(--retro-pink);
+  0%,
+  100% {
+    text-shadow: 0 0 3px var(--retro-pink), 0 0 8px var(--retro-pink), 0 0 15px var(--retro-pink);
   }
   50% {
-    text-shadow:
-      0 0 4px var(--retro-pink),
-      0 0 10px var(--retro-pink),
-      0 0 18px var(--retro-pink);
+    text-shadow: 0 0 4px var(--retro-pink), 0 0 10px var(--retro-pink), 0 0 18px var(--retro-pink);
   }
 }
 
 @keyframes glowCyan {
-  0%, 100% {
-    text-shadow:
-      0 0 3px var(--retro-cyan),
-      0 0 8px var(--retro-cyan),
-      0 0 15px var(--retro-cyan);
+  0%,
+  100% {
+    text-shadow: 0 0 3px var(--retro-cyan), 0 0 8px var(--retro-cyan), 0 0 15px var(--retro-cyan);
   }
   50% {
-    text-shadow:
-      0 0 4px var(--retro-cyan),
-      0 0 10px var(--retro-cyan),
-      0 0 18px var(--retro-cyan);
+    text-shadow: 0 0 4px var(--retro-cyan), 0 0 10px var(--retro-cyan), 0 0 18px var(--retro-cyan);
   }
 }
 
 @keyframes glowViolet {
-  0%, 100% {
-    text-shadow:
-      0 0 3px var(--retro-violet),
-      0 0 8px var(--retro-violet),
-      0 0 15px var(--retro-violet);
+  0%,
+  100% {
+    text-shadow: 0 0 3px var(--retro-violet), 0 0 8px var(--retro-violet), 0 0 15px var(--retro-violet);
   }
   50% {
-    text-shadow:
-      0 0 4px var(--retro-violet),
-      0 0 10px var(--retro-violet),
-      0 0 18px var(--retro-violet);
+    text-shadow: 0 0 4px var(--retro-violet), 0 0 10px var(--retro-violet), 0 0 18px var(--retro-violet);
   }
 }
 
 @keyframes glowAmber {
-  0%, 100% {
-    text-shadow:
-      0 0 3px var(--retro-amber),
-      0 0 8px var(--retro-amber),
-      0 0 15px var(--retro-amber);
+  0%,
+  100% {
+    text-shadow: 0 0 3px var(--retro-amber), 0 0 8px var(--retro-amber), 0 0 15px var(--retro-amber);
   }
   50% {
-    text-shadow:
-      0 0 4px var(--retro-amber),
-      0 0 10px var(--retro-amber),
-      0 0 18px var(--retro-amber);
+    text-shadow: 0 0 4px var(--retro-amber), 0 0 10px var(--retro-amber), 0 0 18px var(--retro-amber);
   }
 }
 
 /* Subtle shimmer - slight brightness variation for realism */
 @keyframes shimmer {
-  0%, 100% { filter: brightness(1); }
-  20% { filter: brightness(1.01); }
-  40% { filter: brightness(0.99); }
-  60% { filter: brightness(1.005); }
-  80% { filter: brightness(0.995); }
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  20% {
+    filter: brightness(1.01);
+  }
+  40% {
+    filter: brightness(0.99);
+  }
+  60% {
+    filter: brightness(1.005);
+  }
+  80% {
+    filter: brightness(0.995);
+  }
 }
 
 /* Neon Border Effects */
 .neon-border-pink {
   border: 1px solid var(--retro-pink);
-  box-shadow:
-    0 0 5px var(--retro-pink),
-    0 0 10px var(--retro-pink),
-    inset 0 0 5px rgba(255, 42, 109, 0.1);
+  box-shadow: 0 0 5px var(--retro-pink), 0 0 10px var(--retro-pink), inset 0 0 5px rgba(255, 42, 109, 0.1);
 }
 
 .neon-border-cyan {
   border: 1px solid var(--retro-cyan);
-  box-shadow:
-    0 0 5px var(--retro-cyan),
-    0 0 10px var(--retro-cyan),
-    inset 0 0 5px rgba(0, 245, 255, 0.1);
+  box-shadow: 0 0 5px var(--retro-cyan), 0 0 10px var(--retro-cyan), inset 0 0 5px rgba(0, 245, 255, 0.1);
 }
 
 /* Glass Morphism */
@@ -567,8 +550,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image:
-    linear-gradient(var(--retro-grid) 1px, transparent 1px),
+  background-image: linear-gradient(var(--retro-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--retro-grid) 1px, transparent 1px);
   background-size: 50px 50px;
   transform: perspective(500px) rotateX(60deg);
@@ -609,12 +591,7 @@ body {
 
 /* Gradient Overlays */
 .gradient-overlay {
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(45, 27, 78, 0.3) 50%,
-    var(--retro-dark) 100%
-  );
+  background: linear-gradient(180deg, transparent 0%, rgba(45, 27, 78, 0.3) 50%, var(--retro-dark) 100%);
 }
 
 /* Scanline Effect (optional CRT look) */
@@ -641,10 +618,7 @@ body {
 }
 
 .hover-glow-pink:hover {
-  box-shadow:
-    0 0 10px var(--retro-pink),
-    0 0 20px var(--retro-pink),
-    0 0 30px var(--retro-pink);
+  box-shadow: 0 0 10px var(--retro-pink), 0 0 20px var(--retro-pink), 0 0 30px var(--retro-pink);
   transform: translateY(-2px);
 }
 
@@ -653,10 +627,7 @@ body {
 }
 
 .hover-glow-cyan:hover {
-  box-shadow:
-    0 0 10px var(--retro-cyan),
-    0 0 20px var(--retro-cyan),
-    0 0 30px var(--retro-cyan);
+  box-shadow: 0 0 10px var(--retro-cyan), 0 0 20px var(--retro-cyan), 0 0 30px var(--retro-cyan);
   transform: translateY(-2px);
 }
 
@@ -681,10 +652,7 @@ body {
 .btn-neon-pink:hover {
   background: var(--retro-pink);
   color: var(--retro-dark);
-  box-shadow:
-    0 0 8px var(--retro-pink),
-    0 0 15px var(--retro-pink),
-    0 0 30px var(--retro-pink);
+  box-shadow: 0 0 8px var(--retro-pink), 0 0 15px var(--retro-pink), 0 0 30px var(--retro-pink);
 }
 
 .btn-neon-cyan {
@@ -697,10 +665,7 @@ body {
 .btn-neon-cyan:hover {
   background: var(--retro-cyan);
   color: var(--retro-dark);
-  box-shadow:
-    0 0 8px var(--retro-cyan),
-    0 0 15px var(--retro-cyan),
-    0 0 30px var(--retro-cyan);
+  box-shadow: 0 0 8px var(--retro-cyan), 0 0 15px var(--retro-cyan), 0 0 30px var(--retro-cyan);
 }
 
 .btn-neon-violet {
@@ -713,19 +678,12 @@ body {
 .btn-neon-violet:hover {
   background: var(--retro-violet);
   color: var(--retro-dark);
-  box-shadow:
-    0 0 8px var(--retro-violet),
-    0 0 15px var(--retro-violet),
-    0 0 30px var(--retro-violet);
+  box-shadow: 0 0 8px var(--retro-violet), 0 0 15px var(--retro-violet), 0 0 30px var(--retro-violet);
 }
 
 /* Card Styles */
 .card-retro {
-  background: linear-gradient(
-    135deg,
-    rgba(26, 26, 62, 0.8) 0%,
-    rgba(45, 27, 78, 0.6) 100%
-  );
+  background: linear-gradient(135deg, rgba(26, 26, 62, 0.8) 0%, rgba(45, 27, 78, 0.6) 100%);
   border: 1px solid var(--retro-grid);
   border-radius: 4px;
   transition: all 0.3s ease;
@@ -733,9 +691,7 @@ body {
 
 .card-retro:hover {
   border-color: var(--retro-violet);
-  box-shadow:
-    0 0 10px rgba(157, 78, 221, 0.3),
-    0 0 20px rgba(157, 78, 221, 0.1);
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.3), 0 0 20px rgba(157, 78, 221, 0.1);
 }
 
 /* Typography Utilities */
@@ -794,8 +750,7 @@ body {
 }
 
 .safe-all {
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Touch Target Utility - 44px minimum for iOS accessibility */

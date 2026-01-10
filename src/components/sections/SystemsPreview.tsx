@@ -17,32 +17,17 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";
-
-const FEATURED_SYSTEMS = [
-  {
-    name: "TRS-80",
-    category: "Computers",
-    description: "The legendary Tandy/RadioShack computer that launched the home computing revolution.",
-    href: "/systems/computers",
-    icon: "80",
-  },
-  {
-    name: "Apple I",
-    category: "Computers",
-    description: "Steve Wozniak's hand-built masterpiece that started it all for Apple.",
-    href: "/systems/computers",
-    icon: "I",
-  },
-  {
-    name: "Sorcerer",
-    category: "Computers",
-    description: "Exidy's powerful CP/M-compatible machine with built-in Microsoft BASIC.",
-    href: "/systems/computers",
-    icon: "S",
-  },
-];
+import { FEATURED_SYSTEMS } from "@/lib/constants";
 
 export function SystemsPreview() {
+  // Filter to only show enabled systems
+  const enabledSystems = FEATURED_SYSTEMS.filter((system) => system.enabled);
+
+  // Don't render if no systems are enabled
+  if (enabledSystems.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-12 sm:py-16 md:py-20">
       <Container>
@@ -76,7 +61,7 @@ export function SystemsPreview() {
             gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))",
           }}
         >
-          {FEATURED_SYSTEMS.map((system) => (
+          {enabledSystems.map((system) => (
             <Link key={system.name} href={system.href} className="card-retro p-4 sm:p-6 hover-glow-pink group block">
               {/* Icon/Badge */}
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded bg-retro-purple/50 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-retro-pink/20 transition-colors duration-300">

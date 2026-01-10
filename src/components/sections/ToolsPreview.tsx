@@ -16,41 +16,37 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { NeonText } from "@/components/effects/NeonText";
+import { FEATURED_TOOLS } from "@/lib/constants";
+import { ReactNode } from "react";
 
-const FEATURED_TOOLS = [
-  {
-    name: "Character ROM Editor",
-    description: "Design and edit character sets for vintage display systems. Export directly to ROM format.",
-    href: "/tools/character-rom-editor",
-    icon: (
-      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Z80 Emulator",
-    description: "Full-featured Zilog Z80 emulator with debugging tools and memory inspection.",
-    href: "/tools/emulators",
-    icon: (
-      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Schematic Viewer",
-    description: "Interactive viewer for vintage computer schematics with zoom and component highlighting.",
-    href: "/tools/schematic-viewer",
-    icon: (
-      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-      </svg>
-    ),
-  },
-];
+// Icons mapped by tool name (icons are JSX so they stay in the component)
+const TOOL_ICONS: Record<string, ReactNode> = {
+  "Character ROM Editor": (
+    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+    </svg>
+  ),
+  "Z80 Emulator": (
+    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  "Schematic Viewer": (
+    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+    </svg>
+  ),
+};
 
 export function ToolsPreview() {
+  // Filter to only show enabled tools
+  const enabledTools = FEATURED_TOOLS.filter((tool) => tool.enabled);
+
+  // Don't render if no tools are enabled
+  if (enabledTools.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-retro-dark to-retro-navy/30">
       <Container>
@@ -84,7 +80,7 @@ export function ToolsPreview() {
             gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))",
           }}
         >
-          {FEATURED_TOOLS.map((tool) => (
+          {enabledTools.map((tool) => (
             <Link
               key={tool.name}
               href={tool.href}
@@ -92,7 +88,7 @@ export function ToolsPreview() {
             >
               {/* Icon */}
               <div className="text-retro-cyan group-hover:text-retro-pink transition-colors duration-300 mb-4 sm:mb-6">
-                {tool.icon}
+                {TOOL_ICONS[tool.name]}
               </div>
 
               {/* Name */}
