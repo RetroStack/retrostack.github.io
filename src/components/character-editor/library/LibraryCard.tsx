@@ -191,13 +191,13 @@ export function LibraryCard({
         </div>
       </div>
 
-      {/* Character preview */}
-      <div className="flex justify-center py-2 bg-black/30 rounded">
+      {/* Character preview - pushed to bottom along with footer */}
+      <div className="flex justify-center py-2 bg-black/30 rounded mt-auto">
         <CharacterPreview characters={characters} config={config} maxCharacters={512} maxWidth={256} maxHeight={4096} />
       </div>
 
-      {/* Footer with size, count, dates, and actions - pushed to bottom */}
-      <div className="flex flex-col gap-2 pt-2 border-t border-retro-grid/30 text-[10px] mt-auto">
+      {/* Footer with size, count, dates, and actions */}
+      <div className="flex flex-col gap-2 pt-2 border-t border-retro-grid/30 text-[10px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* Size badge */}
