@@ -287,6 +287,7 @@ Use specialized agents proactively when implementing features:
 - **e2e-generator**: Create Playwright E2E tests for user flows
 - **coverage-analyzer**: Identify test coverage gaps and prioritize testing
 - **code-reviewer**: Review code for quality, patterns, and CLAUDE.md compliance
+- **refactor**: Clean up code during/after refactors - includes removing unused exports, components, functions, and types from the codebase
 
 ### Patterns
 

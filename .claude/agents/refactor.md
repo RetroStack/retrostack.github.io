@@ -50,6 +50,7 @@ Every refactoring must:
 
 - [ ] Single responsibility - split large functions/components
 - [ ] Remove dead code and unused imports
+- [ ] Remove unused exports, components, functions, and types
 - [ ] Remove redundant comments
 - [ ] Simplify complex conditionals
 - [ ] Flatten deeply nested code
@@ -132,6 +133,53 @@ function processData(data) {
 }
 ```
 
+### Find and Remove Unused Code
+
+After refactoring, actively search for and remove unused code from the codebase:
+
+**Step 1: Run TypeScript compiler to find unused locals**
+
+```bash
+npm run typecheck
+# Look for TS6133 warnings: "'x' is declared but its value is never read"
+```
+
+**Step 2: Search for unused exports**
+
+For each export in a refactored file, verify it's still imported elsewhere:
+
+```bash
+# Search for usages of an exported function/component
+grep -r "import.*ComponentName" src/
+grep -r "from.*filename" src/
+```
+
+**Step 3: Check for orphaned files**
+
+If you renamed or consolidated files, check if old files are still imported:
+
+```bash
+# Find files that may no longer be imported
+grep -r "from.*old-filename" src/
+```
+
+**Step 4: Remove completely**
+
+When removing unused code:
+
+- Delete the entire export, not just comment it out
+- Remove associated types/interfaces only used by that export
+- Remove test files for deleted code
+- Do NOT add `// removed` comments or backwards-compatibility shims
+
+```typescript
+// BAD: Don't leave traces
+// export const oldFunction = () => {}; // removed
+// export type OldType = string; // no longer used
+
+// GOOD: Delete entirely - git history preserves the old code if needed
+```
+
 ### Consolidate Imports
 
 ```typescript
@@ -156,7 +204,7 @@ Move complex logic from components/hooks to pure functions in `/lib/`:
 // Before: Logic in component
 function LibraryView() {
   const filtered = useMemo(() => {
-    return sets.filter(set => {
+    return sets.filter((set) => {
       if (filters.manufacturer && set.manufacturer !== filters.manufacturer) return false;
       if (filters.minSize && set.size < filters.minSize) return false;
       return true;
@@ -166,19 +214,13 @@ function LibraryView() {
 
 // After: Pure function in /lib/
 // /src/lib/character-editor/library/filters.ts
-export function filterCharacterSets(
-  sets: SerializedCharacterSet[],
-  filters: LibraryFilter
-): SerializedCharacterSet[] {
-  return sets.filter(set => matchesAllFilters(set, filters));
+export function filterCharacterSets(sets: SerializedCharacterSet[], filters: LibraryFilter): SerializedCharacterSet[] {
+  return sets.filter((set) => matchesAllFilters(set, filters));
 }
 
 // Component just calls the function
 function LibraryView() {
-  const filtered = useMemo(
-    () => filterCharacterSets(sets, filters),
-    [sets, filters]
-  );
+  const filtered = useMemo(() => filterCharacterSets(sets, filters), [sets, filters]);
 }
 ```
 
@@ -200,10 +242,7 @@ export interface UseCharacterLibraryOptions {
 }
 
 export function useCharacterLibrary(options?: UseCharacterLibraryOptions) {
-  const storage = useMemo(
-    () => options?.storage ?? characterStorage,
-    [options?.storage]
-  );
+  const storage = useMemo(() => options?.storage ?? characterStorage, [options?.storage]);
 
   useEffect(() => {
     storage.getAll().then(setCharacterSets);
@@ -322,8 +361,9 @@ These change behavior and should NOT be done:
 1. **Analyze** - Read and understand the code
 2. **Plan** - List specific refactorings to apply
 3. **Execute** - Apply changes one at a time
-4. **Verify** - Confirm no behavior change
-5. **Report** - Document what was changed and why
+4. **Cleanup** - Search for and remove any unused exports, components, functions, or types created by the refactor
+5. **Verify** - Confirm no behavior change (run typecheck and tests)
+6. **Report** - Document what was changed and why, including any removed unused code
 
 ## Notes
 
