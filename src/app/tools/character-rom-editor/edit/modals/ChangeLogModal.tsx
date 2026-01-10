@@ -9,6 +9,7 @@ import {
   getOperationIcon,
 } from "@/hooks/character-editor/useChangeLog";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
+import { useToast } from "@/hooks/useToast";
 
 export interface ChangeLogModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ export interface ChangeLogModalProps {
   entries: ChangeLogEntry[];
   onClear: () => void;
   onExport: () => string;
+  /** Optional callback to show success message after clearing */
+  onClearSuccess?: () => void;
 }
 
 /**
@@ -54,15 +57,10 @@ function formatTimestamp(timestamp: number): string {
 /**
  * Modal for viewing the change log
  */
-export function ChangeLogModal({
-  isOpen,
-  onClose,
-  entries,
-  onClear,
-  onExport,
-}: ChangeLogModalProps) {
+export function ChangeLogModal({ isOpen, onClose, entries, onClear, onExport, onClearSuccess }: ChangeLogModalProps) {
   const [showConfirmClear, setShowConfirmClear] = useState(false);
   const [copied, setCopied] = useState(false);
+  const toast = useToast();
 
   // Handle export
   const handleExport = useCallback(() => {
@@ -77,7 +75,9 @@ export function ChangeLogModal({
   const handleClear = useCallback(() => {
     onClear();
     setShowConfirmClear(false);
-  }, [onClear]);
+    onClearSuccess?.();
+    toast.success("Change log cleared");
+  }, [onClear, onClearSuccess, toast]);
 
   // Group entries by date
   const groupedEntries = entries.reduce<Record<string, ChangeLogEntry[]>>((acc, entry) => {
@@ -99,12 +99,7 @@ export function ChangeLogModal({
           </p>
         </div>
         <div className="flex items-center gap-2 mr-2">
-          <Button
-            onClick={handleExport}
-            variant="ghost"
-            size="sm"
-            disabled={entries.length === 0}
-          >
+          <Button onClick={handleExport} variant="ghost" size="sm" disabled={entries.length === 0}>
             {copied ? "Copied!" : "Copy Log"}
           </Button>
           {showConfirmClear ? (
@@ -123,12 +118,7 @@ export function ChangeLogModal({
               </button>
             </div>
           ) : (
-            <Button
-              onClick={() => setShowConfirmClear(true)}
-              variant="ghost"
-              size="sm"
-              disabled={entries.length === 0}
-            >
+            <Button onClick={() => setShowConfirmClear(true)} variant="ghost" size="sm" disabled={entries.length === 0}>
               Clear
             </Button>
           )}
@@ -136,131 +126,109 @@ export function ChangeLogModal({
       </ModalHeader>
 
       <ModalContent scrollable className="p-4">
-          {entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-              <svg
-                className="w-16 h-16 mb-4 opacity-50"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-              <p className="text-sm">No changes logged yet</p>
-              <p className="text-xs mt-1">Your editing activity will appear here</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {Object.entries(groupedEntries).map(([date, dateEntries]) => (
-                <div key={date}>
-                  <div className="sticky top-0 bg-retro-navy/95 backdrop-blur-sm py-1 mb-2">
-                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      {date === new Date().toLocaleDateString() ? "Today" : date}
-                    </h3>
-                  </div>
-                  <div className="relative pl-6 border-l border-retro-grid/30">
-                    {dateEntries.map((entry, index) => (
+        {entries.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+            <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <p className="text-sm">No changes logged yet</p>
+            <p className="text-xs mt-1">Your editing activity will appear here</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Object.entries(groupedEntries).map(([date, dateEntries]) => (
+              <div key={date}>
+                <div className="sticky top-0 bg-retro-navy/95 backdrop-blur-sm py-1 mb-2">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    {date === new Date().toLocaleDateString() ? "Today" : date}
+                  </h3>
+                </div>
+                <div className="relative pl-6 border-l border-retro-grid/30">
+                  {dateEntries.map((entry, index) => (
+                    <div key={entry.id} className={`relative mb-4 ${index === dateEntries.length - 1 ? "mb-0" : ""}`}>
+                      {/* Timeline dot */}
                       <div
-                        key={entry.id}
-                        className={`relative mb-4 ${index === dateEntries.length - 1 ? "mb-0" : ""}`}
-                      >
-                        {/* Timeline dot */}
-                        <div
-                          className={`absolute -left-[25px] w-4 h-4 rounded-full border-2 ${
-                            index === 0 && date === new Date().toLocaleDateString()
-                              ? "border-retro-cyan bg-retro-cyan/20"
-                              : "border-retro-grid/50 bg-retro-dark"
-                          }`}
-                        />
+                        className={`absolute -left-[25px] w-4 h-4 rounded-full border-2 ${
+                          index === 0 && date === new Date().toLocaleDateString()
+                            ? "border-retro-cyan bg-retro-cyan/20"
+                            : "border-retro-grid/50 bg-retro-dark"
+                        }`}
+                      />
 
-                        {/* Entry content */}
-                        <div className="bg-retro-dark/30 rounded border border-retro-grid/20 p-3 hover:border-retro-grid/40 transition-colors">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              {/* Operation icon */}
-                              <span className={getOperationColor(entry.type)}>
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d={getOperationIcon(entry.type)}
-                                  />
-                                </svg>
-                              </span>
-                              {/* Operation type badge */}
-                              <span
-                                className={`text-xs px-1.5 py-0.5 rounded ${getOperationColor(
-                                  entry.type
-                                )} bg-current/10`}
-                              >
-                                {getOperationDisplayName(entry.type)}
-                              </span>
-                            </div>
-                            {/* Timestamp */}
-                            <span className="text-xs text-gray-500" title={formatTimestamp(entry.timestamp)}>
-                              {formatRelativeTime(entry.timestamp)}
+                      {/* Entry content */}
+                      <div className="bg-retro-dark/30 rounded border border-retro-grid/20 p-3 hover:border-retro-grid/40 transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            {/* Operation icon */}
+                            <span className={getOperationColor(entry.type)}>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d={getOperationIcon(entry.type)}
+                                />
+                              </svg>
+                            </span>
+                            {/* Operation type badge */}
+                            <span
+                              className={`text-xs px-1.5 py-0.5 rounded ${getOperationColor(entry.type)} bg-current/10`}
+                            >
+                              {getOperationDisplayName(entry.type)}
                             </span>
                           </div>
-
-                          {/* Description */}
-                          <p className="text-sm text-gray-300 mt-2">{entry.description}</p>
-
-                          {/* Affected characters */}
-                          {entry.affectedIndices.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {entry.affectedIndices.slice(0, 10).map((index) => (
-                                <span
-                                  key={index}
-                                  className="text-xs px-1.5 py-0.5 rounded bg-retro-dark border border-retro-grid/30 text-gray-400"
-                                >
-                                  #{index}
-                                </span>
-                              ))}
-                              {entry.affectedIndices.length > 10 && (
-                                <span className="text-xs px-1.5 py-0.5 text-gray-500">
-                                  +{entry.affectedIndices.length - 10} more
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Details */}
-                          {entry.details && (
-                            <p className="text-xs text-gray-500 mt-2 italic">{entry.details}</p>
-                          )}
+                          {/* Timestamp */}
+                          <span className="text-xs text-gray-500" title={formatTimestamp(entry.timestamp)}>
+                            {formatRelativeTime(entry.timestamp)}
+                          </span>
                         </div>
+
+                        {/* Description */}
+                        <p className="text-sm text-gray-300 mt-2">{entry.description}</p>
+
+                        {/* Affected characters */}
+                        {entry.affectedIndices.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {entry.affectedIndices.slice(0, 10).map((index) => (
+                              <span
+                                key={index}
+                                className="text-xs px-1.5 py-0.5 rounded bg-retro-dark border border-retro-grid/30 text-gray-400"
+                              >
+                                #{index}
+                              </span>
+                            ))}
+                            {entry.affectedIndices.length > 10 && (
+                              <span className="text-xs px-1.5 py-0.5 text-gray-500">
+                                +{entry.affectedIndices.length - 10} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Details */}
+                        {entry.details && <p className="text-xs text-gray-500 mt-2 italic">{entry.details}</p>}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
       </ModalContent>
 
       {entries.length > 0 && (
         <ModalFooter className="bg-retro-dark/30 flex items-center justify-between text-xs text-gray-500">
           <span>
             Session started:{" "}
-            {entries.length > 0
-              ? new Date(entries[entries.length - 1].timestamp).toLocaleTimeString()
-              : "N/A"}
+            {entries.length > 0 ? new Date(entries[entries.length - 1].timestamp).toLocaleTimeString() : "N/A"}
           </span>
-          <span>
-            Last change:{" "}
-            {entries.length > 0 ? formatRelativeTime(entries[0].timestamp) : "N/A"}
-          </span>
+          <span>Last change: {entries.length > 0 ? formatRelativeTime(entries[0].timestamp) : "N/A"}</span>
         </ModalFooter>
       )}
     </Modal>

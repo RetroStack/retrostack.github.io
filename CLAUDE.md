@@ -110,6 +110,21 @@ Add new pages in `/src/lib/constants.ts`.
 - Use `ToggleSwitch` instead of checkboxes
 - Use `useDropdown` for dropdown state + outside click
 
+## UX Patterns
+
+### Confirmation Dialogs and Toasts
+
+When a confirmation dialog is confirmed (not cancelled), show a toast notification to provide feedback. This applies to:
+
+- Modal confirmation dialogs (using `ConfirmDialog` component)
+- Inline confirmation UI (e.g., Confirm/Cancel buttons)
+
+Do NOT show toasts for:
+
+- Actions without confirmation dialogs
+- Cancelled/dismissed confirmations
+- Navigation actions (e.g., "Leave without saving")
+
 ## State Management
 
 - Use custom hooks over React Context for complex state
@@ -300,10 +315,7 @@ All hooks that use external dependencies MUST support injection:
 Example:
 
 ```typescript
-export function useMyFeature(options?: {
-  storage?: IKeyValueStorage;
-  apiClient?: IApiClient;
-}) {
+export function useMyFeature(options?: { storage?: IKeyValueStorage; apiClient?: IApiClient }) {
   const storage = options?.storage ?? defaultStorage;
   const api = options?.apiClient ?? defaultApiClient;
 }
@@ -387,7 +399,7 @@ When modifying files, always update related documentation:
 
 ### Comment Guidelines
 
-```typescript
+````typescript
 /**
  * Brief description of what this does
  *
@@ -402,7 +414,7 @@ When modifying files, always update related documentation:
 export function myFunction(paramName: Type): ReturnType {
   // Implementation
 }
-```
+````
 
 ### When to Update CLAUDE.md
 
@@ -413,19 +425,19 @@ export function myFunction(paramName: Type): ReturnType {
 
 ## Key Files
 
-| File                                             | Purpose                        |
-| ------------------------------------------------ | ------------------------------ |
-| `/src/app/globals.css`                           | All styling                    |
-| `/src/lib/constants.ts`                          | Nav items, config              |
-| `/src/components/layout/ToolLayout.tsx`          | Tool page wrapper              |
-| `/src/hooks/useDropdown.ts`                      | Dropdown state                 |
-| `/src/hooks/useModalManager.ts`                  | Modal management               |
-| `/src/hooks/useResizeObserver.ts`                | Element size observation       |
-| `/src/hooks/useOnboarding.ts`                    | Onboarding tour management     |
-| `/src/hooks/useTheme.ts`                         | Theme (dark/light) management  |
-| `/src/contexts/CharacterEditorContext.tsx`       | Editor display settings        |
-| `/src/components/ui/DropdownPrimitives.tsx`      | Shared dropdown UI components  |
-| `/src/lib/character-editor/types.ts`             | Character editor types         |
-| `/src/lib/character-editor/storage/keys.ts`      | Storage keys                   |
-| `/src/lib/character-editor/storage/interfaces.ts`| Storage interfaces (DI)        |
-| `/src/lib/character-editor/storage/autosave.ts`  | Auto-save utilities            |
+| File                                              | Purpose                       |
+| ------------------------------------------------- | ----------------------------- |
+| `/src/app/globals.css`                            | All styling                   |
+| `/src/lib/constants.ts`                           | Nav items, config             |
+| `/src/components/layout/ToolLayout.tsx`           | Tool page wrapper             |
+| `/src/hooks/useDropdown.ts`                       | Dropdown state                |
+| `/src/hooks/useModalManager.ts`                   | Modal management              |
+| `/src/hooks/useResizeObserver.ts`                 | Element size observation      |
+| `/src/hooks/useOnboarding.ts`                     | Onboarding tour management    |
+| `/src/hooks/useTheme.ts`                          | Theme (dark/light) management |
+| `/src/contexts/CharacterEditorContext.tsx`        | Editor display settings       |
+| `/src/components/ui/DropdownPrimitives.tsx`       | Shared dropdown UI components |
+| `/src/lib/character-editor/types.ts`              | Character editor types        |
+| `/src/lib/character-editor/storage/keys.ts`       | Storage keys                  |
+| `/src/lib/character-editor/storage/interfaces.ts` | Storage interfaces (DI)       |
+| `/src/lib/character-editor/storage/autosave.ts`   | Auto-save utilities           |

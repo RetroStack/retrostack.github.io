@@ -182,6 +182,18 @@ export function EditView() {
     [characterSet, editor, toast],
   );
 
+  // Handle snapshot delete with toast (has inline confirmation dialog)
+  const handleSnapshotDelete = useCallback(
+    async (snapshotId: string) => {
+      const success = await snapshots.remove(snapshotId);
+      if (success) {
+        toast.success("Snapshot deleted");
+      }
+      return success;
+    },
+    [snapshots, toast],
+  );
+
   // Load character set (wait for library to be ready first)
   useEffect(() => {
     async function loadCharacterSet() {
@@ -314,12 +326,14 @@ export function EditView() {
           config: data.config,
         });
         editor.setSelectedIndex(data.selectedIndex);
+        toast.success("Changes recovered");
       } catch (e) {
         console.error("Failed to recover:", e);
         autoSave.discard();
+        toast.error("Failed to recover changes");
       }
     }
-  }, [autoSave, characterSet, editor]);
+  }, [autoSave, characterSet, editor, toast]);
 
   // Handle Save As
   const handleSaveAs = useCallback(async () => {
@@ -1269,7 +1283,7 @@ export function EditView() {
         backgroundColor={colors.background}
         onSave={handleSnapshotSave}
         onRestore={snapshots.restore}
-        onDelete={snapshots.remove}
+        onDelete={handleSnapshotDelete}
         onRename={snapshots.rename}
         onRestoreApply={handleSnapshotRestore}
       />
@@ -1437,8 +1451,10 @@ export function EditView() {
         cancelLabel="Cancel"
         variant="danger"
         onConfirm={() => {
+          const count = editor.batchSelection.size > 0 ? editor.batchSelection.size + 1 : 1;
           editor.deleteSelected();
           setShowDeleteCharacterConfirm(false);
+          toast.success(count > 1 ? `${count} characters deleted` : "Character deleted");
         }}
         onCancel={() => setShowDeleteCharacterConfirm(false)}
       />
