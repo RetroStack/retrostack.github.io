@@ -42,7 +42,7 @@ export interface DropdownPanelProps {
  */
 export function DropdownPanel({
   alignRight = true,
-  width = 240,
+  width = 480,
   maxHeight = 320,
   dropUp = false,
   children,
@@ -202,7 +202,7 @@ export function DropdownClearButton({ onClick, label = "Clear selection" }: Drop
     <div className="p-2 border-b border-retro-grid/30">
       <button
         onClick={onClick}
-        className="w-full text-left px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-retro-grid/20 rounded transition-colors"
+        className="w-full text-left px-2 py-1 text-xs text-retro-pink hover:text-white hover:bg-retro-grid/20 rounded transition-colors"
       >
         {label}
       </button>
