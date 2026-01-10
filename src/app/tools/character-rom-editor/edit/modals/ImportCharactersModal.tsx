@@ -4,12 +4,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { LibraryCardCompact } from "@/components/character-editor/library/LibraryCard";
 import { CharacterDisplay } from "@/components/character-editor/character/CharacterDisplay";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
-import {
-  SerializedCharacterSet,
-  CharacterSetConfig,
-  Character,
-  AnchorPoint,
-} from "@/lib/character-editor/types";
+import { SerializedCharacterSet, CharacterSetConfig, Character, AnchorPoint } from "@/lib/character-editor/types";
 import { deserializeCharacterSet } from "@/lib/character-editor/import/binary";
 import { resizeCharacter } from "@/lib/character-editor/transforms";
 import { formatSize } from "@/lib/character-editor/utils";
@@ -19,11 +14,7 @@ import { SelectionModeBar } from "@/components/ui/SelectionModeBar";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
 
 // 3x3 anchor grid
-const ANCHOR_POSITIONS: AnchorPoint[] = [
-  "tl", "tc", "tr",
-  "ml", "mc", "mr",
-  "bl", "bc", "br",
-];
+const ANCHOR_POSITIONS: AnchorPoint[] = ["tl", "tc", "tr", "ml", "mc", "mr", "bl", "bc", "br"];
 
 function getAnchorLabel(anchor: AnchorPoint): string {
   const labels: Record<AnchorPoint, string> = {
@@ -62,7 +53,7 @@ function CharacterButton({
     (e: React.MouseEvent) => {
       onClick(index, e.shiftKey, e.ctrlKey || e.metaKey);
     },
-    [index, onClick]
+    [index, onClick],
   );
 
   const handleLongPressCallback = useCallback(() => {
@@ -86,19 +77,12 @@ function CharacterButton({
       data-grid-index={index}
       className={`
         p-1 rounded border-2 transition-all relative touch-manipulation
-        ${isSelected
-          ? "border-retro-cyan bg-retro-cyan/20"
-          : "border-transparent hover:border-retro-grid/50"
-        }
+        ${isSelected ? "border-retro-cyan bg-retro-cyan/20" : "border-transparent hover:border-retro-grid/50"}
       `}
       style={{ touchAction: "manipulation" }}
       title={`Character ${index}`}
     >
-      <CharacterDisplay
-        character={character}
-        mode="small"
-        smallScale={3}
-      />
+      <CharacterDisplay character={character} mode="small" smallScale={3} />
       {/* Checkmark overlay for selection mode */}
       {isSelectionMode && isSelected && (
         <div className="absolute top-0 right-0 w-3 h-3 bg-retro-cyan rounded-bl flex items-center justify-center">
@@ -131,12 +115,7 @@ type Step = "select-set" | "select-chars" | "resize";
 /**
  * Modal for importing characters from another character set in the library
  */
-export function ImportCharactersModal({
-  isOpen,
-  onClose,
-  currentConfig,
-  onImport,
-}: ImportCharactersModalProps) {
+export function ImportCharactersModal({ isOpen, onClose, currentConfig, onImport }: ImportCharactersModalProps) {
   const { characterSets, loading } = useCharacterLibrary();
 
   // Current step
@@ -192,10 +171,7 @@ export function ImportCharactersModal({
   // Check if dimensions differ
   const dimensionsDiffer = useMemo(() => {
     if (!selectedSet) return false;
-    return (
-      currentConfig.width !== selectedSet.config.width ||
-      currentConfig.height !== selectedSet.config.height
-    );
+    return currentConfig.width !== selectedSet.config.width || currentConfig.height !== selectedSet.config.height;
   }, [selectedSet, currentConfig]);
 
   // Filter character sets
@@ -204,8 +180,7 @@ export function ImportCharactersModal({
     const query = searchQuery.toLowerCase();
     return characterSets.filter(
       (set) =>
-        set.metadata.name.toLowerCase().includes(query) ||
-        set.metadata.description.toLowerCase().includes(query)
+        set.metadata.name.toLowerCase().includes(query) || set.metadata.description.toLowerCase().includes(query),
     );
   }, [characterSets, searchQuery]);
 
@@ -299,7 +274,7 @@ export function ImportCharactersModal({
         setLastClickedIndex(index);
       }
     },
-    [lastClickedIndex, isSelectionMode]
+    [lastClickedIndex, isSelectionMode],
   );
 
   const handleLongPress = useCallback((index: number) => {
@@ -356,7 +331,7 @@ export function ImportCharactersModal({
     // Resize if needed
     if (dimensionsDiffer) {
       charsToImport = charsToImport.map((char) =>
-        resizeCharacter(char, currentConfig.width, currentConfig.height, anchor)
+        resizeCharacter(char, currentConfig.width, currentConfig.height, anchor),
       );
     }
 
@@ -376,227 +351,206 @@ export function ImportCharactersModal({
       </ModalHeader>
 
       <ModalContent className="p-4 flex flex-col min-h-0 overflow-hidden">
-          {/* Step 1: Select Set */}
-          {step === "select-set" && (
-            <div className="flex flex-col flex-1 min-h-0 gap-4">
-              {/* Search */}
-              <div className="relative flex-shrink-0">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full px-3 py-2 pl-9 bg-retro-dark border border-retro-grid/50 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
-                  autoFocus
+        {/* Step 1: Select Set */}
+        {step === "select-set" && (
+          <div className="flex flex-col flex-1 min-h-0 gap-4">
+            {/* Search */}
+            <div className="relative flex-shrink-0">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-3 py-2 pl-9 bg-retro-dark border border-retro-grid/50 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-retro-cyan/50"
+                autoFocus
+              />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              </svg>
+            </div>
+
+            {/* Set list */}
+            <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">Loading...</div>
+              ) : filteredSets.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No character sets found</div>
+              ) : (
+                filteredSets.map((set) => (
+                  <LibraryCardCompact
+                    key={set.metadata.id}
+                    characterSet={set}
+                    selected={selectedSetId === set.metadata.id}
+                    onClick={() => handleSelectSet(set)}
                   />
-                </svg>
-              </div>
-
-              {/* Set list */}
-              <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
-                {loading ? (
-                  <div className="text-center py-8 text-gray-500">Loading...</div>
-                ) : filteredSets.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">No character sets found</div>
-                ) : (
-                  filteredSets.map((set) => (
-                    <LibraryCardCompact
-                      key={set.metadata.id}
-                      characterSet={set}
-                      selected={selectedSetId === set.metadata.id}
-                      onClick={() => handleSelectSet(set)}
-                    />
-                  ))
-                )}
-              </div>
-
-              {/* Dimension info */}
-              {selectedSet && (
-                <div className="flex-shrink-0 text-xs text-gray-500 text-center pt-2 border-t border-retro-grid/30">
-                  Source: {formatSize(selectedSet.config)} ({sourceCharacters.length} chars)
-                  {dimensionsDiffer && (
-                    <span className="text-yellow-500 ml-2">
-                      (will be resized to {formatSize(currentConfig)})
-                    </span>
-                  )}
-                </div>
+                ))
               )}
             </div>
-          )}
 
-          {/* Step 2: Select Characters */}
-          {step === "select-chars" && selectedSet && (
-            <div className="flex flex-col flex-1 min-h-0 gap-4 relative">
-              {/* Selection controls */}
-              <div className="flex items-center justify-between flex-shrink-0">
-                <div className="text-xs text-gray-500">
-                  {isSelectionMode
-                    ? "Tap to toggle selection"
-                    : "Click to select, Shift+click for range, Ctrl+click to toggle"}
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Selection mode toggle button */}
-                  <button
-                    onClick={() => setIsSelectionMode(!isSelectionMode)}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                      isSelectionMode
-                        ? "bg-retro-cyan/20 text-retro-cyan"
-                        : "text-gray-400 hover:text-retro-cyan hover:bg-retro-cyan/10"
-                    }`}
-                    title={isSelectionMode ? "Exit selection mode" : "Enter selection mode"}
-                  >
-                    {isSelectionMode ? (
-                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    ) : (
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                        />
-                      </svg>
-                    )}
-                    <span>Select</span>
-                  </button>
-                  {!isSelectionMode && (
-                    <>
-                      <button
-                        onClick={handleSelectAll}
-                        className="text-xs text-retro-cyan hover:underline"
-                      >
-                        All
-                      </button>
-                      <button
-                        onClick={handleSelectNone}
-                        className="text-xs text-gray-400 hover:underline"
-                      >
-                        Clear
-                      </button>
-                    </>
-                  )}
-                </div>
+            {/* Dimension info */}
+            {selectedSet && (
+              <div className="flex-shrink-0 text-xs text-gray-500 text-center pt-2 border-t border-retro-grid/30">
+                Source: {formatSize(selectedSet.config)} ({sourceCharacters.length} chars)
+                {dimensionsDiffer && (
+                  <span className="text-yellow-500 ml-2">(will be resized to {formatSize(currentConfig)})</span>
+                )}
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Character grid */}
-              <div
-                className={`bg-black/30 rounded-lg p-3 flex-1 overflow-y-auto min-h-0 ${
-                  isSelectionMode ? "pb-16 ring-1 ring-retro-cyan/30" : ""
-                }`}
-              >
-                <div
-                  ref={gridRef}
-                  className="grid gap-1 select-none"
-                  style={{
-                    gridTemplateColumns: `repeat(auto-fill, minmax(${Math.max(selectedSet.config.width * 3, 24) + 8}px, 1fr))`,
-                  }}
-                  onTouchStartCapture={dragSelect.onTouchStart}
-                  onTouchMoveCapture={dragSelect.onTouchMove}
-                  onTouchEndCapture={dragSelect.onTouchEnd}
-                  onMouseDownCapture={dragSelect.onMouseDown}
-                  onMouseMoveCapture={dragSelect.onMouseMove}
-                  onMouseUpCapture={dragSelect.onMouseUp}
-                  onClickCapture={dragSelect.onClickCapture}
+        {/* Step 2: Select Characters */}
+        {step === "select-chars" && selectedSet && (
+          <div className="flex flex-col flex-1 min-h-0 gap-4 relative">
+            {/* Selection controls */}
+            <div className="flex items-center justify-between flex-shrink-0">
+              <div className="text-xs text-gray-500">
+                {isSelectionMode
+                  ? "Tap to toggle selection"
+                  : "Click to select, Shift+click for range, Ctrl+click to toggle"}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Selection mode toggle button */}
+                <button
+                  onClick={() => setIsSelectionMode(!isSelectionMode)}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                    isSelectionMode
+                      ? "bg-retro-cyan/20 text-retro-cyan"
+                      : "text-gray-400 hover:text-retro-cyan hover:bg-retro-cyan/10"
+                  }`}
+                  title={isSelectionMode ? "Exit selection mode" : "Enter selection mode"}
                 >
-                  {sourceCharacters.map((char, index) => (
-                    <CharacterButton
-                      key={index}
-                      character={char}
-                      index={index}
-                      isSelected={selectedIndices.has(index)}
-                      isSelectionMode={isSelectionMode}
-                      onClick={handleCharacterClick}
-                      onLongPress={handleLongPress}
-                    />
-                  ))}
-                </div>
+                  {isSelectionMode ? (
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                      />
+                    </svg>
+                  )}
+                  <span>Select</span>
+                </button>
               </div>
-
-              {/* Selection mode bar */}
-              <SelectionModeBar
-                isVisible={isSelectionMode}
-                selectionCount={selectedIndices.size}
-                totalItems={sourceCharacters.length}
-                onSelectAll={handleSelectAll}
-                onClearSelection={handleSelectNone}
-                onExitMode={handleExitSelectionMode}
-              />
             </div>
-          )}
 
-          {/* Step 3: Resize */}
-          {step === "resize" && selectedSet && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-300 mb-2">
-                  Source dimensions differ from target
-                </p>
-                <p className="text-xs text-gray-500">
-                  {formatSize(selectedSet.config)} → {formatSize(currentConfig)}
-                </p>
+            {/* Character grid */}
+            <div
+              className={`bg-black/30 rounded-lg p-3 flex-1 overflow-y-auto min-h-0 ${
+                isSelectionMode ? "pb-16 ring-1 ring-retro-cyan/30" : ""
+              }`}
+            >
+              <div
+                ref={gridRef}
+                className="grid gap-1 select-none"
+                style={{
+                  gridTemplateColumns: `repeat(auto-fill, minmax(${
+                    Math.max(selectedSet.config.width * 3, 24) + 8
+                  }px, 1fr))`,
+                }}
+                onTouchStartCapture={dragSelect.onTouchStart}
+                onTouchMoveCapture={dragSelect.onTouchMove}
+                onTouchEndCapture={dragSelect.onTouchEnd}
+                onMouseDownCapture={dragSelect.onMouseDown}
+                onMouseMoveCapture={dragSelect.onMouseMove}
+                onMouseUpCapture={dragSelect.onMouseUp}
+                onClickCapture={dragSelect.onClickCapture}
+              >
+                {sourceCharacters.map((char, index) => (
+                  <CharacterButton
+                    key={index}
+                    character={char}
+                    index={index}
+                    isSelected={selectedIndices.has(index)}
+                    isSelectionMode={isSelectionMode}
+                    onClick={handleCharacterClick}
+                    onLongPress={handleLongPress}
+                  />
+                ))}
               </div>
+            </div>
 
-              {/* Anchor selection */}
-              <div>
-                <label className="block text-sm text-gray-300 mb-2 text-center">
-                  Anchor Position
-                </label>
-                <p className="text-xs text-gray-500 mb-3 text-center">
-                  Select where to anchor content when resizing
-                </p>
-                <div className="grid grid-cols-3 gap-1 w-32 mx-auto">
-                  {ANCHOR_POSITIONS.map((pos) => {
-                    const isSelected = anchor === pos;
-                    return (
-                      <button
-                        key={pos}
-                        type="button"
-                        onClick={() => setAnchor(pos)}
-                        className={`
+            {/* Selection mode bar */}
+            <SelectionModeBar
+              isVisible={isSelectionMode}
+              selectionCount={selectedIndices.size}
+              totalItems={sourceCharacters.length}
+              onSelectAll={handleSelectAll}
+              onClearSelection={handleSelectNone}
+              onExitMode={handleExitSelectionMode}
+            />
+          </div>
+        )}
+
+        {/* Step 3: Resize */}
+        {step === "resize" && selectedSet && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-sm text-gray-300 mb-2">Source dimensions differ from target</p>
+              <p className="text-xs text-gray-500">
+                {formatSize(selectedSet.config)} → {formatSize(currentConfig)}
+              </p>
+            </div>
+
+            {/* Anchor selection */}
+            <div>
+              <label className="block text-sm text-gray-300 mb-2 text-center">Anchor Position</label>
+              <p className="text-xs text-gray-500 mb-3 text-center">Select where to anchor content when resizing</p>
+              <div className="grid grid-cols-3 gap-1 w-32 mx-auto">
+                {ANCHOR_POSITIONS.map((pos) => {
+                  const isSelected = anchor === pos;
+                  return (
+                    <button
+                      key={pos}
+                      type="button"
+                      onClick={() => setAnchor(pos)}
+                      className={`
                           w-10 h-10 rounded border-2 transition-all
                           flex items-center justify-center
-                          ${isSelected
-                            ? "border-retro-cyan bg-retro-cyan/20"
-                            : "border-retro-grid/50 bg-retro-dark hover:border-retro-grid"
+                          ${
+                            isSelected
+                              ? "border-retro-cyan bg-retro-cyan/20"
+                              : "border-retro-grid/50 bg-retro-dark hover:border-retro-grid"
                           }
                         `}
-                        title={getAnchorLabel(pos)}
-                      >
-                        <div
-                          className={`
+                      title={getAnchorLabel(pos)}
+                    >
+                      <div
+                        className={`
                             w-3 h-3 rounded-sm transition-colors
                             ${isSelected ? "bg-retro-cyan" : "bg-gray-600"}
                           `}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
+                      />
+                    </button>
+                  );
+                })}
               </div>
-
-              <p className="text-xs text-gray-500 text-center">
-                {selectedIndices.size} character{selectedIndices.size !== 1 ? "s" : ""} will be imported and resized
-              </p>
             </div>
-          )}
+
+            <p className="text-xs text-gray-500 text-center">
+              {selectedIndices.size} character{selectedIndices.size !== 1 ? "s" : ""} will be imported and resized
+            </p>
+          </div>
+        )}
       </ModalContent>
 
       <ModalFooter className="flex justify-between">
@@ -627,14 +581,11 @@ export function ImportCharactersModal({
           <button
             onClick={handleNext}
             disabled={
-              (step === "select-set" && !selectedSetId) ||
-              (step === "select-chars" && selectedIndices.size === 0)
+              (step === "select-set" && !selectedSetId) || (step === "select-chars" && selectedIndices.size === 0)
             }
             className="px-4 py-2 text-sm bg-retro-cyan/20 border border-retro-cyan rounded text-retro-cyan hover:bg-retro-cyan/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {step === "select-chars" && !dimensionsDiffer
-              ? `Import (${selectedIndices.size})`
-              : "Next"}
+            {step === "select-chars" && !dimensionsDiffer ? `Import (${selectedIndices.size})` : "Next"}
           </button>
         )}
       </ModalFooter>

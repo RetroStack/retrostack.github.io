@@ -194,32 +194,7 @@ export function EditorSidebar({
         {/* Character grid - collapsible, improved density */}
         <div className="border-b border-retro-grid/30">
           <div className="flex items-center justify-between p-2">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-sm text-gray-300">Characters</span>
-              {/* Hide All/None buttons when in selection mode - they're in the SelectionModeBar */}
-              {!selectionMode.isSelectionMode && onSelectAll && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectAll();
-                  }}
-                  className="text-[10px] text-gray-500 hover:text-retro-cyan transition-colors"
-                >
-                  All
-                </button>
-              )}
-              {!selectionMode.isSelectionMode && onSelectNone && hasMultipleSelected && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectNone();
-                  }}
-                  className="text-[10px] text-gray-500 hover:text-retro-pink transition-colors"
-                >
-                  None
-                </button>
-              )}
-            </div>
+            <span className="font-medium text-sm text-gray-300">Characters</span>
             <button
               onClick={() => setGridCollapsed(!gridCollapsed)}
               className="p-1 text-gray-400 hover:text-retro-cyan transition-colors"
@@ -270,31 +245,7 @@ export function EditorSidebar({
         onSelectAll={selectionMode.selectAll}
         onClearSelection={selectionMode.clearSelection}
         onExitMode={selectionMode.exitSelectionMode}
-        actions={
-          onDeleteSelected
-            ? [
-                {
-                  id: "delete",
-                  label: "Delete",
-                  icon: (
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  ),
-                  onClick: () => {
-                    onDeleteSelected();
-                    selectionMode.exitSelectionMode();
-                  },
-                  variant: "danger",
-                },
-              ]
-            : []
-        }
+        fixed
       />
     </div>
   );

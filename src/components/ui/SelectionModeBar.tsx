@@ -47,6 +47,8 @@ export interface SelectionModeBarProps {
   onExitMode: () => void;
   /** Additional action buttons */
   actions?: SelectionModeAction[];
+  /** Whether to use fixed positioning (stays at bottom of screen) */
+  fixed?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
@@ -80,6 +82,7 @@ export function SelectionModeBar({
   onClearSelection,
   onExitMode,
   actions = [],
+  fixed = false,
   className = "",
 }: SelectionModeBarProps) {
   if (!isVisible) return null;
@@ -89,7 +92,7 @@ export function SelectionModeBar({
   return (
     <div
       className={`
-        absolute bottom-0 left-0 right-0
+        ${fixed ? "sticky" : "absolute"} bottom-0 left-0 right-0
         bg-retro-navy/95 backdrop-blur-sm
         border-t border-retro-cyan/50
         px-3 py-2
@@ -109,7 +112,7 @@ export function SelectionModeBar({
           <span className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-full bg-retro-cyan/20 text-retro-cyan text-sm font-medium">
             {selectionCount}
           </span>
-          <span className="text-sm text-gray-400">selected</span>
+          <span className="text-xs text-gray-400">selected</span>
         </div>
 
         {/* Bulk selection buttons */}
@@ -155,14 +158,6 @@ export function SelectionModeBar({
             <span className="hidden sm:inline">{action.label}</span>
           </button>
         ))}
-
-        {/* Done button */}
-        <button
-          onClick={onExitMode}
-          className="px-3 py-1.5 rounded text-xs font-medium bg-retro-cyan/20 text-retro-cyan hover:bg-retro-cyan/30 transition-colors"
-        >
-          Done
-        </button>
       </div>
     </div>
   );
