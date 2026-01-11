@@ -20,7 +20,12 @@ import { jsPDF } from "jspdf";
 /**
  * Export format types
  */
-export type ExportFormat = "binary" | "c-header" | "assembly" | "png" | "reference-sheet";
+export type ExportFormat = "binary" | "code" | "png" | "reference-sheet";
+
+/**
+ * Code export output format (C Header or Assembly)
+ */
+export type CodeOutputFormat = "c-header" | "assembly";
 
 /**
  * Reference sheet output format (PNG or PDF)
@@ -50,18 +55,11 @@ export const EXPORT_FORMATS: ExportFormatInfo[] = [
     mimeType: "application/octet-stream",
   },
   {
-    id: "c-header",
-    name: "C/C++ Header",
-    description: "Byte array for embedded development",
+    id: "code",
+    name: "Source Code",
+    description: "C/C++ header or assembly include file",
     extension: ".h",
     mimeType: "text/x-c",
-  },
-  {
-    id: "assembly",
-    name: "Assembly Include",
-    description: "Data bytes for 6502/Z80 assembly",
-    extension: ".asm",
-    mimeType: "text/plain",
   },
   {
     id: "png",

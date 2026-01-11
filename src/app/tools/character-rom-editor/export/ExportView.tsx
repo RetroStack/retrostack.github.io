@@ -26,6 +26,7 @@ import { getSuggestedFilename, formatFileSize } from "@/lib/character-editor/uti
 import {
   EXPORT_FORMATS,
   ExportFormat,
+  CodeOutputFormat,
   CHeaderOptions,
   AssemblyOptions,
   PngOptions,
@@ -115,10 +116,9 @@ export function ExportView() {
   const [padding, setPadding] = useState<PaddingDirection>("right");
   const [bitDirection, setBitDirection] = useState<BitDirection>("ltr");
 
-  // C Header options
+  // Code export options (C Header or Assembly)
+  const [codeOutputFormat, setCodeOutputFormat] = useState<CodeOutputFormat>("c-header");
   const [cHeaderOptions, setCHeaderOptions] = useState<CHeaderOptions>(getDefaultCHeaderOptions(""));
-
-  // Assembly options
   const [assemblyOptions, setAssemblyOptions] = useState<AssemblyOptions>(getDefaultAssemblyOptions(""));
 
   // PNG options
@@ -242,9 +242,12 @@ export function ExportView() {
     if (format === "reference-sheet") {
       return referenceSheetOptions.outputFormat === "pdf" ? ".pdf" : ".png";
     }
+    if (format === "code") {
+      return codeOutputFormat === "c-header" ? ".h" : ".asm";
+    }
     const formatInfo = EXPORT_FORMATS.find((f) => f.id === format);
     return formatInfo?.extension || ".bin";
-  }, [format, referenceSheetOptions.outputFormat]);
+  }, [format, referenceSheetOptions.outputFormat, codeOutputFormat]);
 
   // Handle sheet background color change with automatic label color adjustment
   const handleSheetBackgroundChange = useCallback((newColor: string) => {
@@ -268,13 +271,16 @@ export function ExportView() {
         const cleanBase = baseName.replace(/-reference$/, "");
         const newExtension = referenceSheetOptions.outputFormat === "pdf" ? ".pdf" : ".png";
         setFilename(cleanBase + "-reference" + newExtension);
+      } else if (format === "code") {
+        const newExtension = codeOutputFormat === "c-header" ? ".h" : ".asm";
+        setFilename(baseName + newExtension);
       } else {
         const newExtension = EXPORT_FORMATS.find((f) => f.id === format)?.extension || ".bin";
         setFilename(baseName + newExtension);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally excludes filename to prevent infinite loop when updating extension
-  }, [format, referenceSheetOptions.outputFormat]);
+  }, [format, referenceSheetOptions.outputFormat, codeOutputFormat]);
 
   // Handle export
   const handleExport = useCallback(async () => {
@@ -301,20 +307,19 @@ export function ExportView() {
           break;
         }
 
-        case "c-header": {
-          const content = exportToCHeader(characterSet.characters, exportConfig, cHeaderOptions);
-          blob = new Blob([content], { type: "text/x-c" });
-          if (!exportFilename.endsWith(".h")) {
-            exportFilename += ".h";
-          }
-          break;
-        }
-
-        case "assembly": {
-          const content = exportToAssembly(characterSet.characters, exportConfig, assemblyOptions);
-          blob = new Blob([content], { type: "text/plain" });
-          if (!exportFilename.endsWith(".asm") && !exportFilename.endsWith(".inc")) {
-            exportFilename += ".asm";
+        case "code": {
+          if (codeOutputFormat === "c-header") {
+            const content = exportToCHeader(characterSet.characters, exportConfig, cHeaderOptions);
+            blob = new Blob([content], { type: "text/x-c" });
+            if (!exportFilename.endsWith(".h")) {
+              exportFilename += ".h";
+            }
+          } else {
+            const content = exportToAssembly(characterSet.characters, exportConfig, assemblyOptions);
+            blob = new Blob([content], { type: "text/plain" });
+            if (!exportFilename.endsWith(".asm") && !exportFilename.endsWith(".inc")) {
+              exportFilename += ".asm";
+            }
           }
           break;
         }
@@ -358,6 +363,7 @@ export function ExportView() {
     filename,
     padding,
     bitDirection,
+    codeOutputFormat,
     cHeaderOptions,
     assemblyOptions,
     pngOptions,
@@ -448,7 +454,7 @@ export function ExportView() {
                         {f.name}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {f.id === "reference-sheet" ? ".png/.pdf" : f.extension}
+                        {f.id === "reference-sheet" ? ".png/.pdf" : f.id === "code" ? ".h/.asm" : f.extension}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">{f.description}</p>
@@ -480,7 +486,7 @@ export function ExportView() {
                 {format === "binary" && (
                   <>
                     <div>
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">System Preset</h3>
                       <BinarySystemSelector
                         padding={padding}
                         bitDirection={bitDirection}
@@ -503,11 +509,37 @@ export function ExportView() {
                   </>
                 )}
 
-                {/* C Header options */}
-                {format === "c-header" && (
+                {/* Code options (C Header or Assembly) */}
+                {format === "code" && (
                   <>
                     <div>
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">Output Format</label>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setCodeOutputFormat("c-header")}
+                          className={`flex-1 px-3 py-2 text-xs rounded border transition-colors ${
+                            codeOutputFormat === "c-header"
+                              ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                              : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                          }`}
+                        >
+                          C/C++ Header
+                        </button>
+                        <button
+                          onClick={() => setCodeOutputFormat("assembly")}
+                          className={`flex-1 px-3 py-2 text-xs rounded border transition-colors ${
+                            codeOutputFormat === "assembly"
+                              ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
+                              : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
+                          }`}
+                        >
+                          Assembly
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">System Preset</h3>
                       <BinarySystemSelector
                         padding={padding}
                         bitDirection={bitDirection}
@@ -528,121 +560,104 @@ export function ExportView() {
                       <BitDirectionSelector value={bitDirection} onChange={setBitDirection} />
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">Array Name</label>
-                      <input
-                        type="text"
-                        value={cHeaderOptions.arrayName}
-                        onChange={(e) => setCHeaderOptions({ ...cHeaderOptions, arrayName: e.target.value })}
-                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
-                      />
-                    </div>
+                    {/* C Header specific options */}
+                    {codeOutputFormat === "c-header" && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">Array Name</label>
+                          <input
+                            type="text"
+                            value={cHeaderOptions.arrayName}
+                            onChange={(e) => setCHeaderOptions({ ...cHeaderOptions, arrayName: e.target.value })}
+                            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <ToggleSwitch
-                          checked={cHeaderOptions.includeGuards}
-                          onChange={(checked) =>
-                            setCHeaderOptions({
-                              ...cHeaderOptions,
-                              includeGuards: checked,
-                            })
-                          }
-                        />
-                        Include guards (#ifndef)
-                      </label>
-                      <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <ToggleSwitch
-                          checked={cHeaderOptions.includeComments}
-                          onChange={(checked) =>
-                            setCHeaderOptions({
-                              ...cHeaderOptions,
-                              includeComments: checked,
-                            })
-                          }
-                        />
-                        Include comments
-                      </label>
-                    </div>
-                  </>
-                )}
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                            <ToggleSwitch
+                              checked={cHeaderOptions.includeGuards}
+                              onChange={(checked) =>
+                                setCHeaderOptions({
+                                  ...cHeaderOptions,
+                                  includeGuards: checked,
+                                })
+                              }
+                            />
+                            Include guards (#ifndef)
+                          </label>
+                          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                            <ToggleSwitch
+                              checked={cHeaderOptions.includeComments}
+                              onChange={(checked) =>
+                                setCHeaderOptions({
+                                  ...cHeaderOptions,
+                                  includeComments: checked,
+                                })
+                              }
+                            />
+                            Include comments
+                          </label>
+                        </div>
+                      </>
+                    )}
 
-                {/* Assembly options */}
-                {format === "assembly" && (
-                  <>
-                    <div>
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
-                      <BinarySystemSelector
-                        padding={padding}
-                        bitDirection={bitDirection}
-                        onSystemChange={(newPadding, newBitDirection) => {
-                          setPadding(newPadding);
-                          setBitDirection(newBitDirection);
-                        }}
-                      />
-                    </div>
+                    {/* Assembly specific options */}
+                    {codeOutputFormat === "assembly" && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">Label Name</label>
+                          <input
+                            type="text"
+                            value={assemblyOptions.labelName}
+                            onChange={(e) => setAssemblyOptions({ ...assemblyOptions, labelName: e.target.value })}
+                            className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
+                          />
+                        </div>
 
-                    <div>
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Padding</h3>
-                      <PaddingDirectionSelector value={padding} onChange={setPadding} />
-                    </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">Directive Style</label>
+                          <SingleSelectDropdown
+                            options={[
+                              { value: ".byte", label: ".byte (ca65, DASM)" },
+                              { value: "db", label: "db (NASM, z80)" },
+                              { value: ".db", label: ".db (ASM6)" },
+                              { value: "DC.B", label: "DC.B (68000)" },
+                            ]}
+                            value={assemblyOptions.directive}
+                            onChange={(value) =>
+                              setAssemblyOptions({
+                                ...assemblyOptions,
+                                directive: value as AssemblyOptions["directive"],
+                              })
+                            }
+                            ariaLabel="Directive style"
+                          />
+                        </div>
 
-                    <div>
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Direction</h3>
-                      <BitDirectionSelector value={bitDirection} onChange={setBitDirection} />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">Label Name</label>
-                      <input
-                        type="text"
-                        value={assemblyOptions.labelName}
-                        onChange={(e) => setAssemblyOptions({ ...assemblyOptions, labelName: e.target.value })}
-                        className="w-full px-3 py-2 bg-retro-dark border border-retro-grid/50 rounded text-sm text-white focus:outline-none focus:border-retro-cyan font-mono"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1">Directive Style</label>
-                      <SingleSelectDropdown
-                        options={[
-                          { value: ".byte", label: ".byte (ca65, DASM)" },
-                          { value: "db", label: "db (NASM, z80)" },
-                          { value: ".db", label: ".db (ASM6)" },
-                          { value: "DC.B", label: "DC.B (68000)" },
-                        ]}
-                        value={assemblyOptions.directive}
-                        onChange={(value) =>
-                          setAssemblyOptions({
-                            ...assemblyOptions,
-                            directive: value as AssemblyOptions["directive"],
-                          })
-                        }
-                        ariaLabel="Directive style"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <ToggleSwitch
-                          checked={assemblyOptions.useHex}
-                          onChange={(checked) => setAssemblyOptions({ ...assemblyOptions, useHex: checked })}
-                        />
-                        Use hex values ($FF)
-                      </label>
-                      <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                        <ToggleSwitch
-                          checked={assemblyOptions.includeComments}
-                          onChange={(checked) =>
-                            setAssemblyOptions({
-                              ...assemblyOptions,
-                              includeComments: checked,
-                            })
-                          }
-                        />
-                        Include comments
-                      </label>
-                    </div>
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                            <ToggleSwitch
+                              checked={assemblyOptions.useHex}
+                              onChange={(checked) => setAssemblyOptions({ ...assemblyOptions, useHex: checked })}
+                            />
+                            Use hex values ($FF)
+                          </label>
+                          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                            <ToggleSwitch
+                              checked={assemblyOptions.includeComments}
+                              onChange={(checked) =>
+                                setAssemblyOptions({
+                                  ...assemblyOptions,
+                                  includeComments: checked,
+                                })
+                              }
+                            />
+                            Include comments
+                          </label>
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
 
@@ -1237,36 +1252,38 @@ export function ExportView() {
                   </div>
                 )}
 
-                {/* C Header preview */}
-                {format === "c-header" && cHeaderPreview && (
-                  <div className="relative">
-                    <div className="bg-black/50 rounded p-3 font-mono text-[10px] text-gray-300 max-h-[300px] overflow-hidden whitespace-pre leading-relaxed">
-                      {cHeaderPreview.split("\n").slice(0, 25).join("\n")}
-                    </div>
-                    {cHeaderPreview.split("\n").length > 25 && (
-                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b pointer-events-none flex items-end justify-center pb-2">
-                        <span className="text-[10px] text-gray-500 bg-black/60 px-2 py-0.5 rounded">
-                          {cHeaderPreview.split("\n").length - 25} more lines
-                        </span>
+                {/* Code preview (C Header or Assembly) */}
+                {format === "code" && (
+                  <>
+                    {codeOutputFormat === "c-header" && cHeaderPreview && (
+                      <div className="relative">
+                        <div className="bg-black/50 rounded p-3 font-mono text-[10px] text-gray-300 max-h-[300px] overflow-hidden whitespace-pre leading-relaxed">
+                          {cHeaderPreview.split("\n").slice(0, 25).join("\n")}
+                        </div>
+                        {cHeaderPreview.split("\n").length > 25 && (
+                          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b pointer-events-none flex items-end justify-center pb-2">
+                            <span className="text-[10px] text-gray-500 bg-black/60 px-2 py-0.5 rounded">
+                              {cHeaderPreview.split("\n").length - 25} more lines
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* Assembly preview */}
-                {format === "assembly" && assemblyPreview && (
-                  <div className="relative">
-                    <div className="bg-black/50 rounded p-3 font-mono text-[10px] text-gray-300 max-h-[300px] overflow-hidden whitespace-pre leading-relaxed">
-                      {assemblyPreview.split("\n").slice(0, 25).join("\n")}
-                    </div>
-                    {assemblyPreview.split("\n").length > 25 && (
-                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b pointer-events-none flex items-end justify-center pb-2">
-                        <span className="text-[10px] text-gray-500 bg-black/60 px-2 py-0.5 rounded">
-                          {assemblyPreview.split("\n").length - 25} more lines
-                        </span>
+                    {codeOutputFormat === "assembly" && assemblyPreview && (
+                      <div className="relative">
+                        <div className="bg-black/50 rounded p-3 font-mono text-[10px] text-gray-300 max-h-[300px] overflow-hidden whitespace-pre leading-relaxed">
+                          {assemblyPreview.split("\n").slice(0, 25).join("\n")}
+                        </div>
+                        {assemblyPreview.split("\n").length > 25 && (
+                          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b pointer-events-none flex items-end justify-center pb-2">
+                            <span className="text-[10px] text-gray-500 bg-black/60 px-2 py-0.5 rounded">
+                              {assemblyPreview.split("\n").length - 25} more lines
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
+                  </>
                 )}
 
                 {/* PNG preview */}
