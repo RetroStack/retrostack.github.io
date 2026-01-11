@@ -50,19 +50,19 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ## 📜 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Create production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript type checking |
-| `npm run test` | Run Jest unit tests |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run test:e2e` | Run Playwright end-to-end tests |
-| `npm run test:visual` | Run visual regression tests |
-| `npm run validate` | Full validation (lint + typecheck + all tests) |
-| `npm run deploy` | Build and deploy to GitHub Pages |
+| Command                 | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| `npm run dev`           | Start development server                       |
+| `npm run build`         | Create production build                        |
+| `npm run start`         | Start production server                        |
+| `npm run lint`          | Run ESLint                                     |
+| `npm run typecheck`     | Run TypeScript type checking                   |
+| `npm run test`          | Run Jest unit tests                            |
+| `npm run test:coverage` | Run tests with coverage report                 |
+| `npm run test:e2e`      | Run Playwright end-to-end tests                |
+| `npm run test:visual`   | Run visual regression tests                    |
+| `npm run validate`      | Full validation (lint + typecheck + all tests) |
+| `npm run deploy`        | Build and deploy to GitHub Pages               |
 
 ## 🛠️ Tech Stack
 
