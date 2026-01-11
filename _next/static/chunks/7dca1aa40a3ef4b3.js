@@ -6,13 +6,13 @@
           flex-1 px-3 py-2 text-xs rounded border transition-colors
           ${"right"===e?"border-retro-cyan bg-retro-cyan/10 text-retro-cyan":"border-retro-grid/50 text-gray-400 hover:border-retro-grid"}
           disabled:opacity-50
-        `,children:"Right"})]})}function a({value:e,onChange:r,disabled:a=!1,className:s=""}){return(0,t.jsxs)("div",{className:`flex gap-2 ${s}`,children:[(0,t.jsx)("button",{type:"button",onClick:()=>r("ltr"),disabled:a,className:`
+        `,children:"Right"})]})}function a({value:e,onChange:r,disabled:a=!1,className:s=""}){return(0,t.jsxs)("div",{className:`flex gap-2 ${s}`,children:[(0,t.jsx)("button",{type:"button",onClick:()=>r("msb"),disabled:a,className:`
           flex-1 px-3 py-2 text-xs rounded border transition-colors
-          ${"ltr"===e?"border-retro-cyan bg-retro-cyan/10 text-retro-cyan":"border-retro-grid/50 text-gray-400 hover:border-retro-grid"}
+          ${"msb"===e?"border-retro-cyan bg-retro-cyan/10 text-retro-cyan":"border-retro-grid/50 text-gray-400 hover:border-retro-grid"}
           disabled:opacity-50
-        `,children:"MSB First"}),(0,t.jsx)("button",{type:"button",onClick:()=>r("rtl"),disabled:a,className:`
+        `,children:"MSB First"}),(0,t.jsx)("button",{type:"button",onClick:()=>r("lsb"),disabled:a,className:`
           flex-1 px-3 py-2 text-xs rounded border transition-colors
-          ${"rtl"===e?"border-retro-cyan bg-retro-cyan/10 text-retro-cyan":"border-retro-grid/50 text-gray-400 hover:border-retro-grid"}
+          ${"lsb"===e?"border-retro-cyan bg-retro-cyan/10 text-retro-cyan":"border-retro-grid/50 text-gray-400 hover:border-retro-grid"}
           disabled:opacity-50
         `,children:"LSB First"})]})}e.s(["PaddingDirectionSelector",()=>r],12795),e.s(["BitDirectionSelector",()=>a],88342)},93125,e=>{"use strict";var t=e.i(43476),r=e.i(71645),a=e.i(18566),s=e.i(22016),i=e.i(3374),n=e.i(58234),l=e.i(28540),o=e.i(59544),c=e.i(93733),d=e.i(92921);function x({onFileSelect:e,selectedFile:a,loading:s=!1,error:i=null,className:n=""}){let[l,o]=(0,r.useState)(!1),[c,x]=(0,r.useState)(null),h=(0,r.useRef)(null),m=i||c,u=(0,r.useCallback)(async t=>{if(x(null),!(0,d.isValidBinaryFile)(t))return void x("Invalid file type. Please select a binary ROM file (.bin, .rom, .chr, .fnt, .dat)");if(t.size>1048576)return void x("File too large. Maximum size is 1MB.");try{let r=await t.arrayBuffer();e(t,r)}catch{x("Failed to read file. Please try again.")}},[e]),g=(0,r.useCallback)(e=>{e.preventDefault(),e.stopPropagation(),o(!1);let t=e.dataTransfer.files;t.length>0&&u(t[0])},[u]),p=(0,r.useCallback)(e=>{e.preventDefault(),e.stopPropagation(),o(!0)},[]),f=(0,r.useCallback)(e=>{e.preventDefault(),e.stopPropagation(),o(!1)},[]),b=(0,r.useCallback)(()=>{h.current?.click()},[]),y=(0,r.useCallback)(e=>{let t=e.target.files;t&&t.length>0&&u(t[0])},[u]),j=(0,r.useCallback)(e=>{("Enter"===e.key||" "===e.key)&&(e.preventDefault(),b())},[b]);return(0,t.jsxs)("div",{className:n,children:[(0,t.jsx)("input",{ref:h,type:"file",accept:".bin,.rom,.chr,.fnt,.dat",onChange:y,className:"hidden","aria-hidden":"true"}),(0,t.jsx)("div",{onClick:b,onDrop:g,onDragOver:p,onDragLeave:f,onKeyDown:j,role:"button",tabIndex:0,"aria-label":"Drop a ROM file or click to browse",className:`
           relative flex flex-col items-center justify-center
