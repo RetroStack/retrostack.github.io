@@ -720,6 +720,19 @@ body {
   box-shadow: 0 0 8px var(--retro-violet), 0 0 15px var(--retro-violet), 0 0 30px var(--retro-violet);
 }
 
+.btn-neon-amber {
+  background: transparent;
+  color: var(--retro-amber);
+  border: 2px solid var(--retro-amber);
+  box-shadow: 0 0 8px rgba(255, 184, 0, 0.25);
+}
+
+.btn-neon-amber:hover {
+  background: var(--retro-amber);
+  color: var(--retro-dark);
+  box-shadow: 0 0 8px var(--retro-amber), 0 0 15px var(--retro-amber), 0 0 30px var(--retro-amber);
+}
+
 /* Card Styles */
 .card-retro {
   background: linear-gradient(135deg, rgba(26, 26, 62, 0.8) 0%, rgba(45, 27, 78, 0.6) 100%);

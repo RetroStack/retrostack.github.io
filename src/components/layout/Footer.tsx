@@ -18,9 +18,21 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { NAV_ITEMS, SOCIAL_LINKS, SITE_CONFIG } from "@/lib/constants";
+import { useOwnerMode } from "@/hooks/useOwnerMode";
+import { useToast } from "@/hooks/useToast";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const { isOwnerMode, toggleOwnerMode } = useOwnerMode();
+  const { showToast } = useToast();
+
+  const handleCopyrightClick = () => {
+    toggleOwnerMode();
+    showToast(
+      isOwnerMode ? "Owner mode disabled" : "Owner mode enabled",
+      "info"
+    );
+  };
 
   return (
     <footer className="bg-retro-navy border-t border-retro-grid safe-bottom safe-x">
@@ -65,9 +77,16 @@ export function Footer() {
 
           {/* Bottom Bar */}
           <div className="pt-6 sm:pt-8 border-t border-retro-grid/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Copyright */}
+            {/* Copyright - The "C" in the copyright symbol is a hidden owner mode toggle */}
             <p className="text-xs sm:text-sm text-text-muted text-center sm:text-left">
-              © {currentYear} {SITE_CONFIG.name}. All rights reserved.
+              <button
+                onClick={handleCopyrightClick}
+                className={`hover:text-retro-cyan transition-colors cursor-pointer ${isOwnerMode ? "text-retro-amber" : ""}`}
+                aria-label="Toggle owner mode"
+              >
+                ©
+              </button>{" "}
+              {currentYear} {SITE_CONFIG.name}. All rights reserved.
             </p>
 
             {/* Social Links - touch-friendly */}

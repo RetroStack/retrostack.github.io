@@ -25,6 +25,7 @@ import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrar
 import { useDatabaseCorruption } from "@/hooks/character-editor/useDatabaseCorruption";
 import { useToast } from "@/hooks/useToast";
 import { useOnboarding, CHARACTER_EDITOR_ONBOARDING_STEPS } from "@/hooks/useOnboarding";
+import { useOwnerMode } from "@/hooks/useOwnerMode";
 import { DatabaseCorruptionDialog } from "@/components/character-editor/DatabaseCorruptionDialog";
 import {
   filterAndSortCharacterSets,
@@ -82,6 +83,9 @@ export function CharacterEditorLibrary() {
     steps: CHARACTER_EDITOR_ONBOARDING_STEPS,
     enabled: true,
   });
+
+  // Owner mode (hidden feature)
+  const { isOwnerMode } = useOwnerMode();
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -501,6 +505,21 @@ export function CharacterEditorLibrary() {
                   <span className="hidden min-[1120px]:inline">Import ROM</span>
                 </Button>
               </Tooltip>
+              {isOwnerMode && (
+                <Tooltip content="Export multiple character sets to JSON" position="bottom">
+                  <Button href="/tools/character-rom-editor/export-all" variant="amber">
+                    <svg className="w-4 h-4 min-[1120px]:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                      />
+                    </svg>
+                    <span className="hidden min-[1120px]:inline">Export All</span>
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           </div>
 
