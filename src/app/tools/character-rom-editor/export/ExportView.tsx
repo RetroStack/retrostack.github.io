@@ -15,6 +15,7 @@ import { PixelGrid } from "@/components/character-editor/editor/PixelGrid";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
+import { BinarySystemSelector } from "@/components/character-editor/selectors/BinarySystemSelector";
 import { BloomEffectPanel, BloomEffectSettings } from "@/components/character-editor/editor/BloomEffectPanel";
 import { CustomColors, getActiveColors } from "@/lib/character-editor/data/colorPresets";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
@@ -478,6 +479,18 @@ export function ExportView() {
                 {/* Binary options */}
                 {format === "binary" && (
                   <>
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+                      <BinarySystemSelector
+                        padding={padding}
+                        bitDirection={bitDirection}
+                        onSystemChange={(newPadding, newBitDirection) => {
+                          setPadding(newPadding);
+                          setBitDirection(newBitDirection);
+                        }}
+                      />
+                    </div>
+
                     <div>
                       <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Padding</h3>
                       <PaddingDirectionSelector value={padding} onChange={setPadding} />
