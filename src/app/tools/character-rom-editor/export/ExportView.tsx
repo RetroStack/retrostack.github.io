@@ -11,6 +11,7 @@ import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { SingleSelectDropdown } from "@/components/ui/SingleSelectDropdown";
 import { NeonText } from "@/components/effects/NeonText";
 import { CharacterPreview } from "@/components/character-editor/character/CharacterPreview";
+import { PixelGrid } from "@/components/character-editor/editor/PixelGrid";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
@@ -669,12 +670,16 @@ export function ExportView() {
 
                     <BloomEffectPanel
                       settings={{
+                        scanlines: pngOptions.scanlines,
+                        scanlinesIntensity: pngOptions.scanlinesIntensity,
                         bloom: pngOptions.bloom,
                         bloomIntensity: pngOptions.bloomIntensity,
                       }}
                       onChange={(settings: BloomEffectSettings) =>
                         setPngOptions({
                           ...pngOptions,
+                          scanlines: settings.scanlines,
+                          scanlinesIntensity: settings.scanlinesIntensity,
                           bloom: settings.bloom,
                           bloomIntensity: settings.bloomIntensity,
                         })
@@ -1026,12 +1031,16 @@ export function ExportView() {
 
                     <BloomEffectPanel
                       settings={{
+                        scanlines: referenceSheetOptions.scanlines,
+                        scanlinesIntensity: referenceSheetOptions.scanlinesIntensity,
                         bloom: referenceSheetOptions.bloom,
                         bloomIntensity: referenceSheetOptions.bloomIntensity,
                       }}
                       onChange={(settings: BloomEffectSettings) =>
                         setReferenceSheetOptions({
                           ...referenceSheetOptions,
+                          scanlines: settings.scanlines,
+                          scanlinesIntensity: settings.scanlinesIntensity,
                           bloom: settings.bloom,
                           bloomIntensity: settings.bloomIntensity,
                         })
@@ -1244,6 +1253,7 @@ export function ExportView() {
                             backgroundColor={pngOptions.transparent ? "transparent" : pngOptions.backgroundColor}
                             showCharacterBorders={pngOptions.showGrid}
                             characterBorderColor={pngOptions.gridColor}
+                            scanlinesIntensity={pngOptions.scanlines ? pngOptions.scanlinesIntensity : 0}
                             bloomIntensity={pngOptions.bloom ? pngOptions.bloomIntensity : 0}
                           />
                           {pngOptions.columns > fittingColumns && (
@@ -1338,30 +1348,17 @@ export function ExportView() {
                                     style={{ width: `${characterSet.config.width * 2 + 8}px` }}
                                   >
                                     {/* Character pixels */}
-                                    <div
-                                      className="border border-gray-700"
-                                      style={{
-                                        width: `${characterSet.config.width * 2}px`,
-                                        height: `${characterSet.config.height * 2}px`,
-                                        backgroundColor: referenceSheetOptions.backgroundColor,
-                                      }}
-                                    >
-                                      {char.pixels.map((row, y) => (
-                                        <div key={y} className="flex">
-                                          {row.map((pixel, x) => (
-                                            <div
-                                              key={x}
-                                              style={{
-                                                width: "2px",
-                                                height: "2px",
-                                                backgroundColor: pixel
-                                                  ? referenceSheetOptions.foregroundColor
-                                                  : referenceSheetOptions.backgroundColor,
-                                              }}
-                                            />
-                                          ))}
-                                        </div>
-                                      ))}
+                                    <div className="border border-gray-700">
+                                      <PixelGrid
+                                        pixels={char.pixels}
+                                        scale={2}
+                                        showGrid={false}
+                                        foregroundColor={referenceSheetOptions.foregroundColor}
+                                        backgroundColor={referenceSheetOptions.backgroundColor}
+                                        interactive={false}
+                                        scanlinesIntensity={referenceSheetOptions.scanlines ? referenceSheetOptions.scanlinesIntensity : 0}
+                                        bloomIntensity={referenceSheetOptions.bloom ? referenceSheetOptions.bloomIntensity : 0}
+                                      />
                                     </div>
 
                                     {/* Labels */}
@@ -1496,30 +1493,16 @@ export function ExportView() {
                               <div key={charIdx} className="flex gap-3 items-center text-[6px] font-mono py-0.5">
                                 {/* Character graphic */}
                                 <div className="w-5 flex justify-center">
-                                  <div
-                                    style={{
-                                      width: `${characterSet.config.width * 2}px`,
-                                      height: `${characterSet.config.height * 2}px`,
-                                      backgroundColor: referenceSheetOptions.backgroundColor,
-                                    }}
-                                  >
-                                    {char.pixels.map((row, y) => (
-                                      <div key={y} className="flex">
-                                        {row.map((pixel, x) => (
-                                          <div
-                                            key={x}
-                                            style={{
-                                              width: "2px",
-                                              height: "2px",
-                                              backgroundColor: pixel
-                                                ? referenceSheetOptions.foregroundColor
-                                                : referenceSheetOptions.backgroundColor,
-                                            }}
-                                          />
-                                        ))}
-                                      </div>
-                                    ))}
-                                  </div>
+                                  <PixelGrid
+                                    pixels={char.pixels}
+                                    scale={2}
+                                    showGrid={false}
+                                    foregroundColor={referenceSheetOptions.foregroundColor}
+                                    backgroundColor={referenceSheetOptions.backgroundColor}
+                                    interactive={false}
+                                    scanlinesIntensity={referenceSheetOptions.scanlines ? referenceSheetOptions.scanlinesIntensity : 0}
+                                    bloomIntensity={referenceSheetOptions.bloom ? referenceSheetOptions.bloomIntensity : 0}
+                                  />
                                 </div>
                                 {referenceSheetOptions.showDecimal && (
                                   <div

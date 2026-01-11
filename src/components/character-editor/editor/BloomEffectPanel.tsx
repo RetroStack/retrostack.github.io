@@ -1,8 +1,8 @@
 /**
- * Bloom Effect Panel Component
+ * CRT Export Effects Panel Component
  *
- * Simple collapsible settings panel for bloom/glow effect.
- * Used in export options where only bloom applies (not scanlines or aspect ratio).
+ * Collapsible settings panel for CRT effects in exports.
+ * Includes scanlines and bloom/glow effects (no pixel aspect ratio for static exports).
  *
  * @module components/character-editor/editor/BloomEffectPanel
  */
@@ -12,6 +12,10 @@ import { useState, useCallback } from "react";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 
 export interface BloomEffectSettings {
+  /** Whether scanlines effect is enabled */
+  scanlines: boolean;
+  /** Scanlines intensity (0-100) */
+  scanlinesIntensity: number;
   /** Whether bloom/glow effect is enabled */
   bloom: boolean;
   /** Bloom intensity (0-100) */
@@ -19,7 +23,7 @@ export interface BloomEffectSettings {
 }
 
 export interface BloomEffectPanelProps {
-  /** Current bloom settings */
+  /** Current CRT settings */
   settings: BloomEffectSettings;
   /** Callback when settings change */
   onChange: (settings: BloomEffectSettings) => void;
@@ -29,11 +33,12 @@ export interface BloomEffectPanelProps {
   className?: string;
 }
 
-/** Default bloom intensity */
+/** Default intensities */
+const DEFAULT_SCANLINES_INTENSITY = 50;
 const DEFAULT_BLOOM_INTENSITY = 40;
 
 /**
- * Collapsible panel for bloom/glow effect settings
+ * Collapsible panel for CRT export effect settings
  */
 export function BloomEffectPanel({
   settings,
@@ -76,6 +81,37 @@ export function BloomEffectPanel({
       {/* Collapsible content */}
       {!collapsed && (
         <div className="p-3 pt-1 space-y-4 border-t border-retro-grid/30">
+          {/* Scanlines */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-400">Scanlines</label>
+              <ToggleSwitch checked={settings.scanlines} onChange={(checked) => updateSetting("scanlines", checked)} />
+            </div>
+            {settings.scanlines && (
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] text-gray-500">Intensity</label>
+                  {settings.scanlinesIntensity !== DEFAULT_SCANLINES_INTENSITY && (
+                    <button
+                      onClick={() => updateSetting("scanlinesIntensity", DEFAULT_SCANLINES_INTENSITY)}
+                      className="text-[10px] text-retro-cyan hover:text-retro-pink"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={settings.scanlinesIntensity}
+                  onChange={(e) => updateSetting("scanlinesIntensity", Number(e.target.value))}
+                  className="w-full h-1.5 accent-retro-cyan"
+                />
+              </div>
+            )}
+          </div>
+
           {/* Bloom */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -106,11 +142,6 @@ export function BloomEffectPanel({
               </div>
             )}
           </div>
-
-          {/* Info text */}
-          <p className="text-[10px] text-gray-500">
-            Adds a soft glow around lit pixels, simulating phosphor bloom on CRT displays.
-          </p>
         </div>
       )}
     </div>

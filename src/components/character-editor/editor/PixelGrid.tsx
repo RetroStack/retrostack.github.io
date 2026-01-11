@@ -55,6 +55,8 @@ export interface PixelGridProps {
   diffPixels?: Set<string>;
   /** Color for diff pixels */
   diffColor?: string;
+  /** Scanlines intensity (0-100, 0 = disabled) */
+  scanlinesIntensity?: number;
   /** Bloom/glow intensity (0-100, 0 = disabled) */
   bloomIntensity?: number;
 }
@@ -84,6 +86,7 @@ export function PixelGrid({
   mixedColor = "#666666",
   diffPixels,
   diffColor = "#ff3333",
+  scanlinesIntensity = 0,
   bloomIntensity = 0,
 }: PixelGridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -106,11 +109,11 @@ export function PixelGrid({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = showGrid ? gridColor : backgroundColor;
+    // Clear canvas with background color
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Set up bloom effect if enabled
+    // Set up bloom effect if enabled (only for character pixels)
     const hasBloom = bloomIntensity > 0;
     if (hasBloom) {
       ctx.shadowColor = foregroundColor;
@@ -160,9 +163,53 @@ export function PixelGrid({
       }
     }
 
-    // Reset shadow
+    // Reset shadow before drawing scanlines and grid
     if (hasBloom) {
       ctx.shadowBlur = 0;
+    }
+
+    // Draw scanlines overlay if enabled
+    if (scanlinesIntensity > 0) {
+      // Map intensity 0-100 to opacity 0-0.5
+      const opacity = (scanlinesIntensity / 100) * 0.5;
+      ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+
+      if (showGrid) {
+        // When grid is shown, draw scanlines per pixel cell to avoid affecting grid lines
+        for (let row = 0; row < height; row++) {
+          for (let col = 0; col < width; col++) {
+            const x = col * (scale + gridThickness) + gridThickness;
+            const y = row * (scale + gridThickness) + gridThickness;
+
+            // Draw horizontal scanlines within this pixel cell
+            for (let sy = 0; sy < scale; sy += 2) {
+              ctx.fillRect(x, y + sy, scale, 1);
+            }
+          }
+        }
+      } else {
+        // No grid - draw scanlines across the entire canvas (full CRT effect)
+        for (let y = 0; y < canvasHeight; y += 2) {
+          ctx.fillRect(0, y, canvasWidth, 1);
+        }
+      }
+    }
+
+    // Draw grid lines LAST (on top of everything, no bloom)
+    if (showGrid) {
+      ctx.fillStyle = gridColor;
+
+      // Vertical lines
+      for (let col = 0; col <= width; col++) {
+        const x = col * (scale + gridThickness);
+        ctx.fillRect(x, 0, gridThickness, canvasHeight);
+      }
+
+      // Horizontal lines
+      for (let row = 0; row <= height; row++) {
+        const y = row * (scale + gridThickness);
+        ctx.fillRect(0, y, canvasWidth, gridThickness);
+      }
     }
   }, [
     pixels,
@@ -180,6 +227,7 @@ export function PixelGrid({
     mixedColor,
     diffPixels,
     diffColor,
+    scanlinesIntensity,
     bloomIntensity,
   ]);
 

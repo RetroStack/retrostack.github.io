@@ -49,6 +49,8 @@ export interface CharacterPreviewProps {
   showCharacterBorders?: boolean;
   /** Color of character borders */
   characterBorderColor?: string;
+  /** Scanlines intensity (0-100, 0 = disabled) */
+  scanlinesIntensity?: number;
   /** Bloom/glow intensity (0-100, 0 = disabled) */
   bloomIntensity?: number;
 }
@@ -72,6 +74,7 @@ export function CharacterPreview({
   forceColumns,
   showCharacterBorders = false,
   characterBorderColor = "rgba(100, 100, 100, 0.5)",
+  scanlinesIntensity = 0,
   bloomIntensity = 0,
 }: CharacterPreviewProps) {
   // Calculate how many characters we can display
@@ -175,6 +178,7 @@ export function CharacterPreview({
         foregroundColor={foregroundColor}
         backgroundColor={backgroundColor}
         interactive={false}
+        scanlinesIntensity={scanlinesIntensity}
         bloomIntensity={bloomIntensity}
       />
 

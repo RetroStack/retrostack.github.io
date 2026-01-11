@@ -111,6 +111,10 @@ export interface PngOptions {
   foregroundColor: string;
   backgroundColor: string;
   transparent: boolean;
+  /** Whether scanlines effect is enabled */
+  scanlines: boolean;
+  /** Scanlines intensity (0-100) */
+  scanlinesIntensity: number;
   /** Whether bloom/glow effect is enabled */
   bloom: boolean;
   /** Bloom intensity (0-100) */
@@ -147,6 +151,10 @@ export interface ReferenceSheetOptions {
   binaryColor: string;
   asciiColor: string;
   nonPrintableAsciiColor: string;
+  /** Whether scanlines effect is enabled */
+  scanlines: boolean;
+  /** Scanlines intensity (0-100) */
+  scanlinesIntensity: number;
   /** Whether bloom/glow effect is enabled */
   bloom: boolean;
   /** Bloom intensity (0-100) */
@@ -201,6 +209,8 @@ export function getDefaultPngOptions(): PngOptions {
     foregroundColor: "#ffffff",
     backgroundColor: "#000000",
     transparent: false,
+    scanlines: false,
+    scanlinesIntensity: 50,
     bloom: false,
     bloomIntensity: 40,
   };
@@ -237,6 +247,8 @@ export function getDefaultReferenceSheetOptions(name: string): ReferenceSheetOpt
     binaryColor: "#888888",
     asciiColor: "#ffffff",
     nonPrintableAsciiColor: "#666666",
+    scanlines: false,
+    scanlinesIntensity: 50,
     bloom: false,
     bloomIntensity: 40,
   };
@@ -382,7 +394,7 @@ export async function exportToPng(
   config: CharacterSetConfig,
   options: PngOptions
 ): Promise<Blob> {
-  const { columns, scale, showGrid, gridColor, foregroundColor, backgroundColor, transparent, bloom, bloomIntensity } =
+  const { columns, scale, showGrid, gridColor, foregroundColor, backgroundColor, transparent, scanlines, scanlinesIntensity, bloom, bloomIntensity } =
     options;
 
   const rows = Math.ceil(characters.length / columns);
@@ -414,25 +426,9 @@ export async function exportToPng(
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   }
 
-  // Draw grid lines if enabled
-  if (showGrid) {
-    ctx.fillStyle = gridColor;
-
-    // Vertical lines
-    for (let col = 0; col <= columns; col++) {
-      const x = col * (charWidth * scale + gridThickness);
-      ctx.fillRect(x, 0, gridThickness, canvasHeight);
-    }
-
-    // Horizontal lines
-    for (let row = 0; row <= rows; row++) {
-      const y = row * (charHeight * scale + gridThickness);
-      ctx.fillRect(0, y, canvasWidth, gridThickness);
-    }
-  }
-
-  // Set up bloom effect if enabled
-  if (bloom && bloomIntensity > 0) {
+  // Set up bloom effect if enabled (only for character pixels)
+  const hasBloom = bloom && bloomIntensity > 0;
+  if (hasBloom) {
     ctx.shadowColor = foregroundColor;
     // Map intensity 0-100 to blur radius 0-2 (scaled by pixel size)
     ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
@@ -459,7 +455,7 @@ export async function exportToPng(
 
         if (isOn) {
           ctx.fillRect(baseX + px * scale, baseY + py * scale, scale, scale);
-        } else if (!transparent && !bloom) {
+        } else if (!transparent && !hasBloom) {
           // Only draw background pixels if no bloom (bloom looks better without explicit bg pixels)
           ctx.save();
           ctx.shadowBlur = 0;
@@ -469,6 +465,59 @@ export async function exportToPng(
           ctx.fillStyle = foregroundColor;
         }
       }
+    }
+  }
+
+  // Reset bloom before drawing scanlines and grid
+  if (hasBloom) {
+    ctx.shadowBlur = 0;
+  }
+
+  // Draw scanlines overlay if enabled
+  if (scanlines && scanlinesIntensity > 0) {
+    // Map intensity 0-100 to opacity 0-0.5
+    const opacity = (scanlinesIntensity / 100) * 0.5;
+    ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+
+    if (showGrid) {
+      // When grid is shown, draw scanlines per character cell to avoid affecting grid lines
+      for (let i = 0; i < characters.length; i++) {
+        const col = i % columns;
+        const row = Math.floor(i / columns);
+
+        const baseX = col * (charWidth * scale + gridThickness) + gridThickness;
+        const baseY = row * (charHeight * scale + gridThickness) + gridThickness;
+
+        const cellW = charWidth * scale;
+        const cellH = charHeight * scale;
+
+        // Draw horizontal scanlines within this character cell
+        for (let y = 0; y < cellH; y += 2) {
+          ctx.fillRect(baseX, baseY + y, cellW, 1);
+        }
+      }
+    } else {
+      // No grid - draw scanlines across the entire canvas (full CRT effect)
+      for (let y = 0; y < canvasHeight; y += 2) {
+        ctx.fillRect(0, y, canvasWidth, 1);
+      }
+    }
+  }
+
+  // Draw grid lines LAST (on top of everything, no bloom)
+  if (showGrid) {
+    ctx.fillStyle = gridColor;
+
+    // Vertical lines
+    for (let col = 0; col <= columns; col++) {
+      const x = col * (charWidth * scale + gridThickness);
+      ctx.fillRect(x, 0, gridThickness, canvasHeight);
+    }
+
+    // Horizontal lines
+    for (let row = 0; row <= rows; row++) {
+      const y = row * (charHeight * scale + gridThickness);
+      ctx.fillRect(0, y, canvasWidth, gridThickness);
     }
   }
 
@@ -539,6 +588,8 @@ function generateReferenceSheetCanvas(
     binaryColor,
     asciiColor,
     nonPrintableAsciiColor,
+    scanlines,
+    scanlinesIntensity,
     bloom,
     bloomIntensity,
   } = options;
@@ -675,10 +726,12 @@ function generateReferenceSheetCanvas(
         const charDrawX = colX + (charColWidth - charWidth * scale * resMult) / 2;
         const charDrawY = rowY - (charHeight * scale * resMult) / 2;
 
+        // Draw character background (no bloom)
+        ctx.shadowBlur = 0;
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(charDrawX - 2 * resMult, charDrawY - 2 * resMult, charWidth * scale * resMult + 4 * resMult, charHeight * scale * resMult + 4 * resMult);
 
-        // Set up bloom effect if enabled
+        // Set up bloom effect for character pixels only
         if (bloom && bloomIntensity > 0) {
           ctx.shadowColor = foregroundColor;
           ctx.shadowBlur = (bloomIntensity / 100) * scale * resMult * 2;
@@ -694,10 +747,25 @@ function generateReferenceSheetCanvas(
           }
         }
 
-        // Reset shadow for labels
+        // Reset shadow before scanlines
         if (bloom && bloomIntensity > 0) {
           ctx.shadowBlur = 0;
         }
+
+        // Draw scanlines on the entire character cell including border
+        if (scanlines && scanlinesIntensity > 0) {
+          const opacity = (scanlinesIntensity / 100) * 0.5;
+          ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+          // Include the 2px border around the character
+          const cellX = charDrawX - 2 * resMult;
+          const cellY = charDrawY - 2 * resMult;
+          const cellW = charWidth * scale * resMult + 4 * resMult;
+          const cellH = charHeight * scale * resMult + 4 * resMult;
+          for (let sy = 0; sy < cellH; sy += 2 * resMult) {
+            ctx.fillRect(cellX, cellY + sy, cellW, resMult);
+          }
+        }
+
         colX += charColWidth;
 
         // Decimal
@@ -822,7 +890,8 @@ function generateReferenceSheetCanvas(
       const cellX = rowHeaderWidth + col * cellWidth;
       const cellY = headerHeight + colHeaderHeight + row * cellHeight;
 
-      // Draw cell background
+      // Draw cell background (no bloom)
+      ctx.shadowBlur = 0;
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(
         cellX + 2 * resMult,
@@ -835,7 +904,7 @@ function generateReferenceSheetCanvas(
       const charX = cellX + cellPadding;
       const charY = cellY + cellPadding;
 
-      // Set up bloom effect if enabled
+      // Set up bloom effect for character pixels only
       if (bloom && bloomIntensity > 0) {
         ctx.shadowColor = foregroundColor;
         ctx.shadowBlur = (bloomIntensity / 100) * scale * resMult * 2;
@@ -851,9 +920,23 @@ function generateReferenceSheetCanvas(
         }
       }
 
-      // Reset shadow for labels
+      // Reset shadow before scanlines
       if (bloom && bloomIntensity > 0) {
         ctx.shadowBlur = 0;
+      }
+
+      // Draw scanlines on the entire character cell including background/padding
+      if (scanlines && scanlinesIntensity > 0) {
+        const opacity = (scanlinesIntensity / 100) * 0.5;
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        // Cover the entire background area (matches the fillRect above)
+        const bgX = cellX + 2 * resMult;
+        const bgY = cellY + 2 * resMult;
+        const bgW = cellWidth - 4 * resMult;
+        const bgH = charHeight * scale * resMult + cellPadding * 2 - 4 * resMult;
+        for (let sy = 0; sy < bgH; sy += 2 * resMult) {
+          ctx.fillRect(bgX, bgY + sy, bgW, resMult);
+        }
       }
 
       // Draw labels
@@ -912,6 +995,9 @@ function generateReferenceSheetCanvas(
     ctx.lineWidth = 2 * resMult;
     ctx.strokeRect(resMult, resMult, canvasWidth - 2 * resMult, canvasHeight - 2 * resMult);
   }
+
+  // Note: Scanlines are drawn per-character cell inline with the character rendering above
+  // to avoid affecting text labels and other UI elements
 
   // Add footer with generator info
   ctx.fillStyle = "#444444";
