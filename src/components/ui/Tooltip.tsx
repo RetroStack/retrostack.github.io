@@ -127,6 +127,7 @@ export function Tooltip({
     }
   }, [isVisible, position, actualPosition]);
 
+  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -134,6 +135,35 @@ export function Tooltip({
       }
     };
   }, []);
+
+  // Hide tooltip on global interactions (click, scroll, escape, window blur)
+  // This prevents tooltips from "sticking" when overlays appear on top
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const handleGlobalInteraction = () => {
+      hideTooltip();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        hideTooltip();
+      }
+    };
+
+    // Use capture phase for click to catch it before other handlers
+    document.addEventListener("click", handleGlobalInteraction, true);
+    document.addEventListener("scroll", handleGlobalInteraction, true);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("blur", handleGlobalInteraction);
+
+    return () => {
+      document.removeEventListener("click", handleGlobalInteraction, true);
+      document.removeEventListener("scroll", handleGlobalInteraction, true);
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("blur", handleGlobalInteraction);
+    };
+  }, [isVisible, hideTooltip]);
 
   const arrowStyles: Record<TooltipPosition, string> = {
     top: "top-full left-1/2 -translate-x-1/2 border-t-gray-800 border-l-transparent border-r-transparent border-b-transparent",
