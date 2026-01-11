@@ -56,16 +56,28 @@ export function CRTEffectsOverlay({
   const customStyles = useMemo<CSSProperties>(() => {
     const styles: Record<string, string> = {};
 
+    if (settings.scanlines) {
+      // Map intensity 0-100 to opacity 0-0.5 for scanlines
+      styles["--crt-scanlines-opacity"] = String((settings.scanlinesIntensity / 100) * 0.5);
+    }
+
     if (settings.bloom) {
       styles["--crt-bloom-color"] = foregroundColor;
     }
 
     return styles as CSSProperties;
-  }, [settings.bloom, foregroundColor]);
+  }, [settings.scanlines, settings.scanlinesIntensity, settings.bloom, foregroundColor]);
 
   return (
     <div className={`${effectClasses} ${className}`} style={customStyles}>
-      {children}
+      <div
+        style={{
+          // Clip bloom glow at container boundaries to prevent bleeding outside
+          ...(settings.bloom ? { overflow: "hidden" } : {}),
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

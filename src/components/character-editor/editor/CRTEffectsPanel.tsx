@@ -40,12 +40,7 @@ const ASPECT_RATIO_OPTIONS: { value: PixelAspectRatio; label: string }[] = [
 /**
  * Collapsible panel for CRT simulation effect settings
  */
-export function CRTEffectsPanel({
-  settings,
-  onChange,
-  defaultCollapsed = true,
-  className = "",
-}: CRTEffectsPanelProps) {
+export function CRTEffectsPanel({ settings, onChange, defaultCollapsed = true, className = "" }: CRTEffectsPanelProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
   const toggleCollapsed = useCallback(() => {
@@ -56,7 +51,7 @@ export function CRTEffectsPanel({
     <K extends keyof CRTSettings>(key: K, value: CRTSettings[K]) => {
       onChange({ ...settings, [key]: value });
     },
-    [settings, onChange]
+    [settings, onChange],
   );
 
   return (
@@ -82,22 +77,41 @@ export function CRTEffectsPanel({
       {!collapsed && (
         <div className="p-3 pt-1 space-y-4 border-t border-retro-grid/30">
           {/* Scanlines */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-400">Scanlines</label>
-            <ToggleSwitch
-              checked={settings.scanlines}
-              onChange={(checked) => updateSetting("scanlines", checked)}
-            />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-400">Scanlines</label>
+              <ToggleSwitch checked={settings.scanlines} onChange={(checked) => updateSetting("scanlines", checked)} />
+            </div>
+            {settings.scanlines && (
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] text-gray-500">Intensity</label>
+                  {settings.scanlinesIntensity !== DEFAULT_CRT_SETTINGS.scanlinesIntensity && (
+                    <button
+                      onClick={() => updateSetting("scanlinesIntensity", DEFAULT_CRT_SETTINGS.scanlinesIntensity)}
+                      className="text-[10px] text-retro-cyan hover:text-retro-pink"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={settings.scanlinesIntensity}
+                  onChange={(e) => updateSetting("scanlinesIntensity", Number(e.target.value))}
+                  className="w-full h-1.5 accent-retro-cyan"
+                />
+              </div>
+            )}
           </div>
 
           {/* Bloom */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs text-gray-400">Bloom / Glow</label>
-              <ToggleSwitch
-                checked={settings.bloom}
-                onChange={(checked) => updateSetting("bloom", checked)}
-              />
+              <ToggleSwitch checked={settings.bloom} onChange={(checked) => updateSetting("bloom", checked)} />
             </div>
             {settings.bloom && (
               <div className="space-y-1">

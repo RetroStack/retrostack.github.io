@@ -2,8 +2,7 @@
  * Character ROM Editor - CRT Simulation Settings
  *
  * Settings for simulating classic CRT display effects in the text preview.
- * Includes scanlines, screen curvature, bloom/glow, and pixel aspect ratio
- * for PAL/NTSC simulation.
+ * Includes scanlines, bloom/glow, and pixel aspect ratio for PAL/NTSC simulation.
  *
  * @module lib/character-editor/data/crtSettings
  */
@@ -23,10 +22,6 @@ export interface CRTSettings {
   scanlines: boolean;
   /** Scanlines intensity (0-100) */
   scanlinesIntensity: number;
-  /** Whether screen curvature effect is enabled */
-  curvature: boolean;
-  /** Curvature amount (0-100) */
-  curvatureAmount: number;
   /** Whether bloom/glow effect is enabled */
   bloom: boolean;
   /** Bloom intensity (0-100) */
@@ -41,8 +36,6 @@ export interface CRTSettings {
 export const DEFAULT_CRT_SETTINGS: CRTSettings = {
   scanlines: false,
   scanlinesIntensity: 50,
-  curvature: false,
-  curvatureAmount: 30,
   bloom: true,
   bloomIntensity: 40,
   pixelAspectRatio: "none",
@@ -95,4 +88,3 @@ export function getCRTSettings(): CRTSettings {
   }
   return { ...DEFAULT_CRT_SETTINGS };
 }
-
