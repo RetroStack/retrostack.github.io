@@ -197,6 +197,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
     resizeCharacters: crud.resizeCharacters,
     updateCharacter: crud.updateCharacter,
     setCharacters: crud.setCharacters,
+    replaceCharactersAtIndices: crud.replaceCharactersAtIndices,
 
     // Undo/redo
     undo,

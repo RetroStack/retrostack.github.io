@@ -216,15 +216,32 @@ export function EditView() {
     [snapshots, editor.characters, editor.config, toast],
   );
 
-  // Handle snapshot restore
+  // Handle snapshot restore (partial or full)
   const handleSnapshotRestore = useCallback(
-    (characters: import("@/lib/character-editor/types").Character[], snapshotName?: string) => {
+    (
+      characters: import("@/lib/character-editor/types").Character[],
+      selectedIndices: Set<number>,
+      snapshotName?: string
+    ) => {
       if (characterSet) {
-        editor.reset({
-          ...characterSet,
-          characters,
-        });
-        toast.info(snapshotName ? `Restored: ${snapshotName}` : "Snapshot restored");
+        const selectedCount = selectedIndices.size;
+
+        if (selectedCount === characters.length) {
+          // Full restore - use existing reset
+          editor.reset({
+            ...characterSet,
+            characters,
+          });
+          toast.info(snapshotName ? `Restored: ${snapshotName}` : "Snapshot restored");
+        } else {
+          // Partial restore - use replaceCharactersAtIndices
+          editor.replaceCharactersAtIndices(characters, selectedIndices, "Partial snapshot restore");
+          toast.info(
+            snapshotName
+              ? `Restored ${selectedCount} character${selectedCount !== 1 ? "s" : ""} from: ${snapshotName}`
+              : `Restored ${selectedCount} character${selectedCount !== 1 ? "s" : ""}`
+          );
+        }
       }
     },
     [characterSet, editor, toast],

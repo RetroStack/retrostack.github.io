@@ -66,6 +66,12 @@ export interface UseCharacterCRUDResult {
   updateCharacter: (index: number, character: Character) => void;
   /** Replace all characters */
   setCharacters: (characters: Character[]) => void;
+  /** Replace characters at specific indices (for partial restore) */
+  replaceCharactersAtIndices: (
+    sourceCharacters: Character[],
+    indices: Set<number>,
+    label?: string
+  ) => void;
 }
 
 /**
@@ -208,6 +214,27 @@ export function useCharacterCRUD({
     [updateState],
   );
 
+  const replaceCharactersAtIndices = useCallback(
+    (sourceCharacters: Character[], indices: Set<number>, label?: string) => {
+      if (indices.size === 0) return;
+
+      updateState((state) => {
+        const newCharacters = [...state.characters];
+
+        for (const index of indices) {
+          // Only replace if index exists in both arrays
+          if (index >= 0 && index < sourceCharacters.length && index < newCharacters.length) {
+            newCharacters[index] = cloneCharacter(sourceCharacters[index]);
+          }
+        }
+
+        state.characters = newCharacters;
+        return state;
+      }, label ?? "Partial restore");
+    },
+    [updateState],
+  );
+
   return {
     addCharacter,
     insertCharacterAfter,
@@ -218,5 +245,6 @@ export function useCharacterCRUD({
     resizeCharacters,
     updateCharacter,
     setCharacters,
+    replaceCharactersAtIndices,
   };
 }
