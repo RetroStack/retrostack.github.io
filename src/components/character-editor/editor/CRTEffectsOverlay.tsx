@@ -9,12 +9,7 @@
 "use client";
 
 import { useMemo, CSSProperties, ReactNode } from "react";
-import {
-  CRTSettings,
-  getScanlinesOpacity,
-  getCurvaturePercentage,
-  getBloomRadius,
-} from "@/lib/character-editor/data/crtSettings";
+import { CRTSettings } from "@/lib/character-editor/data/crtSettings";
 
 export interface CRTEffectsOverlayProps {
   /** CRT effect settings */
@@ -44,10 +39,6 @@ export function CRTEffectsOverlay({
       classes.push("crt-scanlines");
     }
 
-    if (settings.curvature) {
-      classes.push("crt-curvature");
-    }
-
     if (settings.bloom) {
       classes.push("crt-bloom");
     }
@@ -61,25 +52,16 @@ export function CRTEffectsOverlay({
     return classes.join(" ");
   }, [settings]);
 
-  // Build CSS custom properties for intensity values
+  // Build CSS custom properties for effect values
   const customStyles = useMemo<CSSProperties>(() => {
     const styles: Record<string, string> = {};
 
-    if (settings.scanlines) {
-      styles["--crt-scanline-opacity"] = String(getScanlinesOpacity(settings.scanlinesIntensity));
-    }
-
-    if (settings.curvature) {
-      styles["--crt-curvature"] = getCurvaturePercentage(settings.curvatureAmount);
-    }
-
     if (settings.bloom) {
       styles["--crt-bloom-color"] = foregroundColor;
-      styles["--crt-bloom-radius"] = getBloomRadius(settings.bloomIntensity);
     }
 
     return styles as CSSProperties;
-  }, [settings, foregroundColor]);
+  }, [settings.bloom, foregroundColor]);
 
   return (
     <div className={`${effectClasses} ${className}`} style={customStyles}>

@@ -82,71 +82,12 @@ export function CRTEffectsPanel({
       {!collapsed && (
         <div className="p-3 pt-1 space-y-4 border-t border-retro-grid/30">
           {/* Scanlines */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-400">Scanlines</label>
-              <ToggleSwitch
-                checked={settings.scanlines}
-                onChange={(checked) => updateSetting("scanlines", checked)}
-              />
-            </div>
-            {settings.scanlines && (
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] text-gray-500">Intensity</label>
-                  {settings.scanlinesIntensity !== DEFAULT_CRT_SETTINGS.scanlinesIntensity && (
-                    <button
-                      onClick={() => updateSetting("scanlinesIntensity", DEFAULT_CRT_SETTINGS.scanlinesIntensity)}
-                      className="text-[10px] text-retro-cyan hover:text-retro-pink"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.scanlinesIntensity}
-                  onChange={(e) => updateSetting("scanlinesIntensity", Number(e.target.value))}
-                  className="w-full h-1.5 accent-retro-cyan"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Curvature */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-400">Screen Curvature</label>
-              <ToggleSwitch
-                checked={settings.curvature}
-                onChange={(checked) => updateSetting("curvature", checked)}
-              />
-            </div>
-            {settings.curvature && (
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] text-gray-500">Amount</label>
-                  {settings.curvatureAmount !== DEFAULT_CRT_SETTINGS.curvatureAmount && (
-                    <button
-                      onClick={() => updateSetting("curvatureAmount", DEFAULT_CRT_SETTINGS.curvatureAmount)}
-                      className="text-[10px] text-retro-cyan hover:text-retro-pink"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.curvatureAmount}
-                  onChange={(e) => updateSetting("curvatureAmount", Number(e.target.value))}
-                  className="w-full h-1.5 accent-retro-cyan"
-                />
-              </div>
-            )}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-400">Scanlines</label>
+            <ToggleSwitch
+              checked={settings.scanlines}
+              onChange={(checked) => updateSetting("scanlines", checked)}
+            />
           </div>
 
           {/* Bloom */}

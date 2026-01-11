@@ -617,7 +617,7 @@ body {
   position: relative;
 }
 
-/* CRT Scanlines - opacity controlled by --crt-scanline-opacity custom property */
+/* CRT Scanlines - fixed intensity for authentic look */
 .crt-scanlines {
   position: relative;
 }
@@ -628,8 +628,8 @@ body {
   inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, var(--crt-scanline-opacity, 0.25)) 0px,
-    rgba(0, 0, 0, var(--crt-scanline-opacity, 0.25)) 1px,
+    rgba(0, 0, 0, 0.25) 0px,
+    rgba(0, 0, 0, 0.25) 1px,
     transparent 1px,
     transparent 2px
   );
@@ -637,16 +637,7 @@ body {
   z-index: 20;
 }
 
-/* CRT Screen Curvature - amount controlled by --crt-curvature custom property */
-.crt-curvature {
-  border-radius: var(--crt-curvature, 2%);
-  overflow: hidden;
-}
-
-/* CRT Bloom/Glow - uses --crt-bloom-color and --crt-bloom-radius custom properties */
-.crt-bloom {
-  filter: drop-shadow(0 0 var(--crt-bloom-radius, 2px) var(--crt-bloom-color, #ffffff));
-}
+/* CRT Bloom/Glow - handled via canvas shadowBlur for per-pixel glow */
 
 /* Pixel Aspect Ratio - PAL (wider pixels) */
 .crt-pal {

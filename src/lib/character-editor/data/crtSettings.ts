@@ -36,14 +36,14 @@ export interface CRTSettings {
 }
 
 /**
- * Default CRT settings (all effects off)
+ * Default CRT settings (bloom enabled for authentic CRT look)
  */
 export const DEFAULT_CRT_SETTINGS: CRTSettings = {
   scanlines: false,
   scanlinesIntensity: 50,
   curvature: false,
   curvatureAmount: 30,
-  bloom: false,
+  bloom: true,
   bloomIntensity: 40,
   pixelAspectRatio: "none",
 };
@@ -96,23 +96,3 @@ export function getCRTSettings(): CRTSettings {
   return { ...DEFAULT_CRT_SETTINGS };
 }
 
-/**
- * Convert scanlines intensity (0-100) to CSS opacity (0-0.5)
- */
-export function getScanlinesOpacity(intensity: number): number {
-  return (intensity / 100) * 0.5;
-}
-
-/**
- * Convert curvature amount (0-100) to CSS percentage (0-5%)
- */
-export function getCurvaturePercentage(amount: number): string {
-  return `${(amount / 100) * 5}%`;
-}
-
-/**
- * Convert bloom intensity (0-100) to CSS blur radius (0-4px)
- */
-export function getBloomRadius(intensity: number): string {
-  return `${(intensity / 100) * 4}px`;
-}

@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { CustomColors } from "@/lib/character-editor/data/colorPresets";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
 import { CRTEffectsOverlay } from "@/components/character-editor/editor/CRTEffectsOverlay";
-import { CRTEffectsPanel } from "@/components/character-editor/editor/CRTEffectsPanel";
-import { CRTSettings, getCRTSettings, saveCRTSettings } from "@/lib/character-editor/data/crtSettings";
+import { DEFAULT_CRT_SETTINGS } from "@/lib/character-editor/data/crtSettings";
 
 export interface TextPreviewModalProps {
   /** Whether the modal is open */
@@ -22,7 +21,7 @@ export interface TextPreviewModalProps {
   colors: CustomColors;
 }
 
-/** Sample text presets */
+/** Sample text presets - "All Characters" is added dynamically based on character count */
 const SAMPLE_TEXTS = [
   { label: "Quick Fox", text: "The quick brown fox jumps over the lazy dog." },
   { label: "Hello World", text: "HELLO WORLD!\nHello World!\nhello world!" },
@@ -30,6 +29,25 @@ const SAMPLE_TEXTS = [
   { label: "Symbols", text: "!@#$%^&*()_+-=[]{}\\|;':\",./<>?" },
   { label: "ASCII Art", text: "+------------------+\n|  RETRO COMPUTER  |\n+------------------+" },
 ];
+
+/**
+ * Generates text containing all characters from index 0 to count-1
+ * Uses character codes directly, displaying 16 characters per line
+ */
+function generateAllCharactersText(count: number): string {
+  const lines: string[] = [];
+  const charsPerLine = 16;
+
+  for (let i = 0; i < count; i += charsPerLine) {
+    let line = "";
+    for (let j = i; j < Math.min(i + charsPerLine, count); j++) {
+      // Use character codes directly - the index shift will map these to the right characters
+      line += String.fromCharCode(j);
+    }
+    lines.push(line);
+  }
+  return lines.join("\n");
+}
 
 /** Scale options */
 const SCALE_OPTIONS = [
@@ -47,11 +65,14 @@ function MiniCharacter({
   scale,
   foregroundColor,
   backgroundColor,
+  bloomIntensity = 0,
 }: {
   character: Character | null;
   scale: number;
   foregroundColor: string;
   backgroundColor: string;
+  /** Bloom intensity 0-100, 0 means no bloom */
+  bloomIntensity?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -72,6 +93,13 @@ function MiniCharacter({
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Set up bloom effect (pixel glow) based on intensity
+    if (bloomIntensity > 0) {
+      ctx.shadowColor = foregroundColor;
+      // Map intensity 0-100 to blur radius 0-2 (scaled by pixel size)
+      ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
+    }
+
     // Draw pixels
     ctx.fillStyle = foregroundColor;
     for (let y = 0; y < height; y++) {
@@ -81,7 +109,7 @@ function MiniCharacter({
         }
       }
     }
-  }, [character, scale, foregroundColor, backgroundColor]);
+  }, [character, scale, foregroundColor, backgroundColor, bloomIntensity]);
 
   if (!character) {
     return (
@@ -108,22 +136,27 @@ export function TextPreviewModal({
   config,
   colors: initialColors,
 }: TextPreviewModalProps) {
-  const [text, setText] = useState(SAMPLE_TEXTS[0].text);
+  const [text, setText] = useState("");
   const [scale, setScale] = useState(2);
   const [localColors, setLocalColors] = useState<CustomColors>(initialColors);
-  const [crtSettings, setCrtSettings] = useState<CRTSettings>(getCRTSettings);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Generate "All Characters" text based on character count
+  const allCharactersText = useMemo(() => {
+    return generateAllCharactersText(characters.length);
+  }, [characters.length]);
+
+  // Set default text to "All Characters" when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setText(allCharactersText);
+    }
+  }, [isOpen, allCharactersText]);
 
   // Update colors when props change
   useEffect(() => {
     setLocalColors(initialColors);
   }, [initialColors]);
-
-  // Handle CRT settings change with persistence
-  const handleCrtSettingsChange = useCallback((settings: CRTSettings) => {
-    setCrtSettings(settings);
-    saveCRTSettings(settings);
-  }, []);
 
   // Focus textarea on open
   useEffect(() => {
@@ -132,20 +165,18 @@ export function TextPreviewModal({
     }
   }, [isOpen]);
 
-  // Convert text to character indices
+  // Convert text to character indices (direct mapping by char code)
   const renderedLines = useMemo(() => {
     const lines = text.split("\n");
     return lines.map((line) => {
       const chars: (Character | null)[] = [];
       for (const char of line) {
         const code = char.charCodeAt(0);
-        // Map ASCII code to character index
-        // Most character sets start at 0, but some may have different mappings
         if (code >= 0 && code < characters.length) {
           chars.push(characters[code]);
         } else {
-          // Use space or first character as fallback
-          chars.push(characters[32] || characters[0] || null);
+          // Use first character as fallback for out-of-range
+          chars.push(characters[0] || null);
         }
       }
       return chars;
@@ -183,6 +214,13 @@ export function TextPreviewModal({
                   Sample texts
                 </label>
                 <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setText(allCharactersText)}
+                    className="px-2 py-1 text-xs bg-retro-dark border border-retro-pink/30 rounded text-retro-pink/70 hover:text-retro-pink hover:border-retro-pink/50 transition-colors"
+                    title={`Show all ${characters.length} characters`}
+                  >
+                    All Characters
+                  </button>
                   {SAMPLE_TEXTS.map((sample) => (
                     <button
                       key={sample.label}
@@ -226,22 +264,15 @@ export function TextPreviewModal({
                 </div>
               </div>
 
-              {/* CRT Effects Panel */}
-              <CRTEffectsPanel
-                settings={crtSettings}
-                onChange={handleCrtSettingsChange}
-                defaultCollapsed={true}
-              />
-
             </div>
 
             {/* Right side - Preview */}
             <div>
               <label className="block text-sm text-gray-300 mb-2">Preview</label>
               <CRTEffectsOverlay
-                settings={crtSettings}
+                settings={DEFAULT_CRT_SETTINGS}
                 foregroundColor={localColors.foreground}
-                className="rounded border border-retro-grid/30 overflow-auto max-h-[400px]"
+                className="rounded border border-retro-grid/30 overflow-auto max-h-[500px]"
               >
                 <div
                   className="p-4"
@@ -266,6 +297,7 @@ export function TextPreviewModal({
                                 scale={scale}
                                 foregroundColor={localColors.foreground}
                                 backgroundColor={localColors.background}
+                                bloomIntensity={DEFAULT_CRT_SETTINGS.bloomIntensity}
                               />
                             ))
                           )}
