@@ -38,8 +38,8 @@ export interface ChargenSourceData {
   chip: string;
   /** Locale/language of the character set (e.g., "English", "German", "Japanese") */
   locale: string;
-  /** Bit direction: "ltr" = MSB is leftmost pixel, "rtl" = LSB is leftmost pixel */
-  bitDirection: "ltr" | "rtl";
+  /** Bit direction: "msb" = MSB is leftmost pixel, "lsb" = LSB is leftmost pixel */
+  bitDirection: "msb" | "lsb";
   /** Padding direction: "left" = padding bits at start, "right" = padding bits at end (default: "right") */
   bitPadding?: "left" | "right";
   /** Version number for built-in character sets (used for auto-updates) */

@@ -97,7 +97,7 @@ export function FontImportView() {
     width: options.charWidth,
     height: options.charHeight,
     padding: "right",
-    bitDirection: "ltr",
+    bitDirection: "msb",
   }), [options.charWidth, options.charHeight]);
 
   // Calculate responsive preview dimensions

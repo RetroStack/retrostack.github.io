@@ -10,8 +10,10 @@
 // Padding direction for byte alignment
 export type PaddingDirection = "left" | "right";
 
-// Bit direction within bytes
-export type BitDirection = "ltr" | "rtl";
+// Bit order within bytes
+// - "msb": Most Significant Bit first (leftmost pixel = bit 7) - most common
+// - "lsb": Least Significant Bit first (leftmost pixel = bit 0) - Teletext, etc.
+export type BitDirection = "msb" | "lsb";
 
 // Anchor points for resize operations (3x3 grid)
 export type AnchorPoint =
@@ -300,7 +302,7 @@ export function createDefaultConfig(): CharacterSetConfig {
     width: 8,
     height: 8,
     padding: "right",
-    bitDirection: "ltr",
+    bitDirection: "msb",
   };
 }
 

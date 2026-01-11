@@ -34,7 +34,7 @@ export interface ExternalCharsetSource {
  *     "system": "Example System",
  *     "chip": "EX-001",
  *     "locale": "English",
- *     "bitDirection": "ltr",
+ *     "bitDirection": "msb",
  *     "bitPadding": "right",
  *     "data": [[0, 1, 2, ...], ...]
  *   }

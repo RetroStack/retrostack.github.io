@@ -26,7 +26,7 @@ describe("textImport", () => {
         charWidth: 8,
         charHeight: 8,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       });
     });
 
@@ -394,7 +394,7 @@ describe("textImport", () => {
         charWidth: 16,
         charHeight: 16,
         padding: "left",
-        bitDirection: "rtl",
+        bitDirection: "lsb",
       };
 
       // 32 bytes for one 16x16 character (16 pixels wide = 2 bytes per row, 16 rows)
@@ -404,7 +404,7 @@ describe("textImport", () => {
       expect(result.config.width).toBe(16);
       expect(result.config.height).toBe(16);
       expect(result.config.padding).toBe("left");
-      expect(result.config.bitDirection).toBe("rtl");
+      expect(result.config.bitDirection).toBe("lsb");
     });
 
     it("preserves detected format in result", () => {
@@ -441,7 +441,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array(0),
         characters: [],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 0,
         error: "No input provided",
@@ -454,7 +454,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
         characters: [createMockCharacter()],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 0,
       };
@@ -470,7 +470,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array(16),
         characters: [createMockCharacter(), createMockCharacter()],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "decimal",
         invalidCount: 0,
       };
@@ -484,7 +484,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
         characters: [createMockCharacter()],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 3,
       };
@@ -498,7 +498,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
         characters: [createMockCharacter()],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 1,
       };
@@ -512,7 +512,7 @@ describe("textImport", () => {
       const baseResult: TextParseResult = {
         bytes: new Uint8Array([255]),
         characters: [],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 0,
       };
@@ -527,7 +527,7 @@ describe("textImport", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66]),
         characters: [],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
         detectedFormat: "hex",
         invalidCount: 0,
       };

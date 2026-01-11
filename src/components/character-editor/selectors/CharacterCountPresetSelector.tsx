@@ -21,7 +21,7 @@ import {
 import {
   getSystemCharacterCountPresetsByManufacturer,
   getRomChipCharacterCountPresetsByManufacturer,
-} from "@/lib/character-editor/data/manufacturers";
+} from "@/lib/character-editor/data/systems";
 import {
   AdaptivePresetSelector,
   PresetDropdownSectionHeader,

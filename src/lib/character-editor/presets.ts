@@ -5,7 +5,7 @@
  * All preset-related components should import from this file.
  */
 
-import { AnchorPoint, PaddingDirection, BitDirection } from "./types";
+import { AnchorPoint } from "./types";
 
 // ============================================================================
 // Dimension Presets
@@ -372,129 +372,6 @@ export function getAnchorPositions(): AnchorPoint[] {
 export function getAnchorPositionLabel(position: AnchorPoint): string {
   const preset = ANCHOR_POSITION_PRESETS.find((p) => p.position === position);
   return preset?.label ?? position;
-}
-
-// ============================================================================
-// Binary Export System Presets
-// ============================================================================
-
-/**
- * A system preset for binary export configuration
- * Contains the padding and bit direction settings for known retro computer systems
- */
-export interface BinaryExportSystemPreset {
-  /** Unique identifier */
-  id: string;
-  /** System/chip name for display */
-  name: string;
-  /** Manufacturer name for grouping */
-  manufacturer: string;
-  /** Bit padding direction */
-  padding: PaddingDirection;
-  /** Bit direction within bytes */
-  bitDirection: BitDirection;
-}
-
-/**
- * Manufacturer group for binary export system presets
- */
-export interface BinaryExportManufacturerGroup {
-  /** Manufacturer name */
-  manufacturer: string;
-  /** Systems from this manufacturer */
-  systems: BinaryExportSystemPreset[];
-}
-
-/**
- * Binary export system presets organized by manufacturer
- *
- * Most 8-bit systems use:
- * - MSB first (ltr) - leftmost pixel is the most significant bit
- * - Right padding - unused bits are on the right side of the byte
- *
- * Some systems (especially early terminals and certain chips) use:
- * - LSB first (rtl) - leftmost pixel is the least significant bit
- * - Left padding - unused bits are on the left side of the byte
- */
-export const BINARY_EXPORT_SYSTEM_PRESETS: BinaryExportSystemPreset[] = [
-  // Acorn
-  { id: "bbc-micro", name: "BBC Micro", manufacturer: "Acorn", padding: "right", bitDirection: "ltr" },
-  { id: "electron", name: "Electron", manufacturer: "Acorn", padding: "right", bitDirection: "ltr" },
-  // Amstrad
-  { id: "amstrad-cpc", name: "CPC", manufacturer: "Amstrad", padding: "right", bitDirection: "ltr" },
-  // Apple
-  { id: "apple2", name: "Apple II", manufacturer: "Apple", padding: "right", bitDirection: "ltr" },
-  // Atari
-  { id: "atari-8bit", name: "400/800/XL/XE", manufacturer: "Atari", padding: "right", bitDirection: "ltr" },
-  { id: "atari-st", name: "ST", manufacturer: "Atari", padding: "right", bitDirection: "ltr" },
-  // Commodore
-  { id: "c64", name: "C64", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  { id: "vic20", name: "VIC-20", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  { id: "c128", name: "C128", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  { id: "plus4", name: "Plus/4", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  { id: "pet", name: "PET", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  { id: "amiga", name: "Amiga", manufacturer: "Commodore", padding: "right", bitDirection: "ltr" },
-  // Dragon
-  { id: "dragon", name: "Dragon 32/64", manufacturer: "Dragon Data", padding: "left", bitDirection: "ltr" },
-  // Hitachi
-  { id: "hd44780", name: "HD44780 LCD", manufacturer: "Hitachi", padding: "left", bitDirection: "ltr" },
-  // IBM
-  { id: "ibm-pc", name: "PC (VGA/EGA)", manufacturer: "IBM", padding: "right", bitDirection: "ltr" },
-  // Microsoft
-  { id: "msx", name: "MSX", manufacturer: "Microsoft", padding: "right", bitDirection: "ltr" },
-  { id: "msx2", name: "MSX2", manufacturer: "Microsoft", padding: "right", bitDirection: "ltr" },
-  // Motorola
-  { id: "mc6847", name: "MC6847 (VDG)", manufacturer: "Motorola", padding: "left", bitDirection: "ltr" },
-  // Philips
-  { id: "saa5050", name: "SAA5050 (Teletext)", manufacturer: "Philips", padding: "left", bitDirection: "rtl" },
-  // Sinclair
-  { id: "zx-spectrum", name: "ZX Spectrum", manufacturer: "Sinclair", padding: "right", bitDirection: "ltr" },
-  { id: "zx81", name: "ZX81", manufacturer: "Sinclair", padding: "right", bitDirection: "ltr" },
-  // Tandy
-  { id: "trs-80", name: "TRS-80 Model I/III", manufacturer: "Tandy", padding: "right", bitDirection: "ltr" },
-  { id: "coco", name: "CoCo", manufacturer: "Tandy", padding: "right", bitDirection: "ltr" },
-  // Texas Instruments
-  { id: "ti-99", name: "TI-99/4A", manufacturer: "Texas Instruments", padding: "right", bitDirection: "ltr" },
-];
-
-/**
- * Get binary export presets grouped by manufacturer
- */
-export function getBinaryExportPresetsByManufacturer(): BinaryExportManufacturerGroup[] {
-  const groups = new Map<string, BinaryExportSystemPreset[]>();
-
-  for (const preset of BINARY_EXPORT_SYSTEM_PRESETS) {
-    if (!groups.has(preset.manufacturer)) {
-      groups.set(preset.manufacturer, []);
-    }
-    groups.get(preset.manufacturer)!.push(preset);
-  }
-
-  // Convert to array and sort by manufacturer name
-  return Array.from(groups.entries())
-    .map(([manufacturer, systems]) => ({ manufacturer, systems }))
-    .sort((a, b) => a.manufacturer.localeCompare(b.manufacturer));
-}
-
-/**
- * Find a system preset by ID
- */
-export function findBinaryExportSystemPreset(
-  id: string
-): BinaryExportSystemPreset | undefined {
-  return BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === id);
-}
-
-/**
- * Find system presets that match given padding and bit direction
- */
-export function findMatchingBinaryExportPresets(
-  padding: PaddingDirection,
-  bitDirection: BitDirection
-): BinaryExportSystemPreset[] {
-  return BINARY_EXPORT_SYSTEM_PRESETS.filter(
-    (p) => p.padding === padding && p.bitDirection === bitDirection
-  );
 }
 
 // ============================================================================

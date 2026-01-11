@@ -156,10 +156,10 @@ describe("Binary Round-Trip Integration", () => {
 
     it("preserves data with different configurations", () => {
       const configs = [
-        createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" }),
-        createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "left" }),
-        createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "left" }),
-        createMockConfig({ width: 16, height: 16, bitDirection: "ltr", padding: "right" }),
+        createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" }),
+        createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "left" }),
+        createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "left" }),
+        createMockConfig({ width: 16, height: 16, bitDirection: "msb", padding: "right" }),
       ];
 
       configs.forEach((config) => {
@@ -336,7 +336,7 @@ describe("Character Set Lifecycle Integration", () => {
         config: {
           width: 6,
           height: 10,
-          bitDirection: "rtl",
+          bitDirection: "lsb",
           padding: "left",
         },
         characterCount: 8,
@@ -692,7 +692,7 @@ describe("Complete Workflow Integration", () => {
     const c64Config = createMockConfig({
       width: 8,
       height: 8,
-      bitDirection: "ltr",
+      bitDirection: "msb",
       padding: "right",
     });
 
@@ -738,7 +738,7 @@ describe("Complete Workflow Integration", () => {
     const appleConfig = createMockConfig({
       width: 7,
       height: 8,
-      bitDirection: "ltr",
+      bitDirection: "msb",
       padding: "right",
     });
 

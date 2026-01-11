@@ -996,7 +996,7 @@ describe("InMemoryAutoSaveStorage", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     },
     selectedIndex: 0,
     timestamp: Date.now(),

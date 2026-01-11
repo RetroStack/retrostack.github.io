@@ -96,7 +96,7 @@ export function createMockConfig(
     width: 8,
     height: 8,
     padding: "right",
-    bitDirection: "ltr",
+    bitDirection: "msb",
     ...overrides,
   };
 }

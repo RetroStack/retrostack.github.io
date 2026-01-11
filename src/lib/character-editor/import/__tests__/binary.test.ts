@@ -36,8 +36,8 @@ import type { Character, CharacterSetConfig } from "@/lib/character-editor/types
 // ============================================================================
 
 describe("bytesToCharacter", () => {
-  describe("standard 8x8 character with ltr bit direction", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" });
+  describe("standard 8x8 character with msb bit direction", () => {
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" });
 
     it("converts all zeros to empty character", () => {
       const bytes = new Uint8Array(8).fill(0);
@@ -55,23 +55,23 @@ describe("bytesToCharacter", () => {
       expect(character.pixels.every((row) => row.every((pixel) => pixel === true))).toBe(true);
     });
 
-    it("converts alternating pattern correctly with ltr", () => {
+    it("converts alternating pattern correctly with msb", () => {
       // 0xAA = 10101010 in binary
       const bytes = new Uint8Array(8).fill(0xaa);
       const character = bytesToCharacter(bytes, config);
 
-      // With ltr, bit 7 (MSB) comes first, so 0xAA = [1,0,1,0,1,0,1,0]
+      // With msb, bit 7 (MSB) comes first, so 0xAA = [1,0,1,0,1,0,1,0]
       for (let row = 0; row < 8; row++) {
         expect(character.pixels[row]).toEqual([true, false, true, false, true, false, true, false]);
       }
     });
 
-    it("converts 0x55 pattern correctly with ltr", () => {
+    it("converts 0x55 pattern correctly with msb", () => {
       // 0x55 = 01010101 in binary
       const bytes = new Uint8Array(8).fill(0x55);
       const character = bytesToCharacter(bytes, config);
 
-      // With ltr, bit 7 (MSB) comes first, so 0x55 = [0,1,0,1,0,1,0,1]
+      // With msb, bit 7 (MSB) comes first, so 0x55 = [0,1,0,1,0,1,0,1]
       for (let row = 0; row < 8; row++) {
         expect(character.pixels[row]).toEqual([false, true, false, true, false, true, false, true]);
       }
@@ -98,37 +98,37 @@ describe("bytesToCharacter", () => {
     });
   });
 
-  describe("rtl bit direction", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "right" });
+  describe("lsb bit direction", () => {
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "right" });
 
-    it("converts alternating pattern with rtl direction", () => {
+    it("converts alternating pattern with lsb direction", () => {
       // 0xAA = 10101010 in binary
       const bytes = new Uint8Array(8).fill(0xaa);
       const character = bytesToCharacter(bytes, config);
 
-      // With rtl, bit 0 (LSB) comes first, so 0xAA = [0,1,0,1,0,1,0,1]
+      // With lsb, bit 0 (LSB) comes first, so 0xAA = [0,1,0,1,0,1,0,1]
       for (let row = 0; row < 8; row++) {
         expect(character.pixels[row]).toEqual([false, true, false, true, false, true, false, true]);
       }
     });
 
-    it("converts 0x55 pattern with rtl direction", () => {
+    it("converts 0x55 pattern with lsb direction", () => {
       // 0x55 = 01010101 in binary
       const bytes = new Uint8Array(8).fill(0x55);
       const character = bytesToCharacter(bytes, config);
 
-      // With rtl, bit 0 (LSB) comes first, so 0x55 = [1,0,1,0,1,0,1,0]
+      // With lsb, bit 0 (LSB) comes first, so 0x55 = [1,0,1,0,1,0,1,0]
       for (let row = 0; row < 8; row++) {
         expect(character.pixels[row]).toEqual([true, false, true, false, true, false, true, false]);
       }
     });
 
-    it("converts single high bit with rtl", () => {
+    it("converts single high bit with lsb", () => {
       // 0x80 = 10000000 in binary
       const bytes = new Uint8Array(8).fill(0x80);
       const character = bytesToCharacter(bytes, config);
 
-      // With rtl, bit 0 comes first, so 0x80 = [0,0,0,0,0,0,0,1]
+      // With lsb, bit 0 comes first, so 0x80 = [0,0,0,0,0,0,0,1]
       for (let row = 0; row < 8; row++) {
         expect(character.pixels[row]).toEqual([false, false, false, false, false, false, false, true]);
       }
@@ -137,7 +137,7 @@ describe("bytesToCharacter", () => {
 
   describe("left padding", () => {
     it("handles 6-bit width with left padding", () => {
-      const config = createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "left" });
+      const config = createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "left" });
       // 0xFF = 11111111, with 6-bit width and left padding, take last 6 bits
       const bytes = new Uint8Array(8).fill(0xff);
       const character = bytesToCharacter(bytes, config);
@@ -147,7 +147,7 @@ describe("bytesToCharacter", () => {
     });
 
     it("handles 5-bit width with left padding correctly", () => {
-      const config = createMockConfig({ width: 5, height: 8, bitDirection: "ltr", padding: "left" });
+      const config = createMockConfig({ width: 5, height: 8, bitDirection: "msb", padding: "left" });
       // 0x1F = 00011111, with left padding skip first 3 bits, take last 5
       const bytes = new Uint8Array(8).fill(0x1f);
       const character = bytesToCharacter(bytes, config);
@@ -160,7 +160,7 @@ describe("bytesToCharacter", () => {
 
   describe("right padding", () => {
     it("handles 6-bit width with right padding", () => {
-      const config = createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "right" });
       // 0xFC = 11111100, with 6-bit width and right padding, take first 6 bits
       const bytes = new Uint8Array(8).fill(0xfc);
       const character = bytesToCharacter(bytes, config);
@@ -170,7 +170,7 @@ describe("bytesToCharacter", () => {
     });
 
     it("handles 5-bit width with right padding correctly", () => {
-      const config = createMockConfig({ width: 5, height: 8, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 5, height: 8, bitDirection: "msb", padding: "right" });
       // 0xF8 = 11111000, with right padding take first 5 bits
       const bytes = new Uint8Array(8).fill(0xf8);
       const character = bytesToCharacter(bytes, config);
@@ -182,7 +182,7 @@ describe("bytesToCharacter", () => {
 
   describe("various dimensions", () => {
     it("converts 8x16 character correctly", () => {
-      const config = createMockConfig({ width: 8, height: 16, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 8, height: 16, bitDirection: "msb", padding: "right" });
       const bytes = new Uint8Array(16).fill(0xff);
       const character = bytesToCharacter(bytes, config);
 
@@ -191,7 +191,7 @@ describe("bytesToCharacter", () => {
     });
 
     it("converts 16x8 character correctly (requires 2 bytes per row)", () => {
-      const config = createMockConfig({ width: 16, height: 8, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 16, height: 8, bitDirection: "msb", padding: "right" });
       // 16 bytes total: 2 bytes per row * 8 rows
       const bytes = new Uint8Array(16).fill(0xff);
       const character = bytesToCharacter(bytes, config);
@@ -202,7 +202,7 @@ describe("bytesToCharacter", () => {
     });
 
     it("converts 12x10 character correctly", () => {
-      const config = createMockConfig({ width: 12, height: 10, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 12, height: 10, bitDirection: "msb", padding: "right" });
       // 12 bits = 2 bytes per row, 10 rows = 20 bytes
       const bytes = new Uint8Array(20).fill(0xff);
       const character = bytesToCharacter(bytes, config);
@@ -212,7 +212,7 @@ describe("bytesToCharacter", () => {
     });
 
     it("converts 4x4 character correctly", () => {
-      const config = createMockConfig({ width: 4, height: 4, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 4, height: 4, bitDirection: "msb", padding: "right" });
       const bytes = new Uint8Array(4).fill(0xf0); // 11110000
       const character = bytesToCharacter(bytes, config);
 
@@ -252,8 +252,8 @@ describe("bytesToCharacter", () => {
 // ============================================================================
 
 describe("characterToBytes", () => {
-  describe("standard 8x8 character with ltr bit direction", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" });
+  describe("standard 8x8 character with msb bit direction", () => {
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" });
 
     it("converts empty character to all zeros", () => {
       const character = createMockCharacter(8, 8, "empty");
@@ -294,33 +294,33 @@ describe("characterToBytes", () => {
     });
   });
 
-  describe("rtl bit direction", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "right" });
+  describe("lsb bit direction", () => {
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "right" });
 
-    it("converts checkerboard with rtl direction", () => {
+    it("converts checkerboard with lsb direction", () => {
       const character = createMockCharacter(8, 8, "checkerboard");
       const bytes = characterToBytes(character, config);
 
-      // Row 0: [T,F,T,F,T,F,T,F] with rtl = 0x55
+      // Row 0: [T,F,T,F,T,F,T,F] with lsb = 0x55
       expect(bytes[0]).toBe(0x55);
-      // Row 1: [F,T,F,T,F,T,F,T] with rtl = 0xAA
+      // Row 1: [F,T,F,T,F,T,F,T] with lsb = 0xAA
       expect(bytes[1]).toBe(0xaa);
     });
 
-    it("converts diagonal with rtl direction", () => {
+    it("converts diagonal with lsb direction", () => {
       const character = createMockCharacter(8, 8, "diagonal");
       const bytes = characterToBytes(character, config);
 
-      // Row 0: [T,F,F,F,F,F,F,F] with rtl = 0x01
+      // Row 0: [T,F,F,F,F,F,F,F] with lsb = 0x01
       expect(bytes[0]).toBe(0x01);
-      // Row 7: [F,F,F,F,F,F,F,T] with rtl = 0x80
+      // Row 7: [F,F,F,F,F,F,F,T] with lsb = 0x80
       expect(bytes[7]).toBe(0x80);
     });
   });
 
   describe("padding variations", () => {
     it("handles 6-bit width with right padding", () => {
-      const config = createMockConfig({ width: 6, height: 1, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 6, height: 1, bitDirection: "msb", padding: "right" });
       const character: Character = { pixels: [[true, true, true, true, true, true]] };
       const bytes = characterToBytes(character, config);
 
@@ -329,7 +329,7 @@ describe("characterToBytes", () => {
     });
 
     it("handles 6-bit width with left padding", () => {
-      const config = createMockConfig({ width: 6, height: 1, bitDirection: "ltr", padding: "left" });
+      const config = createMockConfig({ width: 6, height: 1, bitDirection: "msb", padding: "left" });
       const character: Character = { pixels: [[true, true, true, true, true, true]] };
       const bytes = characterToBytes(character, config);
 
@@ -338,7 +338,7 @@ describe("characterToBytes", () => {
     });
 
     it("handles 5-bit width with right padding", () => {
-      const config = createMockConfig({ width: 5, height: 1, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 5, height: 1, bitDirection: "msb", padding: "right" });
       const character: Character = { pixels: [[true, false, true, false, true]] };
       const bytes = characterToBytes(character, config);
 
@@ -349,7 +349,7 @@ describe("characterToBytes", () => {
 
   describe("various dimensions", () => {
     it("converts 16x8 character (2 bytes per row)", () => {
-      const config = createMockConfig({ width: 16, height: 8, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 16, height: 8, bitDirection: "msb", padding: "right" });
       const character = createMockCharacter(16, 8, "filled");
       const bytes = characterToBytes(character, config);
 
@@ -358,7 +358,7 @@ describe("characterToBytes", () => {
     });
 
     it("converts 8x16 character correctly", () => {
-      const config = createMockConfig({ width: 8, height: 16, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 8, height: 16, bitDirection: "msb", padding: "right" });
       const character = createMockCharacter(8, 16, "filled");
       const bytes = characterToBytes(character, config);
 
@@ -366,7 +366,7 @@ describe("characterToBytes", () => {
     });
 
     it("converts 12x10 character correctly", () => {
-      const config = createMockConfig({ width: 12, height: 10, bitDirection: "ltr", padding: "right" });
+      const config = createMockConfig({ width: 12, height: 10, bitDirection: "msb", padding: "right" });
       const character = createMockCharacter(12, 10, "empty");
       const bytes = characterToBytes(character, config);
 
@@ -405,14 +405,14 @@ describe("characterToBytes", () => {
 
 describe("bytesToCharacter and characterToBytes round-trip", () => {
   const configs: { name: string; config: CharacterSetConfig }[] = [
-    { name: "8x8 ltr right", config: createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" }) },
-    { name: "8x8 ltr left", config: createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "left" }) },
-    { name: "8x8 rtl right", config: createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "right" }) },
-    { name: "8x8 rtl left", config: createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "left" }) },
-    { name: "6x8 ltr right", config: createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "right" }) },
-    { name: "6x8 ltr left", config: createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "left" }) },
-    { name: "16x16 ltr right", config: createMockConfig({ width: 16, height: 16, bitDirection: "ltr", padding: "right" }) },
-    { name: "8x16 ltr right", config: createMockConfig({ width: 8, height: 16, bitDirection: "ltr", padding: "right" }) },
+    { name: "8x8 msb right", config: createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" }) },
+    { name: "8x8 msb left", config: createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "left" }) },
+    { name: "8x8 lsb right", config: createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "right" }) },
+    { name: "8x8 lsb left", config: createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "left" }) },
+    { name: "6x8 msb right", config: createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "right" }) },
+    { name: "6x8 msb left", config: createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "left" }) },
+    { name: "16x16 msb right", config: createMockConfig({ width: 16, height: 16, bitDirection: "msb", padding: "right" }) },
+    { name: "8x16 msb right", config: createMockConfig({ width: 8, height: 16, bitDirection: "msb", padding: "right" }) },
   ];
 
   configs.forEach(({ name, config }) => {
@@ -452,7 +452,7 @@ describe("bytesToCharacter and characterToBytes round-trip", () => {
   });
 
   it("bytes -> character -> bytes returns original bytes", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" });
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" });
     const originalBytes = new Uint8Array([0x3c, 0x42, 0x81, 0x81, 0x81, 0x81, 0x42, 0x3c]); // A circle pattern
     const character = bytesToCharacter(originalBytes, config);
     const restoredBytes = characterToBytes(character, config);
@@ -466,7 +466,7 @@ describe("bytesToCharacter and characterToBytes round-trip", () => {
 // ============================================================================
 
 describe("parseCharacterRom", () => {
-  const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" });
+  const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" });
 
   it("parses empty ROM data", () => {
     const data = new Uint8Array(0);
@@ -530,7 +530,7 @@ describe("parseCharacterRom", () => {
   });
 
   it("parses with 16-bit wide characters", () => {
-    const wideConfig = createMockConfig({ width: 16, height: 8, bitDirection: "ltr", padding: "right" });
+    const wideConfig = createMockConfig({ width: 16, height: 8, bitDirection: "msb", padding: "right" });
     const data = new Uint8Array(16).fill(0xff); // One 16x8 character
 
     const characters = parseCharacterRom(data, wideConfig);
@@ -546,7 +546,7 @@ describe("parseCharacterRom", () => {
 // ============================================================================
 
 describe("serializeCharacterRom", () => {
-  const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" });
+  const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" });
 
   it("serializes empty character array", () => {
     const characters: Character[] = [];
@@ -584,10 +584,10 @@ describe("serializeCharacterRom", () => {
 
 describe("parseCharacterRom and serializeCharacterRom round-trip", () => {
   const configs = [
-    createMockConfig({ width: 8, height: 8, bitDirection: "ltr", padding: "right" }),
-    createMockConfig({ width: 8, height: 8, bitDirection: "rtl", padding: "left" }),
-    createMockConfig({ width: 6, height: 8, bitDirection: "ltr", padding: "right" }),
-    createMockConfig({ width: 16, height: 16, bitDirection: "ltr", padding: "right" }),
+    createMockConfig({ width: 8, height: 8, bitDirection: "msb", padding: "right" }),
+    createMockConfig({ width: 8, height: 8, bitDirection: "lsb", padding: "left" }),
+    createMockConfig({ width: 6, height: 8, bitDirection: "msb", padding: "right" }),
+    createMockConfig({ width: 16, height: 16, bitDirection: "msb", padding: "right" }),
   ];
 
   configs.forEach((config) => {
@@ -817,7 +817,7 @@ describe("serializeCharacterSet", () => {
     const config = createMockConfig({
       width: 6,
       height: 10,
-      bitDirection: "rtl",
+      bitDirection: "lsb",
       padding: "left",
     });
     const characterSet = createMockCharacterSet({ config, characterCount: 8 });
@@ -899,7 +899,7 @@ describe("deserializeCharacterSet", () => {
     const config = createMockConfig({
       width: 12,
       height: 10,
-      bitDirection: "rtl",
+      bitDirection: "lsb",
       padding: "left",
     });
     const serialized = {
@@ -911,7 +911,7 @@ describe("deserializeCharacterSet", () => {
 
     expect(characterSet.config.width).toBe(12);
     expect(characterSet.config.height).toBe(10);
-    expect(characterSet.config.bitDirection).toBe("rtl");
+    expect(characterSet.config.bitDirection).toBe("lsb");
     expect(characterSet.config.padding).toBe("left");
   });
 
@@ -1002,10 +1002,10 @@ describe("serializeCharacterSet and deserializeCharacterSet round-trip", () => {
 
   it("round-trips with all config variations", () => {
     const configs = [
-      createMockConfig({ bitDirection: "ltr", padding: "right" }),
-      createMockConfig({ bitDirection: "ltr", padding: "left" }),
-      createMockConfig({ bitDirection: "rtl", padding: "right" }),
-      createMockConfig({ bitDirection: "rtl", padding: "left" }),
+      createMockConfig({ bitDirection: "msb", padding: "right" }),
+      createMockConfig({ bitDirection: "msb", padding: "left" }),
+      createMockConfig({ bitDirection: "lsb", padding: "right" }),
+      createMockConfig({ bitDirection: "lsb", padding: "left" }),
     ];
 
     configs.forEach((config) => {
@@ -1169,8 +1169,8 @@ describe("createDownloadBlob", () => {
   });
 
   it("applies export config overrides", () => {
-    const config = createMockConfig({ width: 8, height: 8, bitDirection: "ltr" });
-    const exportConfig = { bitDirection: "rtl" as const };
+    const config = createMockConfig({ width: 8, height: 8, bitDirection: "msb" });
+    const exportConfig = { bitDirection: "lsb" as const };
     const characters = [createMockCharacter(8, 8, "checkerboard")];
 
     const blobLtr = createDownloadBlob(characters, config);
@@ -1226,7 +1226,7 @@ describe("binary conversion integration", () => {
     const c64Config = createMockConfig({
       width: 8,
       height: 8,
-      bitDirection: "ltr",
+      bitDirection: "msb",
       padding: "right",
     });
 
@@ -1252,7 +1252,7 @@ describe("binary conversion integration", () => {
     const appleConfig = createMockConfig({
       width: 7,
       height: 8,
-      bitDirection: "ltr",
+      bitDirection: "msb",
       padding: "right",
     });
 
@@ -1279,7 +1279,7 @@ describe("binary conversion integration", () => {
     const vicConfig = createMockConfig({
       width: 8,
       height: 16,
-      bitDirection: "ltr",
+      bitDirection: "msb",
       padding: "right",
     });
 

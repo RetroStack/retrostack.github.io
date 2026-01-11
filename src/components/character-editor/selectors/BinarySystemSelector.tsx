@@ -13,9 +13,9 @@ import {
 import type { PaddingDirection, BitDirection } from "@/lib/character-editor/types";
 import {
   BINARY_EXPORT_SYSTEM_PRESETS,
-  BinaryExportSystemPreset,
+  type BinaryExportSystemPreset,
   getBinaryExportPresetsByManufacturer,
-} from "@/lib/character-editor/presets";
+} from "@/lib/character-editor/data/systems";
 
 export interface BinarySystemSelectorProps {
   /** Current padding direction */
@@ -71,7 +71,7 @@ export function BinarySystemSelector({
 
   const handleClear = () => {
     // Reset to default (most common: right padding, MSB first)
-    onSystemChange("right", "ltr");
+    onSystemChange("right", "msb");
     close();
   };
 
@@ -95,7 +95,7 @@ export function BinarySystemSelector({
         {isOpen && (
           <DropdownPanel width={420} maxHeight={400}>
             {/* Clear option - only show if not already default */}
-            {(padding !== "right" || bitDirection !== "ltr") && (
+            {(padding !== "right" || bitDirection !== "msb") && (
               <DropdownClearButton onClick={handleClear} label="Reset to default" />
             )}
 

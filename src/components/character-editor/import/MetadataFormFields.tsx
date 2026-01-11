@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { ManufacturerSystemSelect } from "../selectors/ManufacturerSystemSelect";
 import { ChipSelect } from "../selectors/ChipSelect";
-import { getRomChipsForSystem } from "@/lib/character-editor/data/manufacturers";
+import { getRomChipsForSystem } from "@/lib/character-editor/data/systems";
 import { TagInput } from "@/components/ui/TagInput";
 
 export interface MetadataFormFieldsProps {

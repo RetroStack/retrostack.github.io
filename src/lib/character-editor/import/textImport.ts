@@ -19,7 +19,7 @@ export interface TextImportOptions {
   charWidth: number;
   charHeight: number;
   padding: "left" | "right";
-  bitDirection: "ltr" | "rtl";
+  bitDirection: "msb" | "lsb";
 }
 
 /**
@@ -53,7 +53,7 @@ export function getDefaultTextImportOptions(): TextImportOptions {
     charWidth: 8,
     charHeight: 8,
     padding: "right",
-    bitDirection: "ltr",
+    bitDirection: "msb",
   };
 }
 

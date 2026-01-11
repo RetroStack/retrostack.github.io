@@ -32,12 +32,12 @@ export function BitDirectionSelector({
     <div className={`flex gap-2 ${className}`}>
       <button
         type="button"
-        onClick={() => onChange("ltr")}
+        onClick={() => onChange("msb")}
         disabled={disabled}
         className={`
           flex-1 px-3 py-2 text-xs rounded border transition-colors
           ${
-            value === "ltr"
+            value === "msb"
               ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
               : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
           }
@@ -48,12 +48,12 @@ export function BitDirectionSelector({
       </button>
       <button
         type="button"
-        onClick={() => onChange("rtl")}
+        onClick={() => onChange("lsb")}
         disabled={disabled}
         className={`
           flex-1 px-3 py-2 text-xs rounded border transition-colors
           ${
-            value === "rtl"
+            value === "lsb"
               ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
               : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
           }

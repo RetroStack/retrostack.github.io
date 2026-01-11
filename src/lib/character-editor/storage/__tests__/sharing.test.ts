@@ -85,10 +85,10 @@ describe("encodeCharacterSet / decodeCharacterSet", () => {
 
   it("round-trips all config combinations", () => {
     const configurations: CharacterSetConfig[] = [
-      { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
-      { width: 8, height: 8, padding: "left", bitDirection: "ltr" },
-      { width: 8, height: 8, padding: "right", bitDirection: "rtl" },
-      { width: 8, height: 8, padding: "left", bitDirection: "rtl" },
+      { width: 8, height: 8, padding: "right", bitDirection: "msb" },
+      { width: 8, height: 8, padding: "left", bitDirection: "msb" },
+      { width: 8, height: 8, padding: "right", bitDirection: "lsb" },
+      { width: 8, height: 8, padding: "left", bitDirection: "lsb" },
     ];
 
     for (const config of configurations) {

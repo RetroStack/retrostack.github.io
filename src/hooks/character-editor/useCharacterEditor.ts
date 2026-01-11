@@ -82,7 +82,7 @@ export function useCharacterEditor(initialCharacterSet: CharacterSet | null): Us
       }
     : {
         characters: [],
-        config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
+        config: { width: 8, height: 8, padding: "right", bitDirection: "msb" },
       };
 
   // Use undo/redo hook for editor state

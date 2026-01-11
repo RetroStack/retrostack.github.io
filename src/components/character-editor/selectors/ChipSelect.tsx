@@ -15,7 +15,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ROM_CHIPS, RomChipInfo } from "@/lib/character-editor/data/manufacturers";
+import { ROM_CHIPS, type RomChipInfo } from "@/lib/character-editor/data/systems";
 import { useDropdown } from "@/hooks/useDropdown";
 import {
   DropdownPanel,
@@ -70,7 +70,7 @@ export function ChipSelect({ chip, onChipChange, system, disabled = false, class
   const compatibleChipIds = useMemo(() => {
     if (!system) return new Set<string>();
     return new Set(
-      ROM_CHIPS.filter((c) => c.usedIn.some((s) => s.toLowerCase() === system.toLowerCase())).map((c) => c.id)
+      ROM_CHIPS.filter((c) => c.usedIn?.some((s) => s.toLowerCase() === system.toLowerCase())).map((c) => c.id)
     );
   }, [system]);
 
@@ -137,7 +137,7 @@ export function ChipSelect({ chip, onChipChange, system, disabled = false, class
                       isSelected={isSelected(chipInfo.partNumber, chipInfo.manufacturer)}
                       onClick={() => handleChipClick(chipInfo.partNumber, chipInfo.manufacturer)}
                       title={`${chipInfo.type} - ${chipInfo.glyph.width}x${chipInfo.glyph.height}${
-                        chipInfo.usedIn.length > 0 ? ` - Used in: ${chipInfo.usedIn.join(", ")}` : ""
+                        chipInfo.usedIn && chipInfo.usedIn.length > 0 ? ` - Used in: ${chipInfo.usedIn.join(", ")}` : ""
                       }`}
                     />
                   ))}

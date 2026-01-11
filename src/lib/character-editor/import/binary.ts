@@ -19,8 +19,8 @@ import {
  * Convert a Uint8Array of bytes to a Character object
  *
  * Reverses the encoding from characterToBytes:
- * - MSB first (ltr): pixel 0 from leftmost data position
- * - LSB first (rtl): pixel 0 from rightmost data position
+ * - MSB first (msb): pixel 0 from leftmost data position
+ * - LSB first (lsb): pixel 0 from rightmost data position
  *
  * @param bytes - Raw binary data for one character
  * @param config - Character set configuration
@@ -52,7 +52,7 @@ export function bytesToCharacter(
     const rowPixels: boolean[] = [];
     for (let i = 0; i < width; i++) {
       let bitIndex: number;
-      if (bitDirection === "ltr") {
+      if (bitDirection === "msb") {
         // MSB first: pixel 0 at first data position
         bitIndex = (padding === "left" ? paddingBits : 0) + i;
       } else {
@@ -72,8 +72,8 @@ export function bytesToCharacter(
  * Convert a Character object back to binary bytes
  *
  * Bit direction affects only the data bits:
- * - MSB first (ltr): pixel 0 at leftmost data position
- * - LSB first (rtl): pixel 0 at rightmost data position (pixels reversed)
+ * - MSB first (msb): pixel 0 at leftmost data position
+ * - LSB first (lsb): pixel 0 at rightmost data position (pixels reversed)
  *
  * Padding is then added on the specified side.
  *
@@ -108,7 +108,7 @@ export function characterToBytes(
 
       // Determine the position in allBits for this pixel
       let bitIndex: number;
-      if (bitDirection === "ltr") {
+      if (bitDirection === "msb") {
         // MSB first: pixel 0 at first data position, pixel (width-1) at last
         bitIndex = (padding === "left" ? paddingBits : 0) + i;
       } else {

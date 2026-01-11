@@ -31,7 +31,7 @@ export const MAX_URL_LENGTH = 8000;
  * Binary format before compression:
  * [width:1][height:1][flags:1][name:UTF8\0][desc:UTF8\0][character data]
  *
- * flags byte: bit0=padding(left=1), bit1=bitDir(rtl=1)
+ * flags byte: bit0=padding(left=1), bit1=bitDir(lsb=1)
  */
 export function encodeCharacterSet(
   name: string,
@@ -49,7 +49,7 @@ export function encodeCharacterSet(
   // Build flags byte
   const flags =
     (config.padding === "left" ? 1 : 0) |
-    (config.bitDirection === "rtl" ? 2 : 0);
+    (config.bitDirection === "lsb" ? 2 : 0);
 
   // Calculate total size: 3 header bytes + name + null + desc + null + data
   const headerSize = 3 + nameBytes.length + 1 + descBytes.length + 1;
@@ -105,7 +105,7 @@ export function decodeCharacterSet(encoded: string): {
     const flags = data[2];
 
     const padding = (flags & 1) ? "left" : "right";
-    const bitDirection = (flags & 2) ? "rtl" : "ltr";
+    const bitDirection = (flags & 2) ? "lsb" : "msb";
 
     // Parse null-terminated strings
     const decoder = new TextDecoder();

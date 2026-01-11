@@ -24,21 +24,21 @@ export const config8x8: CharacterSetConfig = {
   width: 8,
   height: 8,
   padding: "right",
-  bitDirection: "ltr",
+  bitDirection: "msb",
 };
 
 export const config8x16: CharacterSetConfig = {
   width: 8,
   height: 16,
   padding: "right",
-  bitDirection: "ltr",
+  bitDirection: "msb",
 };
 
 export const config16x16: CharacterSetConfig = {
   width: 16,
   height: 16,
   padding: "right",
-  bitDirection: "ltr",
+  bitDirection: "msb",
 };
 
 // ============================================================================

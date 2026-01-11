@@ -114,7 +114,7 @@ export function ExportView() {
   // Binary export settings
   const [filename, setFilename] = useState("");
   const [padding, setPadding] = useState<PaddingDirection>("right");
-  const [bitDirection, setBitDirection] = useState<BitDirection>("ltr");
+  const [bitDirection, setBitDirection] = useState<BitDirection>("msb");
 
   // Code export options (C Header or Assembly)
   const [codeOutputFormat, setCodeOutputFormat] = useState<CodeOutputFormat>("c-header");
@@ -1219,7 +1219,7 @@ export function ExportView() {
                             <div className="flex items-center justify-center text-retro-pink mb-1">
                               <svg className="w-full h-3 max-w-[120px]" viewBox="0 0 80 12" fill="none" stroke="currentColor" strokeWidth="1.5">
                                 <line x1="4" y1="6" x2="76" y2="6" />
-                                <polyline points={bitDirection === "ltr" ? "70,2 76,6 70,10" : "10,2 4,6 10,10"} />
+                                <polyline points={bitDirection === "msb" ? "70,2 76,6 70,10" : "10,2 4,6 10,10"} />
                               </svg>
                             </div>
                             {/* Bit pattern (D/P) */}

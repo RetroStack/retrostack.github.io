@@ -53,7 +53,7 @@ describe("formatSize", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(formatSize(config)).toBe("8x8");
   });
@@ -63,7 +63,7 @@ describe("formatSize", () => {
       width: 8,
       height: 16,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(formatSize(config)).toBe("8x16");
   });
@@ -73,7 +73,7 @@ describe("formatSize", () => {
       width: 1,
       height: 1,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(formatSize(config)).toBe("1x1");
   });
@@ -83,7 +83,7 @@ describe("formatSize", () => {
       width: 16,
       height: 16,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(formatSize(config)).toBe("16x16");
   });
@@ -134,7 +134,7 @@ describe("validateConfig", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(validateConfig(config)).toEqual([]);
   });
@@ -144,7 +144,7 @@ describe("validateConfig", () => {
       width: 1,
       height: 1,
       padding: "left",
-      bitDirection: "rtl",
+      bitDirection: "lsb",
     };
     expect(validateConfig(minConfig)).toEqual([]);
 
@@ -152,7 +152,7 @@ describe("validateConfig", () => {
       width: 16,
       height: 16,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(validateConfig(maxConfig)).toEqual([]);
   });
@@ -162,7 +162,7 @@ describe("validateConfig", () => {
       width: 0,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Width must be between 1 and 16 pixels");
@@ -173,7 +173,7 @@ describe("validateConfig", () => {
       width: 17,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Width must be between 1 and 16 pixels");
@@ -184,7 +184,7 @@ describe("validateConfig", () => {
       width: 8,
       height: 0,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Height must be between 1 and 16 pixels");
@@ -195,7 +195,7 @@ describe("validateConfig", () => {
       width: 8,
       height: 17,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Height must be between 1 and 16 pixels");
@@ -206,7 +206,7 @@ describe("validateConfig", () => {
       width: 8,
       height: 8,
       padding: "center" as "left" | "right",
-      bitDirection: "ltr" as const,
+      bitDirection: "msb" as const,
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Padding must be 'left' or 'right'");
@@ -217,10 +217,10 @@ describe("validateConfig", () => {
       width: 8,
       height: 8,
       padding: "right" as const,
-      bitDirection: "bidi" as "ltr" | "rtl",
+      bitDirection: "bidi" as "msb" | "lsb",
     };
     const errors = validateConfig(config);
-    expect(errors).toContain("Bit direction must be 'ltr' or 'rtl'");
+    expect(errors).toContain("Bit direction must be 'msb' or 'lsb'");
   });
 
   it("returns multiple errors for multiple invalid fields", () => {
@@ -228,14 +228,14 @@ describe("validateConfig", () => {
       width: 0,
       height: 20,
       padding: "invalid" as "left" | "right",
-      bitDirection: "invalid" as "ltr" | "rtl",
+      bitDirection: "invalid" as "msb" | "lsb",
     };
     const errors = validateConfig(config);
     expect(errors).toHaveLength(4);
     expect(errors).toContain("Width must be between 1 and 16 pixels");
     expect(errors).toContain("Height must be between 1 and 16 pixels");
     expect(errors).toContain("Padding must be 'left' or 'right'");
-    expect(errors).toContain("Bit direction must be 'ltr' or 'rtl'");
+    expect(errors).toContain("Bit direction must be 'msb' or 'lsb'");
   });
 
   it("returns error for negative dimensions", () => {
@@ -243,7 +243,7 @@ describe("validateConfig", () => {
       width: -5,
       height: -3,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     const errors = validateConfig(config);
     expect(errors).toContain("Width must be between 1 and 16 pixels");
@@ -295,7 +295,7 @@ describe("calculateCharacterCount", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 8x8 = 8 bytes per character
     expect(calculateCharacterCount(2048, config)).toBe(256); // 2KB ROM
@@ -309,7 +309,7 @@ describe("calculateCharacterCount", () => {
       width: 8,
       height: 16,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 8x16 = 16 bytes per character
     expect(calculateCharacterCount(4096, config)).toBe(256);
@@ -321,7 +321,7 @@ describe("calculateCharacterCount", () => {
       width: 16,
       height: 16,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 16x16 = 2 bytes per line * 16 lines = 32 bytes per character
     expect(calculateCharacterCount(8192, config)).toBe(256);
@@ -333,7 +333,7 @@ describe("calculateCharacterCount", () => {
       width: 5,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 5 pixels wide = 1 byte per line (ceil(5/8)), 8 lines = 8 bytes per char
     expect(calculateCharacterCount(2048, config)).toBe(256);
@@ -344,7 +344,7 @@ describe("calculateCharacterCount", () => {
       width: 12,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 12 pixels wide = 2 bytes per line (ceil(12/8)), 8 lines = 16 bytes per char
     expect(calculateCharacterCount(4096, config)).toBe(256);
@@ -355,7 +355,7 @@ describe("calculateCharacterCount", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     // 8 bytes per character, 20 bytes = 2 complete characters
     expect(calculateCharacterCount(20, config)).toBe(2);
@@ -366,7 +366,7 @@ describe("calculateCharacterCount", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(calculateCharacterCount(7, config)).toBe(0);
     expect(calculateCharacterCount(0, config)).toBe(0);
@@ -377,7 +377,7 @@ describe("calculateCharacterCount", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     };
     expect(calculateCharacterCount(0, config)).toBe(0);
   });

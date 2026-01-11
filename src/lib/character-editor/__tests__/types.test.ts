@@ -93,7 +93,7 @@ describe("bytesPerCharacter", () => {
         width: 8,
         height: 8,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(8);
     });
@@ -103,17 +103,17 @@ describe("bytesPerCharacter", () => {
         width: 8,
         height: 8,
         padding: "left",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(8);
     });
 
-    it("returns 8 bytes for 8x8 character with rtl bit direction", () => {
+    it("returns 8 bytes for 8x8 character with lsb bit direction", () => {
       const config: CharacterSetConfig = {
         width: 8,
         height: 8,
         padding: "right",
-        bitDirection: "rtl",
+        bitDirection: "lsb",
       };
       expect(bytesPerCharacter(config)).toBe(8);
     });
@@ -125,7 +125,7 @@ describe("bytesPerCharacter", () => {
         width: 8,
         height: 16,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(16);
     });
@@ -137,7 +137,7 @@ describe("bytesPerCharacter", () => {
         width: 16,
         height: 8,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(16);
     });
@@ -149,7 +149,7 @@ describe("bytesPerCharacter", () => {
         width: 16,
         height: 16,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(32);
     });
@@ -161,7 +161,7 @@ describe("bytesPerCharacter", () => {
         width: 12,
         height: 10,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(20);
     });
@@ -171,7 +171,7 @@ describe("bytesPerCharacter", () => {
         width: 7,
         height: 8,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       // 7 bits needs 1 byte per line, 8 lines = 8 bytes
       expect(bytesPerCharacter(config)).toBe(8);
@@ -182,7 +182,7 @@ describe("bytesPerCharacter", () => {
         width: 5,
         height: 7,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(7);
     });
@@ -194,7 +194,7 @@ describe("bytesPerCharacter", () => {
         width: 1,
         height: 1,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(1);
     });
@@ -204,7 +204,7 @@ describe("bytesPerCharacter", () => {
         width: 0,
         height: 8,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(0);
     });
@@ -214,7 +214,7 @@ describe("bytesPerCharacter", () => {
         width: 8,
         height: 0,
         padding: "right",
-        bitDirection: "ltr",
+        bitDirection: "msb",
       };
       expect(bytesPerCharacter(config)).toBe(0);
     });
@@ -319,7 +319,7 @@ describe("getCharacterCount", () => {
           width: 8,
           height: 8,
           padding: "right",
-          bitDirection: "ltr",
+          bitDirection: "msb",
         },
         binaryData: "", // Empty base64
       };
@@ -345,7 +345,7 @@ describe("getCharacterCount", () => {
           width: 0,
           height: 8,
           padding: "right",
-          bitDirection: "ltr",
+          bitDirection: "msb",
         },
         binaryData: "AAAA",
       };
@@ -624,7 +624,7 @@ describe("createDefaultConfig", () => {
 
   it("returns correct default bit direction", () => {
     const config = createDefaultConfig();
-    expect(config.bitDirection).toBe("ltr");
+    expect(config.bitDirection).toBe("msb");
   });
 
   it("returns a new object on each call (not shared reference)", () => {
@@ -660,12 +660,12 @@ describe("createDefaultConfig", () => {
     const width: number = config.width;
     const height: number = config.height;
     const padding: "left" | "right" = config.padding;
-    const bitDirection: "ltr" | "rtl" = config.bitDirection;
+    const bitDirection: "msb" | "lsb" = config.bitDirection;
 
     expect(typeof width).toBe("number");
     expect(typeof height).toBe("number");
     expect(["left", "right"]).toContain(padding);
-    expect(["ltr", "rtl"]).toContain(bitDirection);
+    expect(["msb", "lsb"]).toContain(bitDirection);
   });
 });
 

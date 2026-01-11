@@ -162,7 +162,7 @@ export function ImageImportView() {
       width: options.charWidth,
       height: options.charHeight,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     }),
     [options.charWidth, options.charHeight],
   );

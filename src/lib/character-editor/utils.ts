@@ -66,8 +66,8 @@ export function validateConfig(config: CharacterSetConfig): string[] {
     errors.push("Padding must be 'left' or 'right'");
   }
 
-  if (config.bitDirection !== "ltr" && config.bitDirection !== "rtl") {
-    errors.push("Bit direction must be 'ltr' or 'rtl'");
+  if (config.bitDirection !== "msb" && config.bitDirection !== "lsb") {
+    errors.push("Bit direction must be 'msb' or 'lsb'");
   }
 
   return errors;

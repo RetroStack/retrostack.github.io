@@ -505,7 +505,7 @@ describe("getBitLayoutVisualization", () => {
       width: 8,
       height: 8,
       padding: "right",
-      bitDirection: "ltr",
+      bitDirection: "msb",
     });
   });
 
@@ -609,11 +609,11 @@ describe("getBitLayoutVisualization", () => {
     expect(result.padding).toBe("DDDDDPPP");
   });
 
-  it("respects rtl bit direction in hex output", () => {
-    const rtlConfig = createMockConfig({
+  it("respects lsb bit direction in hex output", () => {
+    const lsbConfig = createMockConfig({
       width: 8,
       height: 8,
-      bitDirection: "rtl",
+      bitDirection: "lsb",
     });
 
     // Create character with specific pattern: first pixel on
@@ -625,7 +625,7 @@ describe("getBitLayoutVisualization", () => {
       }),
     };
 
-    const result = getBitLayoutVisualization(character, rtlConfig, 0);
+    const result = getBitLayoutVisualization(character, lsbConfig, 0);
 
     // In RTL mode, the first pixel (index 0) maps to bit 0 (LSB)
     // So binary should be 00000001 = 0x01

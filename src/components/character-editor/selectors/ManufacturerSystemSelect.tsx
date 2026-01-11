@@ -14,7 +14,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/data/manufacturers";
+import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/data/systems";
 import { useDropdown } from "@/hooks/useDropdown";
 import {
   DropdownPanel,
@@ -56,7 +56,7 @@ export function ManufacturerSystemSelect({
 
   // Sort manufacturers alphabetically
   const sortedManufacturers = useMemo(() => {
-    return [...KNOWN_MANUFACTURERS].sort((a, b) => a.manufacturer.localeCompare(b.manufacturer));
+    return [...KNOWN_MANUFACTURERS].sort((a, b) => a.name.localeCompare(b.name));
   }, []);
 
   const handleManufacturerClick = (mfr: string) => {
@@ -113,17 +113,17 @@ export function ManufacturerSystemSelect({
             <div className="p-2">
               {sortedManufacturers.map((mfr) => (
                 <DropdownGroup
-                  key={mfr.manufacturer}
-                  label={mfr.manufacturer}
-                  onClick={() => handleManufacturerClick(mfr.manufacturer)}
-                  isSelected={manufacturer === mfr.manufacturer && !system}
+                  key={mfr.name}
+                  label={mfr.name}
+                  onClick={() => handleManufacturerClick(mfr.name)}
+                  isSelected={manufacturer === mfr.name && !system}
                 >
                   {mfr.systems.map((sys) => (
                     <DropdownChipButton
                       key={sys}
                       label={sys}
-                      isSelected={manufacturer === mfr.manufacturer && system === sys}
-                      onClick={() => handleSystemClick(mfr.manufacturer, sys)}
+                      isSelected={manufacturer === mfr.name && system === sys}
+                      onClick={() => handleSystemClick(mfr.name, sys)}
                     />
                   ))}
                 </DropdownGroup>
@@ -147,7 +147,7 @@ export function ManufacturerSystemSelectCompact({
   disabled = false,
   className = "",
 }: ManufacturerSystemSelectProps) {
-  const allManufacturers = useMemo(() => KNOWN_MANUFACTURERS.map((m) => m.manufacturer), []);
+  const allManufacturers = useMemo(() => KNOWN_MANUFACTURERS.map((m) => m.name), []);
   const availableSystems = useMemo(() => {
     if (!manufacturer) return [];
     return getSystemsForManufacturer(manufacturer);

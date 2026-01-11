@@ -554,31 +554,31 @@ export function ImportView() {
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => handleBitDirectionChange("ltr")}
+                          onClick={() => handleBitDirectionChange("msb")}
                           className={`
                             flex-1 px-3 py-1.5 text-xs rounded border transition-colors
                             ${
-                              config.bitDirection === "ltr"
+                              config.bitDirection === "msb"
                                 ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
                                 : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
                             }
                           `}
                         >
-                          Left to Right
+                          MSB First
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleBitDirectionChange("rtl")}
+                          onClick={() => handleBitDirectionChange("lsb")}
                           className={`
                             flex-1 px-3 py-1.5 text-xs rounded border transition-colors
                             ${
-                              config.bitDirection === "rtl"
+                              config.bitDirection === "lsb"
                                 ? "border-retro-cyan bg-retro-cyan/10 text-retro-cyan"
                                 : "border-retro-grid/50 text-gray-400 hover:border-retro-grid"
                             }
                           `}
                         >
-                          Right to Left
+                          LSB First
                         </button>
                       </div>
                     </div>
