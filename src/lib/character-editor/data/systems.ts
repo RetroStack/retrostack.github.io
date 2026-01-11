@@ -349,14 +349,15 @@ export interface ManufacturerSystems {
 }
 
 /**
- * Known manufacturers with their systems (only those with character ROM)
+ * Known manufacturers with their systems (only those with character ROM).
+ * Systems are sorted by release year (oldest first).
  */
 export const KNOWN_MANUFACTURERS: ManufacturerSystems[] = COMPUTER_MANUFACTURERS.map((m) => ({
   name: m.name,
   systems: m.systems
     .filter((s) => hasCharacterRom(s))
-    .map((s) => s.name)
-    .sort(),
+    .sort((a, b) => (a.year ?? 9999) - (b.year ?? 9999) || a.name.localeCompare(b.name))
+    .map((s) => s.name),
 }))
   .filter((m) => m.systems.length > 0)
   .sort((a, b) => a.name.localeCompare(b.name));
@@ -373,6 +374,8 @@ export interface SystemDimensionPreset {
   manufacturer: string;
   /** System name */
   system: string;
+  /** Release year (for sorting) */
+  year?: number;
   /** Character width in pixels */
   width: number;
   /** Character height in pixels */
@@ -382,23 +385,26 @@ export interface SystemDimensionPreset {
 }
 
 /**
- * System presets for character dimensions
+ * System presets for character dimensions.
+ * Sorted by manufacturer name, then by release year (oldest first).
  */
 export const SYSTEM_PRESETS: SystemDimensionPreset[] = COMPUTER_MANUFACTURERS.flatMap((m) =>
   m.systems
+    .filter((s) => hasCharacterRom(s))
     .map((s) => {
-      const resolved = getSystemCharacterRom(s);
-      if (!resolved) return null;
+      const resolved = getSystemCharacterRom(s)!;
       return {
         manufacturer: m.name,
         system: s.name,
+        year: s.year,
         width: resolved.width,
         height: resolved.height,
         label: `${resolved.width}x${resolved.height}`,
       };
-    })
-    .filter((preset): preset is SystemDimensionPreset => preset !== null),
-).sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.system.localeCompare(b.system));
+    }),
+).sort((a, b) =>
+  a.manufacturer.localeCompare(b.manufacturer) || (a.year ?? 9999) - (b.year ?? 9999) || a.system.localeCompare(b.system),
+);
 
 // ============================================================================
 // Derived Data: System Character Count Presets
@@ -412,6 +418,8 @@ export interface SystemCharacterCountPreset {
   manufacturer: string;
   /** System name */
   system: string;
+  /** Release year (for sorting) */
+  year?: number;
   /** Number of characters */
   characterCount: number;
   /** Alias for characterCount (for backwards compatibility) */
@@ -421,23 +429,26 @@ export interface SystemCharacterCountPreset {
 }
 
 /**
- * System presets for character counts
+ * System presets for character counts.
+ * Sorted by manufacturer name, then by release year (oldest first).
  */
 export const SYSTEM_CHARACTER_COUNT_PRESETS: SystemCharacterCountPreset[] = COMPUTER_MANUFACTURERS.flatMap((m) =>
   m.systems
+    .filter((s) => hasCharacterRom(s))
     .map((s) => {
-      const resolved = getSystemCharacterRom(s);
-      if (!resolved) return null;
+      const resolved = getSystemCharacterRom(s)!;
       return {
         manufacturer: m.name,
         system: s.name,
+        year: s.year,
         characterCount: resolved.characterCount,
         count: resolved.characterCount,
         label: String(resolved.characterCount),
       };
-    })
-    .filter((preset): preset is SystemCharacterCountPreset => preset !== null),
-).sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.system.localeCompare(b.system));
+    }),
+).sort((a, b) =>
+  a.manufacturer.localeCompare(b.manufacturer) || (a.year ?? 9999) - (b.year ?? 9999) || a.system.localeCompare(b.system),
+);
 
 // ============================================================================
 // Derived Data: Binary Export Presets
@@ -453,6 +464,8 @@ export interface BinaryExportSystemPreset {
   name: string;
   /** Manufacturer name for grouping */
   manufacturer: string;
+  /** Release year (for sorting) */
+  year?: number;
   /** Bit padding direction */
   padding: PaddingDirection;
   /** Bit order within bytes (msb = leftmost pixel is bit 7, lsb = leftmost pixel is bit 0) */
@@ -472,6 +485,7 @@ export interface BinaryExportManufacturerGroup {
 /**
  * Binary export system presets derived from systems with resolved inheritance.
  * Only includes systems that have character ROM definitions.
+ * Sorted by manufacturer name, then by release year (oldest first).
  */
 export const BINARY_EXPORT_SYSTEM_PRESETS: BinaryExportSystemPreset[] = COMPUTER_MANUFACTURERS.flatMap((m) =>
   m.systems
@@ -482,11 +496,14 @@ export const BINARY_EXPORT_SYSTEM_PRESETS: BinaryExportSystemPreset[] = COMPUTER
         id: s.id,
         name: s.name,
         manufacturer: m.name,
+        year: s.year,
         padding: format.padding,
         bitDirection: format.bitOrder,
       };
     }),
-).sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.name.localeCompare(b.name));
+).sort((a, b) =>
+  a.manufacturer.localeCompare(b.manufacturer) || (a.year ?? 9999) - (b.year ?? 9999) || a.name.localeCompare(b.name),
+);
 
 /**
  * Get binary export presets grouped by manufacturer
