@@ -13,7 +13,7 @@
  */
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { KNOWN_MANUFACTURERS, getSystemsForManufacturer } from "@/lib/character-editor/data/systems";
 import { useDropdown } from "@/hooks/useDropdown";
 import {
@@ -53,28 +53,67 @@ export function ManufacturerSystemSelect({
   className = "",
 }: ManufacturerSystemSelectProps) {
   const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Wrapper for toggle that clears search when opening
+  const handleToggle = useCallback(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+    toggle();
+  }, [isOpen, toggle]);
 
   // Sort manufacturers alphabetically
   const sortedManufacturers = useMemo(() => {
     return [...KNOWN_MANUFACTURERS].sort((a, b) => a.name.localeCompare(b.name));
   }, []);
 
+  // Filter manufacturers and systems based on search query
+  const filteredManufacturers = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return sortedManufacturers;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+
+    return sortedManufacturers
+      .map((mfr) => {
+        const manufacturerMatches = mfr.name.toLowerCase().includes(query);
+        const matchingSystems = mfr.systems.filter(
+          (sys) => manufacturerMatches || sys.toLowerCase().includes(query)
+        );
+
+        if (matchingSystems.length === 0) {
+          return null;
+        }
+
+        return {
+          name: mfr.name,
+          systems: matchingSystems,
+        };
+      })
+      .filter((mfr): mfr is NonNullable<typeof mfr> => mfr !== null);
+  }, [sortedManufacturers, searchQuery]);
+
   const handleManufacturerClick = (mfr: string) => {
     onManufacturerChange(mfr);
     onSystemChange("");
     close();
+    setSearchQuery("");
   };
 
   const handleSystemClick = (mfr: string, sys: string) => {
     onManufacturerChange(mfr);
     onSystemChange(sys);
     close();
+    setSearchQuery("");
   };
 
   const handleClear = () => {
     onManufacturerChange("");
     onSystemChange("");
     close();
+    setSearchQuery("");
   };
 
   return (
@@ -101,33 +140,49 @@ export function ManufacturerSystemSelect({
 
       {/* Picker dropdown */}
       <div ref={dropdownRef} className="relative flex-shrink-0">
-        <Picker3DButton onClick={toggle} disabled={disabled} title="Select manufacturer and system" />
+        <Picker3DButton onClick={handleToggle} disabled={disabled} title="Select manufacturer and system" />
 
         {/* Dropdown panel */}
         {isOpen && (
-          <DropdownPanel>
+          <DropdownPanel width={420} maxHeight={400}>
+            {/* Search input - sticky at top */}
+            <div className="sticky top-0 z-10 p-2 border-b border-retro-grid/30 bg-retro-navy">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search manufacturers or systems..."
+                autoFocus
+                className="w-full px-3 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
+              />
+            </div>
+
             {/* Clear option */}
-            {(manufacturer || system) && <DropdownClearButton onClick={handleClear} />}
+            {(manufacturer || system) && !searchQuery && <DropdownClearButton onClick={handleClear} />}
 
             {/* Manufacturers and systems */}
             <div className="p-2">
-              {sortedManufacturers.map((mfr) => (
-                <DropdownGroup
-                  key={mfr.name}
-                  label={mfr.name}
-                  onClick={() => handleManufacturerClick(mfr.name)}
-                  isSelected={manufacturer === mfr.name && !system}
-                >
-                  {mfr.systems.map((sys) => (
-                    <DropdownChipButton
-                      key={sys}
-                      label={sys}
-                      isSelected={manufacturer === mfr.name && system === sys}
-                      onClick={() => handleSystemClick(mfr.name, sys)}
-                    />
-                  ))}
-                </DropdownGroup>
-              ))}
+              {filteredManufacturers.length === 0 ? (
+                <div className="text-center text-gray-500 text-sm py-4">No manufacturers or systems found</div>
+              ) : (
+                filteredManufacturers.map((mfr) => (
+                  <DropdownGroup
+                    key={mfr.name}
+                    label={mfr.name}
+                    onClick={() => handleManufacturerClick(mfr.name)}
+                    isSelected={manufacturer === mfr.name && !system}
+                  >
+                    {mfr.systems.map((sys) => (
+                      <DropdownChipButton
+                        key={sys}
+                        label={sys}
+                        isSelected={manufacturer === mfr.name && system === sys}
+                        onClick={() => handleSystemClick(mfr.name, sys)}
+                      />
+                    ))}
+                  </DropdownGroup>
+                ))
+              )}
             </div>
           </DropdownPanel>
         )}
