@@ -703,13 +703,47 @@ export const DATA: SystemsData = {
       founded: 1976,
       founders: ["Steve Jobs", "Steve Wozniak", "Ronald Wayne"],
       headquarters: "Cupertino, California",
-      productLines: ["Apple II series", "Apple III", "Macintosh"],
+      productLines: ["Apple I", "Apple II series", "Apple III", "Macintosh"],
       funFacts: [
         "The Apple II was one of the first mass-produced personal computers with color graphics",
         "Ronald Wayne sold his 10% stake in Apple for $800 in 1976; it would be worth over $300 billion today",
         "Steve Wozniak hand-built every Apple I circuit board, producing about 200 units",
       ],
       systems: [
+        {
+          id: "apple-i",
+          name: "Apple I",
+          alternateNames: ["Apple-1", "Apple Computer 1"],
+          year: 1976,
+          characterRom: { id: "signetics-2513" },
+          cpu: { chip: "MOS 6502", speed: 1 },
+          memory: { ramKb: 4, romKb: 0.25, expandableKb: 8 },
+          characterDimensions: {
+            cell: { width: 7, height: 8 },
+            glyph: { width: 5, height: 7 },
+          },
+          characterSets: {
+            glyphs: 64,
+            uppercase: true,
+            lowercase: false,
+            encoding: "ASCII subset",
+          },
+          characterGenerator: {
+            location: "dedicated_chip",
+            customizable: false,
+          },
+          display: {
+            textModes: [{ columns: 40, rows: 24 }],
+          },
+          notes:
+            "First Apple computer, sold as a kit. Used Signetics 2513 for character generation with TV output.",
+          funFacts: [
+            "Only about 200 Apple I units were ever built, hand-assembled by Steve Wozniak",
+            "Original price was $666.66 because Wozniak liked repeating digits",
+            "Working Apple I computers have sold at auction for over $900,000",
+            "The Apple I was the first computer to come with a video terminal as standard",
+          ],
+        },
         {
           id: "apple-ii",
           name: "Apple II",
@@ -2403,7 +2437,7 @@ export const DATA: SystemsData = {
           glyph: { width: 5, height: 7 },
           glyphCount: 64,
           binaryFormat: { padding: "right", bitOrder: "msb" },
-          usedIn: ["Apple II", "Apple II Plus"],
+          usedIn: ["Apple I", "Apple II", "Apple II Plus"],
           variants: {
             "2513-CM": "Uppercase (General Instrument RO-3-2513)",
             "2513-CN": "Lowercase",
