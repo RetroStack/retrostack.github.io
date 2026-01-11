@@ -49,6 +49,8 @@ export interface CharacterPreviewProps {
   showCharacterBorders?: boolean;
   /** Color of character borders */
   characterBorderColor?: string;
+  /** Bloom/glow intensity (0-100, 0 = disabled) */
+  bloomIntensity?: number;
 }
 
 /**
@@ -70,6 +72,7 @@ export function CharacterPreview({
   forceColumns,
   showCharacterBorders = false,
   characterBorderColor = "rgba(100, 100, 100, 0.5)",
+  bloomIntensity = 0,
 }: CharacterPreviewProps) {
   // Calculate how many characters we can display
   const { displayChars, columns, rows } = useMemo(() => {
@@ -172,6 +175,7 @@ export function CharacterPreview({
         foregroundColor={foregroundColor}
         backgroundColor={backgroundColor}
         interactive={false}
+        bloomIntensity={bloomIntensity}
       />
 
       {/* Character borders overlay */}

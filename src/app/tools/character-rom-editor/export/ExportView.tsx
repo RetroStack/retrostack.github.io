@@ -14,9 +14,8 @@ import { CharacterPreview } from "@/components/character-editor/character/Charac
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
-import { CRTEffectsPanel } from "@/components/character-editor/editor/CRTEffectsPanel";
+import { BloomEffectPanel, BloomEffectSettings } from "@/components/character-editor/editor/BloomEffectPanel";
 import { CustomColors, getActiveColors } from "@/lib/character-editor/data/colorPresets";
-import { CRTSettings } from "@/lib/character-editor/data/crtSettings";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { useEditorReturn } from "@/hooks/character-editor/useEditorReturn";
 import { CharacterSet, PaddingDirection, BitDirection, bytesPerCharacter } from "@/lib/character-editor/types";
@@ -668,15 +667,12 @@ export function ExportView() {
                       </label>
                     </div>
 
-                    <CRTEffectsPanel
+                    <BloomEffectPanel
                       settings={{
-                        scanlines: false,
-                        scanlinesIntensity: 50,
                         bloom: pngOptions.bloom,
                         bloomIntensity: pngOptions.bloomIntensity,
-                        pixelAspectRatio: "none",
                       }}
-                      onChange={(settings: CRTSettings) =>
+                      onChange={(settings: BloomEffectSettings) =>
                         setPngOptions({
                           ...pngOptions,
                           bloom: settings.bloom,
@@ -1028,15 +1024,12 @@ export function ExportView() {
                       </div>
                     </div>
 
-                    <CRTEffectsPanel
+                    <BloomEffectPanel
                       settings={{
-                        scanlines: false,
-                        scanlinesIntensity: 50,
                         bloom: referenceSheetOptions.bloom,
                         bloomIntensity: referenceSheetOptions.bloomIntensity,
-                        pixelAspectRatio: "none",
                       }}
-                      onChange={(settings: CRTSettings) =>
+                      onChange={(settings: BloomEffectSettings) =>
                         setReferenceSheetOptions({
                           ...referenceSheetOptions,
                           bloom: settings.bloom,
@@ -1251,6 +1244,7 @@ export function ExportView() {
                             backgroundColor={pngOptions.transparent ? "transparent" : pngOptions.backgroundColor}
                             showCharacterBorders={pngOptions.showGrid}
                             characterBorderColor={pngOptions.gridColor}
+                            bloomIntensity={pngOptions.bloom ? pngOptions.bloomIntensity : 0}
                           />
                           {pngOptions.columns > fittingColumns && (
                             <div className="flex items-center justify-center text-gray-500 pl-2">

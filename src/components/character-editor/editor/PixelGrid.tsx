@@ -55,6 +55,8 @@ export interface PixelGridProps {
   diffPixels?: Set<string>;
   /** Color for diff pixels */
   diffColor?: string;
+  /** Bloom/glow intensity (0-100, 0 = disabled) */
+  bloomIntensity?: number;
 }
 
 /**
@@ -67,7 +69,7 @@ export function PixelGrid({
   pixels,
   scale = 1,
   showGrid = false,
-  gridColor = "#333333",
+  gridColor = "#4a4a4a",
   gridThickness = 1,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
@@ -82,6 +84,7 @@ export function PixelGrid({
   mixedColor = "#666666",
   diffPixels,
   diffColor = "#ff3333",
+  bloomIntensity = 0,
 }: PixelGridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -107,6 +110,13 @@ export function PixelGrid({
     ctx.fillStyle = showGrid ? gridColor : backgroundColor;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+    // Set up bloom effect if enabled
+    const hasBloom = bloomIntensity > 0;
+    if (hasBloom) {
+      ctx.shadowColor = foregroundColor;
+      ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
+    }
+
     // Draw pixels
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
@@ -123,7 +133,8 @@ export function PixelGrid({
         const isOn = pixels[row]?.[col] || false;
 
         if (isMixed) {
-          // Draw checkered pattern for mixed pixels
+          // Draw checkered pattern for mixed pixels (disable bloom for this)
+          if (hasBloom) ctx.shadowBlur = 0;
           const halfScale = Math.floor(scale / 2);
           ctx.fillStyle = foregroundColor;
           ctx.fillRect(x, y, halfScale, halfScale);
@@ -131,22 +142,27 @@ export function PixelGrid({
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(x + halfScale, y, scale - halfScale, halfScale);
           ctx.fillRect(x, y + halfScale, halfScale, scale - halfScale);
+          if (hasBloom) ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
         } else if (isDiff) {
-          // Highlight differing pixels in red
+          // Highlight differing pixels in red (disable bloom for this)
+          if (hasBloom) ctx.shadowBlur = 0;
           ctx.fillStyle = diffColor;
           ctx.fillRect(x, y, scale, scale);
+          if (hasBloom) ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
         } else {
-          // Draw base pixel first
+          // Draw base pixel
           ctx.fillStyle = isOn ? foregroundColor : backgroundColor;
+          // Only apply bloom to foreground pixels
+          if (hasBloom && !isOn) ctx.shadowBlur = 0;
           ctx.fillRect(x, y, scale, scale);
-
-          // If it's a diff pixel, draw semi-transparent overlay on top
-          if (isDiff) {
-            ctx.fillStyle = diffColor;
-            ctx.fillRect(x, y, scale, scale);
-          }
+          if (hasBloom && !isOn) ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
         }
       }
+    }
+
+    // Reset shadow
+    if (hasBloom) {
+      ctx.shadowBlur = 0;
     }
   }, [
     pixels,
@@ -164,6 +180,7 @@ export function PixelGrid({
     mixedColor,
     diffPixels,
     diffColor,
+    bloomIntensity,
   ]);
 
   // Convert canvas coordinates to pixel coordinates
