@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/Button";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import {
@@ -10,6 +11,9 @@ import {
   getUrlLengthStatus,
 } from "@/lib/character-editor/storage/sharing";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
+
+/** Maximum URL length for reliable QR code scanning */
+const MAX_QR_URL_LENGTH = 4000;
 
 export interface ShareModalProps {
   isOpen: boolean;
@@ -34,6 +38,7 @@ export function ShareModal({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const qrRef = useRef<SVGSVGElement>(null);
 
   // Check if sharing is possible
   const shareStatus = canShare(characters.length, config.width, config.height);
@@ -78,7 +83,52 @@ export function ShareModal({
     }
   }, [shareUrl]);
 
+  // Handle download QR code as PNG
+  const handleDownloadQR = useCallback(() => {
+    if (!qrRef.current || !shareUrl) return;
+
+    const svg = qrRef.current;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const scale = 2; // 2x for higher resolution
+      canvas.width = 160 * scale;
+      canvas.height = 160 * scale;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Fill with dark background for contrast
+      ctx.fillStyle = "#0a0a1a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw QR code
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Convert to PNG and download
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${name.replace(/[^a-z0-9]/gi, "-").toLowerCase()}-qr.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, "image/png");
+
+      URL.revokeObjectURL(svgUrl);
+    };
+    img.src = svgUrl;
+  }, [shareUrl, name]);
+
   const urlStatus = shareUrl ? getUrlLengthStatus(shareUrl) : "error";
+  const canShowQR = shareUrl && shareUrl.length <= MAX_QR_URL_LENGTH;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
@@ -175,6 +225,41 @@ export function ShareModal({
                 >
                   {copied ? "Copied!" : "Copy"}
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {/* QR Code */}
+          {canShowQR && (
+            <div className="mb-4 p-4 bg-retro-dark/30 rounded border border-retro-grid/20">
+              <div className="flex items-center gap-4">
+                <div className="bg-white p-2 rounded">
+                  <QRCodeSVG
+                    ref={qrRef}
+                    value={shareUrl}
+                    size={128}
+                    bgColor="#ffffff"
+                    fgColor="#0a0a1a"
+                    level="M"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-white mb-1">QR Code</h4>
+                  <p className="text-xs text-gray-400 mb-3">
+                    Scan with your phone to open the character set
+                  </p>
+                  <Button
+                    onClick={handleDownloadQR}
+                    variant="ghost"
+                    size="sm"
+                    className="text-retro-cyan hover:text-retro-cyan/80"
+                  >
+                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download QR
+                  </Button>
+                </div>
               </div>
             </div>
           )}
