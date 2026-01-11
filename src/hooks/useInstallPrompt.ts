@@ -14,6 +14,7 @@
  * @module hooks/useInstallPrompt
  */
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- SSR-safe hydration from browser state */
 
 import { useState, useEffect, useCallback } from "react";
 
