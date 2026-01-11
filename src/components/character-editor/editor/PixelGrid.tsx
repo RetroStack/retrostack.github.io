@@ -131,6 +131,10 @@ export function PixelGrid({
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(x + halfScale, y, scale - halfScale, halfScale);
           ctx.fillRect(x, y + halfScale, halfScale, scale - halfScale);
+        } else if (isDiff) {
+          // Highlight differing pixels in red
+          ctx.fillStyle = diffColor;
+          ctx.fillRect(x, y, scale, scale);
         } else {
           // Draw base pixel first
           ctx.fillStyle = isOn ? foregroundColor : backgroundColor;
