@@ -615,6 +615,73 @@ export const CHIP_CHARACTER_COUNT_PRESETS: ChipCharacterCountPreset[] = CHIP_MAN
 );
 
 /**
+ * Chip binary export preset with padding and bit direction.
+ */
+export interface ChipBinaryExportPreset {
+  /** Chip ID */
+  id: string;
+  /** Part number for display */
+  partNumber: string;
+  /** Manufacturer name for grouping */
+  manufacturer: string;
+  /** Bit padding direction */
+  padding: PaddingDirection;
+  /** Bit order within bytes */
+  bitDirection: BitDirection;
+}
+
+/**
+ * Chip binary export manufacturer group
+ */
+export interface ChipBinaryExportManufacturerGroup {
+  /** Manufacturer name */
+  manufacturer: string;
+  /** Chips from this manufacturer */
+  chips: ChipBinaryExportPreset[];
+}
+
+/**
+ * Chip binary export presets derived from chips with binaryFormat defined.
+ * Sorted by manufacturer name, then by part number.
+ */
+export const CHIP_BINARY_EXPORT_PRESETS: ChipBinaryExportPreset[] = CHIP_MANUFACTURERS.flatMap((m) =>
+  m.chips
+    .filter((chip) => chip.binaryFormat !== undefined)
+    .map((chip) => ({
+      id: chip.id,
+      partNumber: chip.partNumber,
+      manufacturer: m.name,
+      padding: chip.binaryFormat!.padding,
+      bitDirection: chip.binaryFormat!.bitOrder,
+    })),
+).sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.partNumber.localeCompare(b.partNumber));
+
+/**
+ * Get chip binary export presets grouped by manufacturer
+ */
+export function getChipBinaryExportPresetsByManufacturer(): ChipBinaryExportManufacturerGroup[] {
+  const groups = new Map<string, ChipBinaryExportPreset[]>();
+
+  for (const preset of CHIP_BINARY_EXPORT_PRESETS) {
+    if (!groups.has(preset.manufacturer)) {
+      groups.set(preset.manufacturer, []);
+    }
+    groups.get(preset.manufacturer)!.push(preset);
+  }
+
+  return Array.from(groups.entries())
+    .map(([manufacturer, chips]) => ({ manufacturer, chips }))
+    .sort((a, b) => a.manufacturer.localeCompare(b.manufacturer));
+}
+
+/**
+ * Find chip binary export preset by ID
+ */
+export function findChipBinaryExportPreset(id: string): ChipBinaryExportPreset | undefined {
+  return CHIP_BINARY_EXPORT_PRESETS.find((p) => p.id === id);
+}
+
+/**
  * Get chip dimension presets grouped by manufacturer
  */
 export function getChipPresetsByManufacturer(): Record<string, ChipDimensionPreset[]> {

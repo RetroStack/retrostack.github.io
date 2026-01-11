@@ -4,8 +4,11 @@ import { useState, useMemo, useCallback } from "react";
 import type { PaddingDirection, BitDirection } from "@/lib/character-editor/types";
 import {
   BINARY_EXPORT_SYSTEM_PRESETS,
+  CHIP_BINARY_EXPORT_PRESETS,
   type BinaryExportSystemPreset,
+  type ChipBinaryExportPreset,
   getBinaryExportPresetsByManufacturer,
+  getChipBinaryExportPresetsByManufacturer,
   getSystemByName,
   ROM_CHIPS,
 } from "@/lib/character-editor/data/systems";
@@ -41,10 +44,10 @@ export interface BinaryFormatSectionProps {
 }
 
 /**
- * Combined binary format section with system preset selector and collapsible custom options.
+ * Combined binary format section with system/chip preset selector and collapsible custom options.
  *
- * - Primary UI: System preset dropdown to select a target system
- * - Secondary UI: Collapsible "Custom" section for manual padding/bit direction
+ * - Primary UI: System/chip preset dropdown to select a target system or character generator
+ * - Secondary UI: Collapsible "Bit Settings" section for manual padding/bit direction
  * - When a preset is selected, both padding and bit direction are set automatically
  * - When custom values differ from selected preset, shows "Custom" in the input
  *
@@ -52,11 +55,32 @@ export interface BinaryFormatSectionProps {
  * - ExportView (binary and code export)
  */
 
+/** Union type for selected preset - can be system or chip */
+type SelectedPreset =
+  | { type: "system"; preset: BinaryExportSystemPreset }
+  | { type: "chip"; preset: ChipBinaryExportPreset };
+
 /**
- * Find a preset by chip/character generator name.
+ * Find a chip preset by chip/character generator name.
+ */
+function findChipPresetByName(chipName: string): ChipBinaryExportPreset | undefined {
+  if (!chipName) return undefined;
+  const lowerName = chipName.toLowerCase();
+
+  // Find the chip by part number (exact or partial match)
+  return CHIP_BINARY_EXPORT_PRESETS.find(
+    (c) =>
+      c.partNumber.toLowerCase() === lowerName ||
+      c.partNumber.toLowerCase().includes(lowerName) ||
+      lowerName.includes(c.partNumber.toLowerCase())
+  );
+}
+
+/**
+ * Find a system preset by chip/character generator name.
  * Looks up which systems use this chip and returns the first matching preset.
  */
-function findPresetByChipName(chipName: string): BinaryExportSystemPreset | undefined {
+function findSystemPresetByChipName(chipName: string): BinaryExportSystemPreset | undefined {
   if (!chipName) return undefined;
   const lowerName = chipName.toLowerCase();
 
@@ -107,21 +131,32 @@ function findPresetBySystemName(systemName: string): BinaryExportSystemPreset | 
 }
 
 /**
- * Find a preset by chip name first (higher priority), then by system name
+ * Find initial selection: chip preset first, then system preset by chip, then system preset by name
  */
-function findInitialPreset(chipName?: string, systemName?: string): BinaryExportSystemPreset | undefined {
-  // Chip/character generator takes priority
+function findInitialSelection(chipName?: string, systemName?: string): { type: "system" | "chip"; id: string } | null {
+  // First try to find a chip preset directly
   if (chipName) {
-    const preset = findPresetByChipName(chipName);
-    if (preset) return preset;
+    const chipPreset = findChipPresetByName(chipName);
+    if (chipPreset) {
+      return { type: "chip", id: chipPreset.id };
+    }
+
+    // Try to find a system that uses this chip
+    const systemPreset = findSystemPresetByChipName(chipName);
+    if (systemPreset) {
+      return { type: "system", id: systemPreset.id };
+    }
   }
 
   // Fall back to system name
   if (systemName) {
-    return findPresetBySystemName(systemName);
+    const preset = findPresetBySystemName(systemName);
+    if (preset) {
+      return { type: "system", id: preset.id };
+    }
   }
 
-  return undefined;
+  return null;
 }
 
 export function BinaryFormatSection({
@@ -146,30 +181,28 @@ export function BinaryFormatSection({
     toggle();
   }, [isOpen, toggle]);
 
-  // Track the selected preset ID (null means custom or no selection yet)
-  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(() => {
-    // Initialize with matching preset - chip takes priority over system
-    const preset = findInitialPreset(initialChipName, initialSystemName);
-    return preset?.id ?? null;
+  // Track the selected preset (type + id)
+  const [selection, setSelection] = useState<{ type: "system" | "chip"; id: string } | null>(() => {
+    return findInitialSelection(initialChipName, initialSystemName);
   });
 
-  // Get presets grouped by manufacturer
-  const manufacturerGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
+  // Get system presets grouped by manufacturer
+  const systemGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
 
-  // Filter manufacturer groups based on search query
-  const filteredGroups = useMemo(() => {
+  // Get chip presets grouped by manufacturer
+  const chipGroups = useMemo(() => getChipBinaryExportPresetsByManufacturer(), []);
+
+  // Filter system groups based on search query
+  const filteredSystemGroups = useMemo(() => {
     if (!searchQuery.trim()) {
-      return manufacturerGroups;
+      return systemGroups;
     }
 
     const query = searchQuery.toLowerCase().trim();
 
-    return manufacturerGroups
+    return systemGroups
       .map((group) => {
-        // Check if manufacturer name matches
         const manufacturerMatches = group.manufacturer.toLowerCase().includes(query);
-
-        // Filter systems that match the query
         const matchingSystems = group.systems.filter(
           (preset) =>
             manufacturerMatches ||
@@ -187,26 +220,67 @@ export function BinaryFormatSection({
         };
       })
       .filter((group): group is NonNullable<typeof group> => group !== null);
-  }, [manufacturerGroups, searchQuery]);
+  }, [systemGroups, searchQuery]);
 
-  // Find the selected preset by ID, or check if current values match it
-  // When padding/bitDirection change externally, currentPreset will be null (shows "Custom")
-  const currentPreset = useMemo(() => {
-    if (selectedPresetId) {
-      const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === selectedPresetId);
-      // Only return the preset if the current values still match
+  // Filter chip groups based on search query
+  const filteredChipGroups = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return chipGroups;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+
+    return chipGroups
+      .map((group) => {
+        const manufacturerMatches = group.manufacturer.toLowerCase().includes(query);
+        const matchingChips = group.chips.filter(
+          (preset) =>
+            manufacturerMatches ||
+            preset.partNumber.toLowerCase().includes(query) ||
+            preset.id.toLowerCase().includes(query)
+        );
+
+        if (matchingChips.length === 0) {
+          return null;
+        }
+
+        return {
+          manufacturer: group.manufacturer,
+          chips: matchingChips,
+        };
+      })
+      .filter((group): group is NonNullable<typeof group> => group !== null);
+  }, [chipGroups, searchQuery]);
+
+  // Find the current preset based on selection
+  const currentPreset = useMemo((): SelectedPreset | null => {
+    if (!selection) return null;
+
+    if (selection.type === "system") {
+      const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === selection.id);
       if (preset && preset.padding === padding && preset.bitDirection === bitDirection) {
-        return preset;
+        return { type: "system", preset };
+      }
+    } else {
+      const preset = CHIP_BINARY_EXPORT_PRESETS.find((p) => p.id === selection.id);
+      if (preset && preset.padding === padding && preset.bitDirection === bitDirection) {
+        return { type: "chip", preset };
       }
     }
-    // No valid selection - return null (will show "Custom")
+
     return null;
-  }, [selectedPresetId, padding, bitDirection]);
+  }, [selection, padding, bitDirection]);
 
   // Display text for the input
-  const displayText = currentPreset
-    ? `${currentPreset.manufacturer} ${currentPreset.name}`
-    : "Custom";
+  const displayText = useMemo(() => {
+    if (!currentPreset) return "Custom";
+
+    if (currentPreset.type === "system") {
+      return `${currentPreset.preset.manufacturer} ${currentPreset.preset.name}`;
+    } else {
+      return `${currentPreset.preset.manufacturer} ${currentPreset.preset.partNumber}`;
+    }
+  }, [currentPreset]);
 
   // Close dropdown and clear search
   const closeDropdown = useCallback(() => {
@@ -214,9 +288,19 @@ export function BinaryFormatSection({
     setSearchQuery("");
   }, [close]);
 
-  const handlePresetClick = useCallback(
+  const handleSystemPresetClick = useCallback(
     (preset: BinaryExportSystemPreset) => {
-      setSelectedPresetId(preset.id);
+      setSelection({ type: "system", id: preset.id });
+      onPaddingChange(preset.padding);
+      onBitDirectionChange(preset.bitDirection);
+      closeDropdown();
+    },
+    [onPaddingChange, onBitDirectionChange, closeDropdown]
+  );
+
+  const handleChipPresetClick = useCallback(
+    (preset: ChipBinaryExportPreset) => {
+      setSelection({ type: "chip", id: preset.id });
       onPaddingChange(preset.padding);
       onBitDirectionChange(preset.bitDirection);
       closeDropdown();
@@ -226,7 +310,7 @@ export function BinaryFormatSection({
 
   const handleClear = useCallback(() => {
     // Reset to default (most common: right padding, MSB first)
-    setSelectedPresetId(null);
+    setSelection(null);
     onPaddingChange("right");
     onBitDirectionChange("msb");
     closeDropdown();
@@ -236,11 +320,13 @@ export function BinaryFormatSection({
     setCustomExpanded((prev) => !prev);
   }, []);
 
+  const hasNoResults = filteredSystemGroups.length === 0 && filteredChipGroups.length === 0;
+
   return (
     <div className={`space-y-3 ${className}`}>
-      {/* System preset selector */}
+      {/* System/chip preset selector */}
       <div>
-        <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+        <h3 className="text-xs font-medium text-gray-400 mb-2">Target System / Character Generator</h3>
         <div className="flex gap-2">
           {/* Read-only display input */}
           <input
@@ -249,23 +335,23 @@ export function BinaryFormatSection({
             readOnly
             disabled={disabled}
             className={pickerInputClasses}
-            title="Select a target system from the picker"
+            title="Select a target system or character generator from the picker"
           />
 
           {/* Picker dropdown */}
           <div ref={dropdownRef} className="relative flex-shrink-0">
-            <Picker3DButton onClick={handleToggle} disabled={disabled} title="Select target system" />
+            <Picker3DButton onClick={handleToggle} disabled={disabled} title="Select target system or chip" />
 
             {/* Dropdown panel */}
             {isOpen && (
               <DropdownPanel width={420} maxHeight={400}>
-                {/* Search input */}
-                <div className="p-2 border-b border-retro-grid/30">
+                {/* Search input - sticky at top */}
+                <div className="sticky top-0 z-10 p-2 border-b border-retro-grid/30 bg-retro-navy">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search systems..."
+                    placeholder="Search systems or chips..."
                     autoFocus
                     className="w-full px-3 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
                   />
@@ -276,25 +362,58 @@ export function BinaryFormatSection({
                   <DropdownClearButton onClick={handleClear} label="Reset to default" />
                 )}
 
-                {/* Systems grouped by manufacturer */}
+                {/* Content area */}
                 <div className="p-2">
-                  {filteredGroups.length === 0 ? (
-                    <div className="text-center text-gray-500 text-sm py-4">
-                      No systems found
-                    </div>
+                  {hasNoResults ? (
+                    <div className="text-center text-gray-500 text-sm py-4">No systems or chips found</div>
                   ) : (
-                    filteredGroups.map((group) => (
-                      <DropdownGroup key={group.manufacturer} label={group.manufacturer}>
-                        {group.systems.map((preset) => (
-                          <DropdownChipButton
-                            key={preset.id}
-                            label={preset.name}
-                            isSelected={currentPreset?.id === preset.id}
-                            onClick={() => handlePresetClick(preset)}
-                          />
-                        ))}
-                      </DropdownGroup>
-                    ))
+                    <>
+                      {/* Character Generators section */}
+                      {filteredChipGroups.length > 0 && (
+                        <div className="mb-3">
+                          <div className="text-xs font-semibold text-retro-cyan uppercase tracking-wider mb-2 px-1">
+                            Character Generators
+                          </div>
+                          {filteredChipGroups.map((group) => (
+                            <DropdownGroup key={`chip-${group.manufacturer}`} label={group.manufacturer}>
+                              {group.chips.map((preset) => (
+                                <DropdownChipButton
+                                  key={preset.id}
+                                  label={preset.partNumber}
+                                  isSelected={
+                                    currentPreset?.type === "chip" && currentPreset.preset.id === preset.id
+                                  }
+                                  onClick={() => handleChipPresetClick(preset)}
+                                />
+                              ))}
+                            </DropdownGroup>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Systems section */}
+                      {filteredSystemGroups.length > 0 && (
+                        <div>
+                          <div className="text-xs font-semibold text-retro-pink uppercase tracking-wider mb-2 px-1">
+                            Computer Systems
+                          </div>
+                          {filteredSystemGroups.map((group) => (
+                            <DropdownGroup key={`system-${group.manufacturer}`} label={group.manufacturer}>
+                              {group.systems.map((preset) => (
+                                <DropdownChipButton
+                                  key={preset.id}
+                                  label={preset.name}
+                                  isSelected={
+                                    currentPreset?.type === "system" && currentPreset.preset.id === preset.id
+                                  }
+                                  onClick={() => handleSystemPresetClick(preset)}
+                                />
+                              ))}
+                            </DropdownGroup>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </DropdownPanel>
@@ -328,20 +447,12 @@ export function BinaryFormatSection({
           <div className="p-3 pt-1 space-y-3 border-t border-retro-grid/30">
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">Bit Padding</label>
-              <PaddingDirectionSelector
-                value={padding}
-                onChange={onPaddingChange}
-                disabled={disabled}
-              />
+              <PaddingDirectionSelector value={padding} onChange={onPaddingChange} disabled={disabled} />
             </div>
 
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">Bit Direction</label>
-              <BitDirectionSelector
-                value={bitDirection}
-                onChange={onBitDirectionChange}
-                disabled={disabled}
-              />
+              <BitDirectionSelector value={bitDirection} onChange={onBitDirectionChange} disabled={disabled} />
             </div>
           </div>
         )}
