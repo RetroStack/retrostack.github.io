@@ -17,12 +17,13 @@
  */
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useEffect } from "react";
 import { EmptyCharacterDisplay } from "./CharacterDisplay";
 import { CharacterGridItem } from "./CharacterGridItem";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
 import { useDragSelect } from "@/hooks/useDragSelect";
+import { useGridKeyboardNavigation } from "@/hooks/useGridKeyboardNavigation";
 
 export interface InteractiveCharacterGridProps {
   /** Array of characters to display */
@@ -111,6 +112,29 @@ export function InteractiveCharacterGrid({
     return Math.max(minColumns, Math.min(maxColumns, cols));
   }, [size.width, cellWidth, gap, minColumns, maxColumns]);
 
+  // Keyboard navigation for the grid
+  const handleKeyboardNavigate = useCallback(
+    (index: number, shiftKey: boolean) => {
+      onSelect?.(index, shiftKey, false);
+    },
+    [onSelect]
+  );
+
+  const { handleKeyDown: handleGridKeyDown, focusItem } = useGridKeyboardNavigation({
+    itemCount: characters.length,
+    columns,
+    currentIndex: selectedIndex ?? 0,
+    onNavigate: handleKeyboardNavigate,
+    containerRef,
+  });
+
+  // Focus the selected item when selection changes externally
+  useEffect(() => {
+    if (selectedIndex !== undefined && document.activeElement?.closest('[role="listbox"]') === containerRef.current) {
+      focusItem(selectedIndex);
+    }
+  }, [selectedIndex, focusItem]);
+
   // Get item index from screen coordinates (for drag-select)
   // Uses DOM-based lookup for accuracy with auto-sized grid cells
   const getIndexFromPoint = useCallback(
@@ -147,6 +171,8 @@ export function InteractiveCharacterGrid({
       className={`overflow-auto p-2 ${className} ${isSelectionMode ? "ring-4 ring-retro-cyan rounded bg-retro-cyan/10" : ""} ${dragSelect.isDragging ? "ring-4 ring-retro-pink bg-retro-pink/20" : ""}`}
       role="listbox"
       aria-label="Character selection grid"
+      aria-multiselectable={isSelectionMode || batchSelection !== undefined}
+      onKeyDown={handleGridKeyDown}
     >
       <div
         ref={gridRef}

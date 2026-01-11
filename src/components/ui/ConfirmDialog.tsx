@@ -16,6 +16,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export interface ConfirmDialogProps {
   /** Whether the dialog is open */
@@ -61,6 +62,13 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Focus trap: keeps Tab navigation within the dialog
+  const focusTrapRef = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    restoreFocus: true,
+    autoFocus: false, // We handle focus manually to confirm button
+  });
+
   // Focus the confirm button when dialog opens
   useEffect(() => {
     if (isOpen && confirmButtonRef.current) {
@@ -90,10 +98,12 @@ export function ConfirmDialog({
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onCancel}
+        aria-hidden="true"
       />
 
-      {/* Dialog */}
+      {/* Dialog with focus trap */}
       <div
+        ref={focusTrapRef}
         className="relative w-full max-w-md bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl p-6"
         role="alertdialog"
         aria-modal="true"

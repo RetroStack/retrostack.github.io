@@ -47,7 +47,7 @@ export interface CharacterEditorContextValue extends EditorDisplaySettings {
 export const DEFAULT_EDITOR_SETTINGS: EditorDisplaySettings = {
   foregroundColor: "#ffffff",
   backgroundColor: "#000000",
-  gridColor: "#333333",
+  gridColor: "#4a4a4a", // Improved contrast (~3.3:1 ratio)
   gridThickness: 1,
   zoom: 20,
 };

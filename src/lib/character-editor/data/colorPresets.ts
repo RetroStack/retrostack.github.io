@@ -27,7 +27,7 @@ export const COLOR_PRESETS: ColorPreset[] = [
     name: "White Phosphor",
     foreground: "#ffffff",
     background: "#000000",
-    gridColor: "#333333",
+    gridColor: "#4a4a4a", // Improved contrast (~3.3:1 ratio)
   },
   {
     id: "green",
@@ -167,7 +167,7 @@ export function getCustomColors(): CustomColors {
   return {
     foreground: "#ffffff",
     background: "#000000",
-    gridColor: "#333333",
+    gridColor: "#4a4a4a",
   };
 }
 
@@ -194,6 +194,6 @@ export function getActiveColors(): CustomColors {
   return {
     foreground: "#ffffff",
     background: "#000000",
-    gridColor: "#333333",
+    gridColor: "#4a4a4a",
   };
 }

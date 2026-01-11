@@ -16,6 +16,7 @@
 "use client";
 
 import { useCallback, type ReactNode, type KeyboardEvent } from "react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 // ============================================================================
 // Types
@@ -151,6 +152,13 @@ export function Modal({
   className = "",
   ariaLabel,
 }: ModalProps) {
+  // Focus trap: keeps Tab navigation within the modal
+  const focusTrapRef = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    restoreFocus: true,
+    autoFocus: true,
+  });
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Escape") {
@@ -179,10 +187,12 @@ export function Modal({
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Modal container */}
+      {/* Modal container with focus trap */}
       <div
+        ref={focusTrapRef}
         className={`
           relative w-full ${sizeClass} ${maxHeightClass}
           bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl

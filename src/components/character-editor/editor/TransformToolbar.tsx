@@ -16,7 +16,7 @@
  */
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Character } from "@/lib/character-editor/types";
 import {
   rotateCharacter,
@@ -43,7 +43,50 @@ import { AddIcon, DuplicateIcon, DeleteIcon, ClearIcon, FillIcon, InvertIcon } f
 
 // Extracted components
 import { TransformPreviewContent } from "./TransformPreview";
-import { ToolbarButton, ToolbarDivider, ToolbarLabel } from "./ToolbarPrimitives";
+import { ToolbarButton, ToolbarDivider } from "./ToolbarPrimitives";
+
+/** Type for toolbar section IDs */
+type ToolbarSectionId = "shift" | "rotate" | "flip" | "modify" | "char";
+
+/** Collapsible section for toolbar groups */
+interface CollapsibleSectionProps {
+  id: ToolbarSectionId;
+  label: string;
+  isExpanded: boolean;
+  onToggle: (id: ToolbarSectionId) => void;
+  children: React.ReactNode;
+}
+
+function CollapsibleSection({ id, label, isExpanded, onToggle, children }: CollapsibleSectionProps) {
+  return (
+    <div className="w-full">
+      <button
+        onClick={() => onToggle(id)}
+        className="w-full flex items-center justify-between px-1 py-0.5 text-[10px] font-medium text-gray-500 hover:text-gray-300 transition-colors"
+        aria-expanded={isExpanded}
+        aria-controls={`toolbar-section-${id}`}
+      >
+        <span>{label}</span>
+        <svg
+          className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <div
+        id={`toolbar-section-${id}`}
+        className={`overflow-hidden transition-all duration-200 ease-in-out ${
+          isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="py-1">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 export interface TransformToolbarProps {
   /** Current character being edited (for preview) */
@@ -111,6 +154,23 @@ export function TransformToolbar({
   disabled = false,
   className = "",
 }: TransformToolbarProps) {
+  // Track which sections are expanded (default: Shift, Rotate, Flip expanded; Modify, Char collapsed)
+  const [expandedSections, setExpandedSections] = useState<Set<ToolbarSectionId>>(
+    new Set(["shift", "rotate", "flip"])
+  );
+
+  const toggleSection = useCallback((id: ToolbarSectionId) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
   const handleShiftUp = useCallback(() => onShift("up"), [onShift]);
   const handleShiftDown = useCallback(() => onShift("down"), [onShift]);
   const handleShiftLeft = useCallback(() => onShift("left"), [onShift]);
@@ -220,205 +280,238 @@ export function TransformToolbar({
   return (
     <div
       className={`
-        flex flex-col items-center py-1 px-2 bg-retro-navy/50 border-l border-retro-grid/30 overflow-hidden
+        flex flex-col items-center py-1 px-2 bg-retro-navy/50 border-l border-retro-grid/30 overflow-y-auto
         ${className}
       `}
+      role="toolbar"
+      aria-label="Character transform tools"
     >
       {/* Shift section with cross layout */}
-      <ToolbarLabel>Shift</ToolbarLabel>
-      <div className="flex flex-col items-center gap-0.5">
-        {/* Up button */}
-        <ToolbarButton
-          onClick={handleShiftUp}
-          disabled={disabled}
-          tooltip="Shift Up"
-          shortcut="W"
-          previewContent={previews?.shiftUp}
-        >
-          <ArrowUpIcon />
-        </ToolbarButton>
-
-        {/* Left - Center - Right row */}
-        <div className="flex items-center gap-0.5">
+      <CollapsibleSection
+        id="shift"
+        label="Shift"
+        isExpanded={expandedSections.has("shift")}
+        onToggle={toggleSection}
+      >
+        <div className="flex flex-col items-center gap-0.5">
+          {/* Up button */}
           <ToolbarButton
-            onClick={handleShiftLeft}
+            onClick={handleShiftUp}
             disabled={disabled}
-            tooltip="Shift Left"
-            shortcut="A"
-            previewContent={previews?.shiftLeft}
+            tooltip="Shift Up"
+            shortcut="W"
+            previewContent={previews?.shiftUp}
           >
-            <ArrowLeftIcon />
+            <ArrowUpIcon />
           </ToolbarButton>
 
-          {/* Center button */}
-          <ToolbarButton
-            onClick={() => onCenter?.()}
-            disabled={disabled || !onCenter}
-            tooltip="Center Content"
-            previewContent={previews?.center}
-          >
-            <CenterIcon />
-          </ToolbarButton>
+          {/* Left - Center - Right row */}
+          <div className="flex items-center gap-0.5">
+            <ToolbarButton
+              onClick={handleShiftLeft}
+              disabled={disabled}
+              tooltip="Shift Left"
+              shortcut="A"
+              previewContent={previews?.shiftLeft}
+            >
+              <ArrowLeftIcon />
+            </ToolbarButton>
 
+            {/* Center button */}
+            <ToolbarButton
+              onClick={() => onCenter?.()}
+              disabled={disabled || !onCenter}
+              tooltip="Center Content"
+              previewContent={previews?.center}
+            >
+              <CenterIcon />
+            </ToolbarButton>
+
+            <ToolbarButton
+              onClick={handleShiftRight}
+              disabled={disabled}
+              tooltip="Shift Right"
+              shortcut="D"
+              previewContent={previews?.shiftRight}
+            >
+              <ArrowRightIcon />
+            </ToolbarButton>
+          </div>
+
+          {/* Down button */}
           <ToolbarButton
-            onClick={handleShiftRight}
+            onClick={handleShiftDown}
             disabled={disabled}
-            tooltip="Shift Right"
-            shortcut="D"
-            previewContent={previews?.shiftRight}
+            tooltip="Shift Down"
+            shortcut="S"
+            previewContent={previews?.shiftDown}
           >
-            <ArrowRightIcon />
+            <ArrowDownIcon />
           </ToolbarButton>
         </div>
-
-        {/* Down button */}
-        <ToolbarButton
-          onClick={handleShiftDown}
-          disabled={disabled}
-          tooltip="Shift Down"
-          shortcut="S"
-          previewContent={previews?.shiftDown}
-        >
-          <ArrowDownIcon />
-        </ToolbarButton>
-      </div>
+      </CollapsibleSection>
 
       <ToolbarDivider />
 
       {/* Rotate section */}
-      <ToolbarLabel>Rotate</ToolbarLabel>
-      <div className="flex items-center gap-1">
-        <ToolbarButton
-          onClick={handleRotateLeft}
-          disabled={disabled}
-          tooltip="Rotate Left"
-          shortcut="Shift+R"
-          previewContent={previews?.rotateLeft}
-        >
-          <RotateLeftIcon />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={handleRotateRight}
-          disabled={disabled}
-          tooltip="Rotate Right"
-          shortcut="R"
-          previewContent={previews?.rotateRight}
-        >
-          <RotateRightIcon />
-        </ToolbarButton>
-      </div>
+      <CollapsibleSection
+        id="rotate"
+        label="Rotate"
+        isExpanded={expandedSections.has("rotate")}
+        onToggle={toggleSection}
+      >
+        <div className="flex items-center justify-center gap-1">
+          <ToolbarButton
+            onClick={handleRotateLeft}
+            disabled={disabled}
+            tooltip="Rotate Left"
+            shortcut="Shift+R"
+            previewContent={previews?.rotateLeft}
+          >
+            <RotateLeftIcon />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={handleRotateRight}
+            disabled={disabled}
+            tooltip="Rotate Right"
+            shortcut="R"
+            previewContent={previews?.rotateRight}
+          >
+            <RotateRightIcon />
+          </ToolbarButton>
+        </div>
+      </CollapsibleSection>
 
       <ToolbarDivider />
 
       {/* Flip section */}
-      <ToolbarLabel>Flip</ToolbarLabel>
-      <div className="flex items-center gap-1">
-        <ToolbarButton
-          onClick={onFlipHorizontal}
-          disabled={disabled}
-          tooltip="Flip Horizontal"
-          shortcut="H"
-          previewContent={previews?.flipHorizontal}
-        >
-          <FlipHorizontalIcon />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={onFlipVertical}
-          disabled={disabled}
-          tooltip="Flip Vertical"
-          shortcut="V"
-          previewContent={previews?.flipVertical}
-        >
-          <FlipVerticalIcon />
-        </ToolbarButton>
-      </div>
+      <CollapsibleSection
+        id="flip"
+        label="Flip"
+        isExpanded={expandedSections.has("flip")}
+        onToggle={toggleSection}
+      >
+        <div className="flex items-center justify-center gap-1">
+          <ToolbarButton
+            onClick={onFlipHorizontal}
+            disabled={disabled}
+            tooltip="Flip Horizontal"
+            shortcut="H"
+            previewContent={previews?.flipHorizontal}
+          >
+            <FlipHorizontalIcon />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={onFlipVertical}
+            disabled={disabled}
+            tooltip="Flip Vertical"
+            shortcut="V"
+            previewContent={previews?.flipVertical}
+          >
+            <FlipVerticalIcon />
+          </ToolbarButton>
+        </div>
+      </CollapsibleSection>
 
       <ToolbarDivider />
 
       {/* Modify section */}
-      <ToolbarLabel>Modify</ToolbarLabel>
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-1">
-          <ToolbarButton
-            onClick={onInvert}
-            disabled={disabled}
-            tooltip="Invert Colors"
-            shortcut="I"
-            previewContent={previews?.invert}
-          >
-            <InvertIcon />
-          </ToolbarButton>
+      <CollapsibleSection
+        id="modify"
+        label="Modify"
+        isExpanded={expandedSections.has("modify")}
+        onToggle={toggleSection}
+      >
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1">
+            <ToolbarButton
+              onClick={onInvert}
+              disabled={disabled}
+              tooltip="Invert Colors"
+              shortcut="I"
+              previewContent={previews?.invert}
+            >
+              <InvertIcon />
+            </ToolbarButton>
+          </div>
+          <div className="flex items-center gap-1">
+            <ToolbarButton onClick={onClear} disabled={disabled} tooltip="Clear" previewContent={previews?.clear}>
+              <ClearIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={onFill} disabled={disabled} tooltip="Fill" previewContent={previews?.fill}>
+              <FillIcon />
+            </ToolbarButton>
+          </div>
+          <div className="flex items-center gap-1">
+            <ToolbarButton onClick={onScale} disabled={disabled} tooltip="Scale Character">
+              <ScaleIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
+              {/* Custom icon: grid with arrow pointing to character */}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {/* Small grid representing source character set */}
+                <rect x="3" y="3" width="4" height="4" strokeWidth={1.5} />
+                <rect x="8" y="3" width="4" height="4" strokeWidth={1.5} />
+                <rect x="3" y="8" width="4" height="4" strokeWidth={1.5} />
+                <rect x="8" y="8" width="4" height="4" strokeWidth={1.5} />
+                {/* Arrow pointing to target */}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10h6m0 0l-3-3m3 3l-3 3" />
+                {/* Target character */}
+                <rect x="15" y="15" width="6" height="6" rx="1" strokeWidth={2} />
+              </svg>
+            </ToolbarButton>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <ToolbarButton onClick={onClear} disabled={disabled} tooltip="Clear" previewContent={previews?.clear}>
-            <ClearIcon />
-          </ToolbarButton>
-          <ToolbarButton onClick={onFill} disabled={disabled} tooltip="Fill" previewContent={previews?.fill}>
-            <FillIcon />
-          </ToolbarButton>
-        </div>
-        <div className="flex items-center gap-1">
-          <ToolbarButton onClick={onScale} disabled={disabled} tooltip="Scale Character">
-            <ScaleIcon />
-          </ToolbarButton>
-          <ToolbarButton onClick={onCopy} disabled={disabled} tooltip="Copy from character set" shortcut="C">
-            {/* Custom icon: grid with arrow pointing to character */}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {/* Small grid representing source character set */}
-              <rect x="3" y="3" width="4" height="4" strokeWidth={1.5} />
-              <rect x="8" y="3" width="4" height="4" strokeWidth={1.5} />
-              <rect x="3" y="8" width="4" height="4" strokeWidth={1.5} />
-              <rect x="8" y="8" width="4" height="4" strokeWidth={1.5} />
-              {/* Arrow pointing to target */}
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10h6m0 0l-3-3m3 3l-3 3" />
-              {/* Target character */}
-              <rect x="15" y="15" width="6" height="6" rx="1" strokeWidth={2} />
-            </svg>
-          </ToolbarButton>
-        </div>
-      </div>
+      </CollapsibleSection>
+
+      <ToolbarDivider />
 
       {/* Character section */}
-      <ToolbarDivider />
-      <ToolbarLabel>Char</ToolbarLabel>
-      <div className="flex flex-col  items-center gap-1">
-        <div className="flex items-center gap-1">
-          <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
-            <AddIcon />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={onDuplicate}
-            disabled={disabled}
-            tooltip="Duplicate selected characters"
-            shortcut="Ctrl+D"
-          >
-            <DuplicateIcon />
-          </ToolbarButton>
+      <CollapsibleSection
+        id="char"
+        label="Char"
+        isExpanded={expandedSections.has("char")}
+        onToggle={toggleSection}
+      >
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1">
+            <ToolbarButton onClick={onAdd} disabled={disabled} tooltip="Add new character" shortcut="Ctrl+N">
+              <AddIcon />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={onDuplicate}
+              disabled={disabled}
+              tooltip="Duplicate selected characters"
+              shortcut="Ctrl+D"
+            >
+              <DuplicateIcon />
+            </ToolbarButton>
+          </div>
+          <div className="flex items-center gap-1">
+            <ToolbarButton
+              onClick={onImport}
+              disabled={disabled}
+              tooltip="Import characters from another set"
+              shortcut="Ctrl+I"
+            >
+              {/* Letter A with arrow pointing down */}
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 20l2.5-7h3L16 20M9.25 16h5.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v8m0 0l-3-3m3 3l3-3" />
+              </svg>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={onDelete}
+              disabled={disabled}
+              tooltip="Delete character"
+              shortcut="Del"
+              className="hover:text-red-400"
+            >
+              <DeleteIcon />
+            </ToolbarButton>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <ToolbarButton
-            onClick={onImport}
-            disabled={disabled}
-            tooltip="Import characters from another set"
-            shortcut="Ctrl+I"
-          >
-            {/* Letter A with arrow pointing down */}
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 20l2.5-7h3L16 20M9.25 16h5.5" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v8m0 0l-3-3m3 3l3-3" />
-            </svg>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={onDelete}
-            disabled={disabled}
-            tooltip="Delete character"
-            shortcut="Del"
-            className="hover:text-red-400"
-          >
-            <DeleteIcon />
-          </ToolbarButton>
-        </div>
-      </div>
+      </CollapsibleSection>
     </div>
   );
 }

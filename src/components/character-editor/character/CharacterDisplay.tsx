@@ -84,7 +84,7 @@ export function CharacterDisplay({
   onPixelLeave,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
-  gridColor = "#333333",
+  gridColor = "#4a4a4a",
   gridThickness = 1,
   interactive = true,
   className = "",

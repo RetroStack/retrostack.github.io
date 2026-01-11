@@ -65,6 +65,8 @@ export interface EditorCanvasProps {
   overlayConfig?: CharacterSetConfig;
   /** Overlay rendering mode */
   overlayMode?: "stretch" | "pixel" | "side-by-side";
+  /** Whether keyboard cursor mode is enabled (for accessibility) */
+  keyboardCursorEnabled?: boolean;
 }
 
 /**
@@ -82,7 +84,7 @@ export function EditorCanvas({
   batchMode = false,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
-  gridColor = "#333333",
+  gridColor = "#4a4a4a",
   gridThickness = 1,
   zoom = 20,
   minZoom = 8,
@@ -94,12 +96,18 @@ export function EditorCanvas({
   overlayCharacter,
   overlayConfig,
   overlayMode = "pixel",
+  keyboardCursorEnabled = true,
 }: EditorCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cursorCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragValue, setDragValue] = useState<boolean | null>(null);
   const lastPinchDistanceRef = useRef<number | null>(null);
+
+  // Keyboard cursor position for accessibility
+  const [cursorPos, setCursorPos] = useState<{ row: number; col: number } | null>(null);
+  const [isCursorActive, setIsCursorActive] = useState(false);
 
   // Calculate mixed pixels for batch editing display
   const mixedPixels = useMemo(() => {
@@ -287,6 +295,127 @@ export function EditorCanvas({
     lastPinchDistanceRef.current = null;
   }, []);
 
+  // Keyboard navigation for accessibility
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!keyboardCursorEnabled || !character) return;
+
+      const navigationKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"];
+      const actionKeys = [" ", "Enter"];
+
+      if (navigationKeys.includes(e.key) || actionKeys.includes(e.key)) {
+        e.preventDefault();
+
+        // Activate cursor if not active
+        if (!isCursorActive) {
+          setIsCursorActive(true);
+          setCursorPos({ row: 0, col: 0 });
+          return;
+        }
+
+        const currentRow = cursorPos?.row ?? 0;
+        const currentCol = cursorPos?.col ?? 0;
+
+        if (actionKeys.includes(e.key)) {
+          // Toggle pixel at cursor position
+          onPixelToggle?.(currentRow, currentCol);
+        } else {
+          // Navigation
+          let newRow = currentRow;
+          let newCol = currentCol;
+
+          switch (e.key) {
+            case "ArrowUp":
+              newRow = Math.max(0, currentRow - 1);
+              break;
+            case "ArrowDown":
+              newRow = Math.min(config.height - 1, currentRow + 1);
+              break;
+            case "ArrowLeft":
+              newCol = Math.max(0, currentCol - 1);
+              break;
+            case "ArrowRight":
+              newCol = Math.min(config.width - 1, currentCol + 1);
+              break;
+            case "Home":
+              newRow = 0;
+              newCol = 0;
+              break;
+            case "End":
+              newRow = config.height - 1;
+              newCol = config.width - 1;
+              break;
+          }
+
+          setCursorPos({ row: newRow, col: newCol });
+          // Update hover display with cursor position
+          onPixelHover?.(newRow, newCol);
+        }
+      }
+    },
+    [keyboardCursorEnabled, character, isCursorActive, cursorPos, config.height, config.width, onPixelToggle, onPixelHover]
+  );
+
+  // Handle focus/blur to show/hide cursor
+  const handleFocus = useCallback(() => {
+    if (keyboardCursorEnabled && character) {
+      setIsCursorActive(true);
+      if (!cursorPos) {
+        setCursorPos({ row: 0, col: 0 });
+      }
+    }
+  }, [keyboardCursorEnabled, character, cursorPos]);
+
+  const handleBlur = useCallback(() => {
+    setIsCursorActive(false);
+  }, []);
+
+  // Draw keyboard cursor overlay
+  useEffect(() => {
+    const canvas = cursorCanvasRef.current;
+    if (!canvas || !isCursorActive || !cursorPos) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Calculate canvas dimensions
+    const cellSize = zoom + gridThickness;
+    const canvasWidth = config.width * cellSize + gridThickness;
+    const canvasHeight = config.height * cellSize + gridThickness;
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // Draw cursor highlight
+    const x = cursorPos.col * cellSize + gridThickness;
+    const y = cursorPos.row * cellSize + gridThickness;
+
+    // Draw animated border
+    ctx.strokeStyle = "#00f5ff"; // retro-cyan
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 2]);
+    ctx.strokeRect(x - 1, y - 1, zoom + 2, zoom + 2);
+
+    // Draw corner markers for better visibility
+    ctx.fillStyle = "#00f5ff";
+    const markerSize = 4;
+    // Top-left
+    ctx.fillRect(x - 1, y - 1, markerSize, 2);
+    ctx.fillRect(x - 1, y - 1, 2, markerSize);
+    // Top-right
+    ctx.fillRect(x + zoom - markerSize + 1, y - 1, markerSize, 2);
+    ctx.fillRect(x + zoom - 1, y - 1, 2, markerSize);
+    // Bottom-left
+    ctx.fillRect(x - 1, y + zoom - 1, markerSize, 2);
+    ctx.fillRect(x - 1, y + zoom - markerSize + 1, 2, markerSize);
+    // Bottom-right
+    ctx.fillRect(x + zoom - markerSize + 1, y + zoom - 1, markerSize, 2);
+    ctx.fillRect(x + zoom - 1, y + zoom - markerSize + 1, 2, markerSize);
+  }, [isCursorActive, cursorPos, zoom, gridThickness, config.width, config.height]);
+
   // Set up passive: false for touch events to allow preventDefault
   useEffect(() => {
     const container = containerRef.current;
@@ -324,12 +453,28 @@ export function EditorCanvas({
     );
   }
 
+  // Calculate canvas dimensions for cursor overlay
+  const cellSize = zoom + gridThickness;
+  const cursorCanvasWidth = config.width * cellSize + gridThickness;
+  const cursorCanvasHeight = config.height * cellSize + gridThickness;
+
+  // ARIA label for current cursor position
+  const cursorAriaLabel = cursorPos && isCursorActive
+    ? `Pixel at row ${cursorPos.row + 1}, column ${cursorPos.col + 1}, ${character?.pixels[cursorPos.row]?.[cursorPos.col] ? "on" : "off"}`
+    : "Pixel editor canvas";
+
   return (
     <div
       ref={containerRef}
-      className={`flex items-center justify-center w-full h-full overflow-hidden ${className}`}
+      className={`flex items-center justify-center w-full h-full overflow-hidden ${className} ${isCursorActive ? "ring-2 ring-retro-cyan/50 rounded" : ""}`}
       tabIndex={0}
+      role="application"
+      aria-label={cursorAriaLabel}
+      aria-roledescription="Pixel editor"
       onWheel={handleWheel}
+      onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -352,11 +497,24 @@ export function EditorCanvas({
             interactive={true}
             mixedPixels={mixedPixels}
           />
+          {/* Keyboard cursor overlay */}
+          {isCursorActive && cursorPos && (
+            <canvas
+              ref={cursorCanvasRef}
+              className="absolute top-0 left-0 pointer-events-none"
+              style={{
+                imageRendering: "pixelated",
+                zIndex: 15,
+                width: cursorCanvasWidth,
+                height: cursorCanvasHeight,
+              }}
+              aria-hidden="true"
+            />
+          )}
           {/* Overlay canvas for tracing another character set (not shown in side-by-side mode) */}
           {overlayConfig &&
             overlayMode !== "side-by-side" &&
             (() => {
-              const cellSize = zoom + gridThickness;
               const w = config.width * cellSize + gridThickness;
               const h = config.height * cellSize + gridThickness;
               return (
