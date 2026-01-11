@@ -264,56 +264,91 @@ export const CHARACTER_EDITOR_ONBOARDING_STEPS: OnboardingStep[] = [
     id: "welcome",
     title: "Welcome to Character ROM Editor",
     description:
-      "Create and edit character sets for retro computers and vintage display systems. Let's take a quick tour!",
+      "Design and edit character sets for retro computers like the C64, Apple II, Atari, and more. This tool supports binary ROMs, pixel editing, and multiple export formats. Let's take a quick tour!",
     position: "center",
   },
   {
     id: "library",
     title: "Character Set Library",
     description:
-      "Your character sets are stored here. Filter by size, manufacturer, system, or chip. Pin favorites and sort by any field.",
+      "Browse built-in and custom character sets. Use filters to find sets by dimensions, manufacturer, system, or chip. Pin your favorites with the star icon and sort by name, date, or size.",
     position: "center",
   },
   {
     id: "import",
-    title: "Import Options",
+    title: "Import Your Data",
     description:
-      "Import from binary ROM files, PNG image grids, font files (TTF/OTF/WOFF), or paste code from C, JavaScript, or Assembly.",
+      "Click 'Import' to load from binary ROM files (.bin), PNG image grids, font files (TTF/OTF/WOFF), or paste code directly from C, JavaScript, or Assembly. The wizard guides you through each format.",
     position: "center",
   },
   {
     id: "editor",
     title: "Pixel Editor",
     description:
-      "Click to toggle pixels, drag to paint, right-click to erase. Use overlays to compare with other character sets.",
+      "Click to toggle pixels, drag to paint multiple pixels, and right-click to erase. Use the zoom slider or scroll wheel to adjust the view. Pick a color preset to match your target system's CRT look.",
+    position: "center",
+  },
+  {
+    id: "navigation",
+    title: "Character Navigation",
+    description:
+      "Use arrow keys to move between characters, Page Up/Down to jump 16 at a time, or Home/End to jump to the start or end. Press G to go to a specific character by index, hex, or ASCII code. Press M to open the ASCII Map for a visual overview.",
     position: "center",
   },
   {
     id: "transforms",
     title: "Transform Tools",
     description:
-      "Rotate, flip, shift, invert, and scale characters. Copy from other sets. All transforms support batch editing.",
+      "Rotate characters with [ and ], flip with H (horizontal) or V (vertical), shift pixels with Shift+Arrow keys, and invert colors with I. Use the Scale tool to resize characters with optional smoothing.",
     position: "center",
   },
   {
-    id: "keyboard",
-    title: "Keyboard Shortcuts",
+    id: "overlays",
+    title: "Overlays & Comparison",
     description:
-      "Press ? to see all shortcuts. Navigate with arrow keys, undo/redo with Ctrl+Z/Y, and transform with single keys.",
+      "Load another character set as an overlay to compare designs. Choose from three modes: 1:1 Pixels, Stretch to fit, or Side by Side. Great for matching your design to a reference set.",
+    position: "center",
+  },
+  {
+    id: "multiselect",
+    title: "Multi-Select & Batch Edit",
+    description:
+      "Hold Shift and click to select a range, or Ctrl/Cmd+click to select individual characters. Use Ctrl/Cmd+A to select all. In selection mode, apply transforms to multiple characters at once.",
+    position: "center",
+  },
+  {
+    id: "saving",
+    title: "Saving & History",
+    description:
+      "Your work auto-saves to recover from unexpected closures. Use Ctrl+S to save explicitly. Create named snapshots to preserve versions. The history slider lets you undo/redo changes with full timestamps.",
     position: "center",
   },
   {
     id: "export",
-    title: "Export Formats",
+    title: "Export Your Work",
     description:
-      "Export as binary ROM, C header, assembly code, PNG image, or printable reference sheets (PNG/PDF) with custom colors.",
+      "Press E to export as binary ROM, C/C++ header, assembly code, or PNG image. Generate printable reference sheets in table or grid layout with customizable colors, available as PNG or PDF.",
+    position: "center",
+  },
+  {
+    id: "crt",
+    title: "CRT Effects",
+    description:
+      "Enable authentic retro visuals with scanlines and bloom effects. Adjust intensity to taste. Set the pixel aspect ratio to None (square), PAL, or NTSC for accurate display simulation.",
+    position: "center",
+  },
+  {
+    id: "help",
+    title: "Help & Tips",
+    description:
+      "Press ? anytime to see all keyboard shortcuts. Click the lightbulb icon for categorized Tips & Tricks covering every feature. Press N to add notes to any character set.",
     position: "center",
   },
   {
     id: "done",
     title: "You're Ready!",
     description:
-      "Start by selecting a character set from the library, or create a new one. Use snapshots to save your progress!",
+      "Start by selecting a character set from the library, or click 'New' to create your own. Built-in sets are read-only—use 'Save As' to create an editable copy. Happy designing!",
     position: "center",
   },
 ];
