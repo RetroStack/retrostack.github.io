@@ -1,27 +1,18 @@
 /**
  * Character ROM Editor - Sharing Utilities
  *
- * Functions for encoding/decoding character sets into shareable URLs
+ * Functions for encoding/decoding character sets into shareable URLs.
+ * Uses v2 compressed format with DEFLATE compression and base64url encoding.
  */
 
 import { Character, CharacterSetConfig } from "../types";
-import { serializeCharacterRom, parseCharacterRom, binaryToBase64, base64ToBinary } from "../import/binary";
+import { serializeCharacterRom, parseCharacterRom } from "../import/binary";
+import { base64urlEncode, base64urlDecode, compressData, decompressData } from "./compression";
 
 /**
- * Data structure for shared character sets
+ * Share format version prefix
  */
-export interface SharedCharacterSet {
-  /** Version of the share format */
-  v: number;
-  /** Name */
-  n: string;
-  /** Description */
-  d: string;
-  /** Config: width, height, padding, bitDirection */
-  c: [number, number, string, string];
-  /** Binary data as base64 */
-  b: string;
-}
+const SHARE_VERSION_PREFIX = "2:";
 
 /**
  * Maximum URL length recommendation
@@ -35,7 +26,12 @@ export const MAX_RECOMMENDED_URL_LENGTH = 2000;
 export const MAX_URL_LENGTH = 8000;
 
 /**
- * Encode a character set for sharing
+ * Encode a character set for sharing using v2 compressed format.
+ *
+ * Binary format before compression:
+ * [width:1][height:1][flags:1][name:UTF8\0][desc:UTF8\0][character data]
+ *
+ * flags byte: bit0=padding(left=1), bit1=bitDir(rtl=1)
  */
 export function encodeCharacterSet(
   name: string,
@@ -44,27 +40,47 @@ export function encodeCharacterSet(
   config: CharacterSetConfig
 ): string {
   const binaryData = serializeCharacterRom(characters, config);
-  const base64Data = binaryToBase64(binaryData);
 
-  const shareData: SharedCharacterSet = {
-    v: 1,
-    n: name,
-    d: description,
-    c: [config.width, config.height, config.padding, config.bitDirection],
-    b: base64Data,
-  };
+  // Encode name and description as UTF-8
+  const encoder = new TextEncoder();
+  const nameBytes = encoder.encode(name);
+  const descBytes = encoder.encode(description);
 
-  const json = JSON.stringify(shareData);
-  // Use encodeURIComponent to handle special characters
-  const encoded = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (_, p1) =>
-    String.fromCharCode(parseInt(p1, 16))
-  ));
+  // Build flags byte
+  const flags =
+    (config.padding === "left" ? 1 : 0) |
+    (config.bitDirection === "rtl" ? 2 : 0);
 
-  return encoded;
+  // Calculate total size: 3 header bytes + name + null + desc + null + data
+  const headerSize = 3 + nameBytes.length + 1 + descBytes.length + 1;
+  const payload = new Uint8Array(headerSize + binaryData.length);
+
+  // Write header
+  let offset = 0;
+  payload[offset++] = config.width;
+  payload[offset++] = config.height;
+  payload[offset++] = flags;
+
+  // Write name + null terminator
+  payload.set(nameBytes, offset);
+  offset += nameBytes.length;
+  payload[offset++] = 0;
+
+  // Write description + null terminator
+  payload.set(descBytes, offset);
+  offset += descBytes.length;
+  payload[offset++] = 0;
+
+  // Write character data
+  payload.set(binaryData, offset);
+
+  // Compress and encode
+  const compressed = compressData(payload);
+  return SHARE_VERSION_PREFIX + base64urlEncode(compressed);
 }
 
 /**
- * Decode a shared character set
+ * Decode a shared character set from v2 compressed format.
  */
 export function decodeCharacterSet(encoded: string): {
   name: string;
@@ -73,32 +89,59 @@ export function decodeCharacterSet(encoded: string): {
   config: CharacterSetConfig;
 } {
   try {
-    const json = decodeURIComponent(
-      atob(encoded)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    const shareData: SharedCharacterSet = JSON.parse(json);
-
-    // Validate version
-    if (shareData.v !== 1) {
-      throw new Error("Unsupported share format version");
+    // Validate version prefix
+    if (!encoded.startsWith(SHARE_VERSION_PREFIX)) {
+      throw new Error("Invalid share format: missing version prefix");
     }
 
+    // Decode and decompress
+    const base64Data = encoded.slice(SHARE_VERSION_PREFIX.length);
+    const compressed = base64urlDecode(base64Data);
+    const data = decompressData(compressed);
+
+    // Parse header
+    const width = data[0];
+    const height = data[1];
+    const flags = data[2];
+
+    const padding = (flags & 1) ? "left" : "right";
+    const bitDirection = (flags & 2) ? "rtl" : "ltr";
+
+    // Parse null-terminated strings
+    const decoder = new TextDecoder();
+    let offset = 3;
+
+    // Find name (null-terminated)
+    const nameEnd = data.indexOf(0, offset);
+    if (nameEnd === -1) {
+      throw new Error("Invalid share format: name not terminated");
+    }
+    const name = decoder.decode(data.slice(offset, nameEnd));
+    offset = nameEnd + 1;
+
+    // Find description (null-terminated)
+    const descEnd = data.indexOf(0, offset);
+    if (descEnd === -1) {
+      throw new Error("Invalid share format: description not terminated");
+    }
+    const description = decoder.decode(data.slice(offset, descEnd));
+    offset = descEnd + 1;
+
+    // Remaining bytes are character data
+    const binaryData = data.slice(offset);
+
     const config: CharacterSetConfig = {
-      width: shareData.c[0],
-      height: shareData.c[1],
-      padding: shareData.c[2] as CharacterSetConfig["padding"],
-      bitDirection: shareData.c[3] as CharacterSetConfig["bitDirection"],
+      width,
+      height,
+      padding: padding as CharacterSetConfig["padding"],
+      bitDirection: bitDirection as CharacterSetConfig["bitDirection"],
     };
 
-    const binaryData = base64ToBinary(shareData.b);
     const characters = parseCharacterRom(binaryData, config);
 
     return {
-      name: shareData.n,
-      description: shareData.d,
+      name,
+      description,
       characters,
       config,
     };
@@ -165,7 +208,14 @@ export function getUrlLengthStatus(url: string): "ok" | "warning" | "error" {
 }
 
 /**
- * Estimate the URL length for a character set
+ * Estimate the URL length for a character set with v2 compressed format.
+ *
+ * Compression ratio varies based on content:
+ * - Sparse data (many empty chars): ~15-25% of original
+ * - Mixed data: ~40-50% of original
+ * - Dense random data: ~80-100% of original
+ *
+ * We use a conservative 50% compression ratio for estimates.
  */
 export function estimateUrlLength(characterCount: number, charWidth: number, charHeight: number): number {
   // Each character needs (width * height) bits, packed into bytes
@@ -173,12 +223,19 @@ export function estimateUrlLength(characterCount: number, charWidth: number, cha
   const bytesPerChar = Math.ceil(bitsPerChar / 8);
   const totalBytes = characterCount * bytesPerChar;
 
-  // Base64 encoding adds ~33% overhead, JSON/URL encoding adds more
-  const base64Length = Math.ceil(totalBytes * 1.37);
-  const jsonOverhead = 100; // Rough estimate for JSON wrapper
-  const urlOverhead = 100; // Rough estimate for URL structure
+  // Header overhead: 3 bytes header + name/desc (estimate ~50 chars average)
+  const headerOverhead = 3 + 50;
 
-  return base64Length + jsonOverhead + urlOverhead;
+  // Conservative compression ratio: assume 50% compression
+  const compressedBytes = Math.ceil((totalBytes + headerOverhead) * 0.5);
+
+  // Base64url encoding adds ~33% overhead, plus "2:" prefix
+  const base64Length = Math.ceil(compressedBytes * 1.34) + 2;
+
+  // URL base path overhead
+  const urlOverhead = 50;
+
+  return base64Length + urlOverhead;
 }
 
 /**
