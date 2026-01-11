@@ -60,3 +60,6 @@ export const CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE = "retrostack-character-edit
 
 /** localStorage key for CRT simulation settings */
 export const CHARACTER_EDITOR_STORAGE_KEY_CRT_SETTINGS = "retrostack-character-editor-crt-settings";
+
+/** localStorage key for tips overlay preferences */
+export const CHARACTER_EDITOR_STORAGE_KEY_TIPS_OVERLAY = "retrostack-character-editor-tips-overlay";

@@ -33,6 +33,8 @@ import { HistorySlider } from "@/components/character-editor/editor/HistorySlide
 import { CharacterDisplay } from "@/components/character-editor/character/CharacterDisplay";
 import { CharacterContextMenu, useContextMenu } from "@/components/character-editor/character/CharacterContextMenu";
 import { KeyboardShortcutsHelp } from "@/components/character-editor/help/KeyboardShortcutsHelp";
+import { TipsOverlay } from "@/components/character-editor/help/TipsOverlay";
+import { LightbulbIcon } from "@/components/ui/icons/ActionIcons";
 import { MetadataEditModal } from "./modals/MetadataEditModal";
 import { ResizeModal } from "./modals/ResizeModal";
 import { ImportCharactersModal } from "./modals/ImportCharactersModal";
@@ -53,6 +55,7 @@ import { useAutoSave } from "@/hooks/character-editor/useAutoSave";
 import { useKeyboardShortcuts, createEditorShortcuts } from "@/hooks/character-editor/useKeyboardShortcuts";
 import { useSnapshots } from "@/hooks/character-editor/useSnapshots";
 import { useNotes } from "@/hooks/character-editor/useNotes";
+import { useTipsOverlay } from "@/hooks/character-editor/useTipsOverlay";
 import { useCharacterEditor } from "@/hooks/character-editor/useCharacterEditor";
 import { CharacterSet, AnchorPoint, generateId } from "@/lib/character-editor/types";
 import { getActiveColors, CustomColors } from "@/lib/character-editor/data/colorPresets";
@@ -203,6 +206,11 @@ export function EditView() {
   // Notes
   const notes = useNotes({
     characterSetId: id,
+    enabled: !!characterSet,
+  });
+
+  // Tips overlay
+  const tipsOverlay = useTipsOverlay({
     enabled: !!characterSet,
   });
 
@@ -1110,6 +1118,14 @@ export function EditView() {
     { type: "separator", id: "sep-5" },
     // Group 6: Help
     {
+      id: "tips",
+      label: "Tips",
+      tooltip: "Tips & tricks for using the editor",
+      icon: <LightbulbIcon className="w-4 h-4" />,
+      onClick: () => tipsOverlay.open(),
+      priority: 0,
+    },
+    {
       id: "help",
       label: "Help",
       tooltip: "View all keyboard shortcuts and help",
@@ -1411,6 +1427,17 @@ export function EditView() {
         isOpen={showShortcutsHelp}
         onClose={() => setShowShortcutsHelp(false)}
         shortcuts={shortcuts}
+      />
+
+      {/* Tips overlay */}
+      <TipsOverlay
+        isOpen={tipsOverlay.isOpen}
+        onClose={tipsOverlay.close}
+        autoShowEnabled={tipsOverlay.autoShowEnabled}
+        onAutoShowChange={tipsOverlay.setAutoShowEnabled}
+        expandedCategories={tipsOverlay.expandedCategories}
+        onToggleCategory={tipsOverlay.toggleCategory}
+        onFirstClose={tipsOverlay.markAsSeen}
       />
 
       {/* Metadata edit modal */}
