@@ -62,35 +62,70 @@ type SelectedPreset =
 
 /**
  * Find a chip preset by chip/character generator name.
+ * Matches against: id, partNumber, manufacturer name, or any combination.
+ * Examples: "2513", "signetics-2513", "Signetics 2513", "signetics"
  */
 function findChipPresetByName(chipName: string): ChipBinaryExportPreset | undefined {
   if (!chipName) return undefined;
   const lowerName = chipName.toLowerCase();
 
-  // Find the chip by part number (exact or partial match)
-  return CHIP_BINARY_EXPORT_PRESETS.find(
+  // Try exact match on id first
+  let found = CHIP_BINARY_EXPORT_PRESETS.find((c) => c.id.toLowerCase() === lowerName);
+  if (found) return found;
+
+  // Try exact match on part number
+  found = CHIP_BINARY_EXPORT_PRESETS.find((c) => c.partNumber.toLowerCase() === lowerName);
+  if (found) return found;
+
+  // Try partial match - chip name contains part number or vice versa
+  found = CHIP_BINARY_EXPORT_PRESETS.find(
     (c) =>
-      c.partNumber.toLowerCase() === lowerName ||
-      c.partNumber.toLowerCase().includes(lowerName) ||
-      lowerName.includes(c.partNumber.toLowerCase())
+      c.partNumber.toLowerCase().includes(lowerName) || lowerName.includes(c.partNumber.toLowerCase())
   );
+  if (found) return found;
+
+  // Try matching "Manufacturer PartNumber" format (e.g., "Signetics 2513")
+  found = CHIP_BINARY_EXPORT_PRESETS.find((c) => {
+    const fullName = `${c.manufacturer} ${c.partNumber}`.toLowerCase();
+    return fullName === lowerName || fullName.includes(lowerName) || lowerName.includes(fullName);
+  });
+  if (found) return found;
+
+  // Try matching manufacturer name alone if it uniquely identifies a chip
+  found = CHIP_BINARY_EXPORT_PRESETS.find(
+    (c) => c.manufacturer.toLowerCase().includes(lowerName) || lowerName.includes(c.manufacturer.toLowerCase())
+  );
+
+  return found;
 }
 
 /**
  * Find a system preset by chip/character generator name.
  * Looks up which systems use this chip and returns the first matching preset.
+ * Matches against: id, partNumber, manufacturer name, or any combination.
  */
 function findSystemPresetByChipName(chipName: string): BinaryExportSystemPreset | undefined {
   if (!chipName) return undefined;
   const lowerName = chipName.toLowerCase();
 
-  // Find the chip by part number (exact or partial match)
-  const chip = ROM_CHIPS.find(
-    (c) =>
-      c.partNumber.toLowerCase() === lowerName ||
-      c.partNumber.toLowerCase().includes(lowerName) ||
-      lowerName.includes(c.partNumber.toLowerCase())
-  );
+  // Find the chip by various matching strategies
+  let chip = ROM_CHIPS.find((c) => c.id.toLowerCase() === lowerName);
+  if (!chip) {
+    chip = ROM_CHIPS.find((c) => c.partNumber.toLowerCase() === lowerName);
+  }
+  if (!chip) {
+    chip = ROM_CHIPS.find(
+      (c) =>
+        c.partNumber.toLowerCase().includes(lowerName) || lowerName.includes(c.partNumber.toLowerCase())
+    );
+  }
+  if (!chip) {
+    // Try "Manufacturer PartNumber" format
+    chip = ROM_CHIPS.find((c) => {
+      const fullName = `${c.manufacturer} ${c.partNumber}`.toLowerCase();
+      return fullName === lowerName || fullName.includes(lowerName) || lowerName.includes(fullName);
+    });
+  }
 
   if (chip && chip.usedIn && chip.usedIn.length > 0) {
     // Find the first system that uses this chip
@@ -107,26 +142,46 @@ function findSystemPresetByChipName(chipName: string): BinaryExportSystemPreset 
 
 /**
  * Find a preset by system name (case-insensitive, supports alternate names)
+ * Matches against: id, name, manufacturer + name, alternate names
+ * Examples: "apple-i", "Apple I", "Apple Computer Inc Apple I", "Apple-1"
  */
 function findPresetBySystemName(systemName: string): BinaryExportSystemPreset | undefined {
   if (!systemName) return undefined;
+  const lowerName = systemName.toLowerCase();
+
+  // Try exact match on id first
+  let preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id.toLowerCase() === lowerName);
+  if (preset) return preset;
 
   // Use the system lookup which supports alternate names
   const system = getSystemByName(systemName);
   if (system) {
-    const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === system.id);
+    preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === system.id);
     if (preset) return preset;
   }
 
-  // Fallback: try direct name matching
-  const lowerName = systemName.toLowerCase();
-  let preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.name.toLowerCase() === lowerName);
+  // Try exact match on name
+  preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.name.toLowerCase() === lowerName);
+  if (preset) return preset;
+
+  // Try matching "Manufacturer SystemName" format (e.g., "Apple Computer Inc Apple I")
+  preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => {
+    const fullName = `${p.manufacturer} ${p.name}`.toLowerCase();
+    return fullName === lowerName || fullName.includes(lowerName) || lowerName.includes(fullName);
+  });
   if (preset) return preset;
 
   // Try partial match (system name contains the search term or vice versa)
   preset = BINARY_EXPORT_SYSTEM_PRESETS.find(
     (p) => p.name.toLowerCase().includes(lowerName) || lowerName.includes(p.name.toLowerCase())
   );
+  if (preset) return preset;
+
+  // Try matching id with partial match (e.g., "apple" matches "apple-i", "apple-ii", etc.)
+  preset = BINARY_EXPORT_SYSTEM_PRESETS.find(
+    (p) => p.id.toLowerCase().includes(lowerName) || lowerName.includes(p.id.toLowerCase())
+  );
+
   return preset;
 }
 
@@ -181,10 +236,22 @@ export function BinaryFormatSection({
     toggle();
   }, [isOpen, toggle]);
 
+  // Compute initial selection based on props - this recalculates when props change
+  const computedInitialSelection = useMemo(
+    () => findInitialSelection(initialChipName, initialSystemName),
+    [initialChipName, initialSystemName]
+  );
+
   // Track the selected preset (type + id)
-  const [selection, setSelection] = useState<{ type: "system" | "chip"; id: string } | null>(() => {
-    return findInitialSelection(initialChipName, initialSystemName);
-  });
+  // Use computed initial selection, but allow user to override
+  const [userSelection, setUserSelection] = useState<{
+    type: "system" | "chip";
+    id: string;
+  } | null>(null);
+  const [hasUserSelected, setHasUserSelected] = useState(false);
+
+  // The actual selection: user's choice if they've selected, otherwise computed from props
+  const selection = hasUserSelected ? userSelection : computedInitialSelection;
 
   // Get system presets grouped by manufacturer
   const systemGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
@@ -272,15 +339,35 @@ export function BinaryFormatSection({
   }, [selection, padding, bitDirection]);
 
   // Display text for the input
+  // Shows the preset name if selected, even if settings don't match exactly
   const displayText = useMemo(() => {
-    if (!currentPreset) return "Custom";
-
-    if (currentPreset.type === "system") {
-      return `${currentPreset.preset.manufacturer} ${currentPreset.preset.name}`;
-    } else {
-      return `${currentPreset.preset.manufacturer} ${currentPreset.preset.partNumber}`;
+    // If currentPreset is set (settings match), use it
+    if (currentPreset) {
+      if (currentPreset.type === "system") {
+        return `${currentPreset.preset.manufacturer} ${currentPreset.preset.name}`;
+      } else {
+        return `${currentPreset.preset.manufacturer} ${currentPreset.preset.partNumber}`;
+      }
     }
-  }, [currentPreset]);
+
+    // If we have a selection but settings don't match, still show the preset name
+    // This happens when the character set has chip metadata but different settings
+    if (selection) {
+      if (selection.type === "system") {
+        const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === selection.id);
+        if (preset) {
+          return `${preset.manufacturer} ${preset.name}`;
+        }
+      } else {
+        const preset = CHIP_BINARY_EXPORT_PRESETS.find((p) => p.id === selection.id);
+        if (preset) {
+          return `${preset.manufacturer} ${preset.partNumber}`;
+        }
+      }
+    }
+
+    return "Custom";
+  }, [currentPreset, selection]);
 
   // Close dropdown and clear search
   const closeDropdown = useCallback(() => {
@@ -290,7 +377,8 @@ export function BinaryFormatSection({
 
   const handleSystemPresetClick = useCallback(
     (preset: BinaryExportSystemPreset) => {
-      setSelection({ type: "system", id: preset.id });
+      setUserSelection({ type: "system", id: preset.id });
+      setHasUserSelected(true);
       onPaddingChange(preset.padding);
       onBitDirectionChange(preset.bitDirection);
       closeDropdown();
@@ -300,7 +388,8 @@ export function BinaryFormatSection({
 
   const handleChipPresetClick = useCallback(
     (preset: ChipBinaryExportPreset) => {
-      setSelection({ type: "chip", id: preset.id });
+      setUserSelection({ type: "chip", id: preset.id });
+      setHasUserSelected(true);
       onPaddingChange(preset.padding);
       onBitDirectionChange(preset.bitDirection);
       closeDropdown();
@@ -310,7 +399,8 @@ export function BinaryFormatSection({
 
   const handleClear = useCallback(() => {
     // Reset to default (most common: right padding, MSB first)
-    setSelection(null);
+    setUserSelection(null);
+    setHasUserSelected(true);
     onPaddingChange("right");
     onBitDirectionChange("msb");
     closeDropdown();
