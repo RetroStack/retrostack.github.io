@@ -4,6 +4,8 @@
  * A dropdown component for single selection with consistent styling.
  * Features:
  * - Single selection from a list of options
+ * - Full-text search to filter options
+ * - Options sorted alphabetically
  * - Consistent styling with MultiSelectDropdown
  * - Generic type support for string or number values
  * - Click-outside to close via useDropdown hook
@@ -12,7 +14,7 @@
  */
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDropdown } from "@/hooks/useDropdown";
 
 export interface SingleSelectDropdownProps<T extends string | number> {
@@ -28,6 +30,8 @@ export interface SingleSelectDropdownProps<T extends string | number> {
   className?: string;
   /** Accessible label for the dropdown */
   ariaLabel?: string;
+  /** Sort options numerically instead of alphabetically */
+  numericSort?: boolean;
 }
 
 /**
@@ -40,16 +44,48 @@ export function SingleSelectDropdown<T extends string | number>({
   placeholder,
   className = "",
   ariaLabel,
+  numericSort = false,
 }: SingleSelectDropdownProps<T>) {
   const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Wrapper for toggle that clears search when opening
+  const handleToggle = useCallback(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+    toggle();
+  }, [isOpen, toggle]);
 
   const handleSelect = useCallback(
     (selectedValue: T) => {
       onChange(selectedValue);
       close();
+      setSearchQuery("");
     },
     [onChange, close]
   );
+
+  // Sort options and filter by search query
+  const filteredOptions = useMemo(() => {
+    const sorted = [...options].sort((a, b) => {
+      if (numericSort) {
+        const numA = parseFloat(a.label);
+        const numB = parseFloat(b.label);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return numA - numB;
+        }
+      }
+      return a.label.localeCompare(b.label);
+    });
+
+    if (!searchQuery.trim()) {
+      return sorted;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return sorted.filter((option) => option.label.toLowerCase().includes(query));
+  }, [options, searchQuery, numericSort]);
 
   const selectedOption = options.find((o) => o.value === value);
   const displayText = selectedOption?.label ?? placeholder ?? "";
@@ -59,7 +95,7 @@ export function SingleSelectDropdown<T extends string | number>({
       {/* Trigger button */}
       <button
         type="button"
-        onClick={toggle}
+        onClick={handleToggle}
         className={`
           flex items-center justify-between gap-2 w-full px-3 py-1.5
           bg-retro-navy/50 border rounded text-sm text-left
@@ -91,8 +127,20 @@ export function SingleSelectDropdown<T extends string | number>({
           className="absolute z-50 w-full mt-1 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl overflow-hidden"
           role="listbox"
         >
+          {/* Search input - sticky at top */}
+          <div className="sticky top-0 z-10 p-2 border-b border-retro-grid/30 bg-retro-navy">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              autoFocus
+              className="w-full px-3 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
+            />
+          </div>
+
           <div className="max-h-60 overflow-y-auto py-1">
-            {options.map((option) => {
+            {filteredOptions.map((option) => {
               const isSelected = option.value === value;
               return (
                 <button
@@ -123,9 +171,9 @@ export function SingleSelectDropdown<T extends string | number>({
               );
             })}
 
-            {options.length === 0 && (
+            {filteredOptions.length === 0 && (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                No options available
+                {searchQuery ? "No matches found" : "No options available"}
               </div>
             )}
           </div>

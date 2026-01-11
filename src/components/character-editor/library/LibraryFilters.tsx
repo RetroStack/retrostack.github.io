@@ -434,6 +434,7 @@ export function LibraryFilters({
             placeholder="Width"
             allOptionLabel="Any width"
             className="min-w-[200px]"
+            numericSort
           />
 
           {/* Height filter */}
@@ -445,6 +446,7 @@ export function LibraryFilters({
             placeholder="Height"
             allOptionLabel="Any height"
             className="min-w-[200px]"
+            numericSort
           />
 
           {/* Character count filter */}
@@ -457,6 +459,7 @@ export function LibraryFilters({
               placeholder="Count"
               allOptionLabel="Any count"
               className="min-w-[200px]"
+              numericSort
             />
           )}
 

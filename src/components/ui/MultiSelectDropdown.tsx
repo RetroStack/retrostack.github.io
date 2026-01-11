@@ -4,6 +4,8 @@
  * A dropdown component allowing multiple selections with checkboxes.
  * Features:
  * - Checkbox-based multi-selection
+ * - Full-text search to filter options
+ * - Options sorted alphabetically
  * - Selected items displayed as removable chips
  * - Optional "All" option to clear selection
  * - Generic type support for string or number values
@@ -13,7 +15,7 @@
  */
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDropdown } from "@/hooks/useDropdown";
 
 export interface MultiSelectDropdownProps<T extends string | number> {
@@ -33,6 +35,8 @@ export interface MultiSelectDropdownProps<T extends string | number> {
   showAllOption?: boolean;
   /** Label for "All" option */
   allOptionLabel?: string;
+  /** Sort options numerically instead of alphabetically */
+  numericSort?: boolean;
 }
 
 /**
@@ -48,8 +52,18 @@ export function MultiSelectDropdown<T extends string | number>({
   className = "",
   showAllOption = true,
   allOptionLabel = "All",
+  numericSort = false,
 }: MultiSelectDropdownProps<T>) {
   const { ref: dropdownRef, isOpen, toggle } = useDropdown<HTMLDivElement>();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Wrapper for toggle that clears search when opening
+  const handleToggle = useCallback(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+    toggle();
+  }, [isOpen, toggle]);
 
   const toggleOption = useCallback(
     (value: T) => {
@@ -79,6 +93,27 @@ export function MultiSelectDropdown<T extends string | number>({
     return option?.label ?? String(value);
   };
 
+  // Sort options and filter by search query
+  const filteredOptions = useMemo(() => {
+    const sorted = [...options].sort((a, b) => {
+      if (numericSort) {
+        const numA = parseFloat(a.label);
+        const numB = parseFloat(b.label);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return numA - numB;
+        }
+      }
+      return a.label.localeCompare(b.label);
+    });
+
+    if (!searchQuery.trim()) {
+      return sorted;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return sorted.filter((option) => option.label.toLowerCase().includes(query));
+  }, [options, searchQuery, numericSort]);
+
   const hasSelection = selected.length > 0;
 
   return (
@@ -86,7 +121,7 @@ export function MultiSelectDropdown<T extends string | number>({
       {/* Trigger button */}
       <button
         type="button"
-        onClick={toggle}
+        onClick={handleToggle}
         className={`
           flex items-center justify-between gap-2 w-full px-3 py-1.5
           bg-retro-navy/50 border rounded text-sm text-left
@@ -140,9 +175,21 @@ export function MultiSelectDropdown<T extends string | number>({
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl overflow-hidden">
+          {/* Search input - sticky at top */}
+          <div className="sticky top-0 z-10 p-2 border-b border-retro-grid/30 bg-retro-navy">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              autoFocus
+              className="w-full px-3 py-1.5 text-sm bg-retro-dark border border-retro-grid/50 rounded text-white placeholder-gray-500 focus:outline-none focus:border-retro-cyan"
+            />
+          </div>
+
           <div className="max-h-60 overflow-y-auto py-1">
-            {/* All option */}
-            {showAllOption && (
+            {/* All option - only show when not searching */}
+            {showAllOption && !searchQuery && (
               <>
                 <button
                   type="button"
@@ -170,7 +217,7 @@ export function MultiSelectDropdown<T extends string | number>({
             )}
 
             {/* Options */}
-            {options.map((option) => {
+            {filteredOptions.map((option) => {
               const isSelected = selected.includes(option.value);
               return (
                 <button
@@ -209,9 +256,9 @@ export function MultiSelectDropdown<T extends string | number>({
               );
             })}
 
-            {options.length === 0 && (
+            {filteredOptions.length === 0 && (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                No options available
+                {searchQuery ? "No matches found" : "No options available"}
               </div>
             )}
           </div>
