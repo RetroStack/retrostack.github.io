@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import type { PaddingDirection, BitDirection } from "@/lib/character-editor/types";
 import {
   BINARY_EXPORT_SYSTEM_PRESETS,
@@ -56,15 +56,34 @@ export function BinaryFormatSection({
   const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
   const [customExpanded, setCustomExpanded] = useState(false);
 
+  // Track the selected preset ID (null means custom or no selection yet)
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+
   // Get presets grouped by manufacturer
   const manufacturerGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
 
-  // Find the current matching system
+  // Find the selected preset by ID, or check if current values match it
   const currentPreset = useMemo(() => {
-    return BINARY_EXPORT_SYSTEM_PRESETS.find(
-      (p) => p.padding === padding && p.bitDirection === bitDirection
-    );
-  }, [padding, bitDirection]);
+    if (selectedPresetId) {
+      const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === selectedPresetId);
+      // Only return the preset if the current values still match
+      if (preset && preset.padding === padding && preset.bitDirection === bitDirection) {
+        return preset;
+      }
+    }
+    // No valid selection - return null (will show "Custom")
+    return null;
+  }, [selectedPresetId, padding, bitDirection]);
+
+  // Clear the selected preset when values change externally (e.g., via custom controls)
+  useEffect(() => {
+    if (selectedPresetId) {
+      const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === selectedPresetId);
+      if (preset && (preset.padding !== padding || preset.bitDirection !== bitDirection)) {
+        setSelectedPresetId(null);
+      }
+    }
+  }, [selectedPresetId, padding, bitDirection]);
 
   // Display text for the input
   const displayText = currentPreset
@@ -72,6 +91,7 @@ export function BinaryFormatSection({
     : "Custom";
 
   const handlePresetClick = (preset: BinaryExportSystemPreset) => {
+    setSelectedPresetId(preset.id);
     onPaddingChange(preset.padding);
     onBitDirectionChange(preset.bitDirection);
     close();
@@ -79,6 +99,7 @@ export function BinaryFormatSection({
 
   const handleClear = () => {
     // Reset to default (most common: right padding, MSB first)
+    setSelectedPresetId(null);
     onPaddingChange("right");
     onBitDirectionChange("msb");
     close();
@@ -146,7 +167,7 @@ export function BinaryFormatSection({
           className="w-full flex items-center justify-between p-2 text-sm text-gray-300 hover:text-retro-cyan transition-colors disabled:opacity-50 disabled:hover:text-gray-300"
           aria-expanded={customExpanded}
         >
-          <span className="font-medium">Custom Settings</span>
+          <span className="font-medium">Bit Settings</span>
           <svg
             className={`w-4 h-4 transition-transform ${customExpanded ? "rotate-180" : ""}`}
             fill="none"
