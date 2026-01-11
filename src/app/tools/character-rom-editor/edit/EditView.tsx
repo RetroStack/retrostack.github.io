@@ -45,6 +45,7 @@ import { TextPreviewModal } from "./modals/TextPreviewModal";
 import { SnapshotsModal } from "./modals/SnapshotsModal";
 import { ShareModal } from "./modals/ShareModal";
 import { OverlaySearchModal } from "./modals/OverlaySearchModal";
+import { SimilarCharactersModal } from "./modals/SimilarCharactersModal";
 import { NotesModal } from "./modals/NotesModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
@@ -174,6 +175,7 @@ export function EditView() {
   // Overlay state
   const [overlayCharacterSet, setOverlayCharacterSet] = useState<CharacterSet | null>(null);
   const [showOverlaySearch, setShowOverlaySearch] = useState(false);
+  const [showSimilarCharacters, setShowSimilarCharacters] = useState(false);
   const [overlayMode, setOverlayMode] = useState<"stretch" | "pixel" | "side-by-side">("pixel");
 
   // Leave confirmation state
@@ -998,6 +1000,23 @@ export function EditView() {
       priority: 0,
     },
     {
+      id: "similar-characters",
+      label: "Similar",
+      tooltip: "Find similar character sets to compare and use as overlay",
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+      ),
+      onClick: () => setShowSimilarCharacters(true),
+      priority: 0,
+    },
+    {
       id: "text-preview",
       label: "Preview",
       tooltip: "Preview text rendered with this character set",
@@ -1544,6 +1563,20 @@ export function EditView() {
         excludeId={id || undefined}
         onSelectSet={setOverlayCharacterSet}
       />
+
+      {/* Similar characters modal */}
+      {characterSet && (
+        <SimilarCharactersModal
+          isOpen={showSimilarCharacters}
+          onClose={() => setShowSimilarCharacters(false)}
+          currentCharacters={editor.characters}
+          currentConfig={editor.config}
+          excludeId={id || undefined}
+          foregroundColor={colors.foreground}
+          backgroundColor={colors.background}
+          onSelectForOverlay={setOverlayCharacterSet}
+        />
+      )}
 
       {/* Character context menu */}
       {contextMenu && (
