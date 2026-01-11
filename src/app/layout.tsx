@@ -15,6 +15,7 @@ import type { Metadata } from "next";
 import { VT323, Press_Start_2P, Orbitron } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { description, title } from "@/lib/constants";
 
 const vt323 = VT323({
@@ -68,9 +69,14 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth">
       <head>
         <meta name="apple-mobile-web-app-title" content="RetroStack" />
+        <meta name="theme-color" content="#0a0a1a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
       </head>
       <body className={`${vt323.variable} ${pressStart2P.variable} ${orbitron.variable} antialiased`}>
         <ToastProvider>{children}</ToastProvider>
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

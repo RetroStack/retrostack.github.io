@@ -24,6 +24,7 @@ import { Navigation, TabletNavigation } from "./Navigation";
 import { MobileMenu, HamburgerButton } from "./MobileMenu";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { InstallAppButton } from "@/components/ui/InstallAppButton";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -83,8 +84,9 @@ export function Header() {
             {/* Desktop Navigation - visible on large screens (lg+) */}
             <Navigation />
 
-            {/* Theme toggle, Bug Report, and Mobile Menu Button */}
+            {/* Theme toggle, Install App, Bug Report, and Mobile Menu Button */}
             <div className="flex items-center gap-1 sm:gap-2">
+              <InstallAppButton className="hidden sm:block" />
               <ThemeToggle className="hidden sm:block" />
               <Tooltip content="Report a bug" position="bottom">
                 <a
