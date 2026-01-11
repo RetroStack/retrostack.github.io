@@ -111,6 +111,10 @@ export interface PngOptions {
   foregroundColor: string;
   backgroundColor: string;
   transparent: boolean;
+  /** Whether bloom/glow effect is enabled */
+  bloom: boolean;
+  /** Bloom intensity (0-100) */
+  bloomIntensity: number;
 }
 
 /**
@@ -143,6 +147,10 @@ export interface ReferenceSheetOptions {
   binaryColor: string;
   asciiColor: string;
   nonPrintableAsciiColor: string;
+  /** Whether bloom/glow effect is enabled */
+  bloom: boolean;
+  /** Bloom intensity (0-100) */
+  bloomIntensity: number;
 }
 
 /**
@@ -189,10 +197,12 @@ export function getDefaultPngOptions(): PngOptions {
     columns: 16,
     scale: 4,
     showGrid: true,
-    gridColor: "#333333",
+    gridColor: "#4a4a4a",
     foregroundColor: "#ffffff",
     backgroundColor: "#000000",
     transparent: false,
+    bloom: false,
+    bloomIntensity: 40,
   };
 }
 
@@ -227,6 +237,8 @@ export function getDefaultReferenceSheetOptions(name: string): ReferenceSheetOpt
     binaryColor: "#888888",
     asciiColor: "#ffffff",
     nonPrintableAsciiColor: "#666666",
+    bloom: false,
+    bloomIntensity: 40,
   };
 }
 
@@ -370,7 +382,7 @@ export async function exportToPng(
   config: CharacterSetConfig,
   options: PngOptions
 ): Promise<Blob> {
-  const { columns, scale, showGrid, gridColor, foregroundColor, backgroundColor, transparent } =
+  const { columns, scale, showGrid, gridColor, foregroundColor, backgroundColor, transparent, bloom, bloomIntensity } =
     options;
 
   const rows = Math.ceil(characters.length / columns);
@@ -419,6 +431,13 @@ export async function exportToPng(
     }
   }
 
+  // Set up bloom effect if enabled
+  if (bloom && bloomIntensity > 0) {
+    ctx.shadowColor = foregroundColor;
+    // Map intensity 0-100 to blur radius 0-2 (scaled by pixel size)
+    ctx.shadowBlur = (bloomIntensity / 100) * scale * 2;
+  }
+
   // Draw characters
   for (let i = 0; i < characters.length; i++) {
     const character = characters[i];
@@ -433,16 +452,21 @@ export async function exportToPng(
       : row * charHeight * scale;
 
     // Draw character pixels
+    ctx.fillStyle = foregroundColor;
     for (let py = 0; py < charHeight; py++) {
       for (let px = 0; px < charWidth; px++) {
         const isOn = character.pixels[py]?.[px] || false;
 
         if (isOn) {
-          ctx.fillStyle = foregroundColor;
           ctx.fillRect(baseX + px * scale, baseY + py * scale, scale, scale);
-        } else if (!transparent) {
+        } else if (!transparent && !bloom) {
+          // Only draw background pixels if no bloom (bloom looks better without explicit bg pixels)
+          ctx.save();
+          ctx.shadowBlur = 0;
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(baseX + px * scale, baseY + py * scale, scale, scale);
+          ctx.restore();
+          ctx.fillStyle = foregroundColor;
         }
       }
     }
@@ -515,6 +539,8 @@ function generateReferenceSheetCanvas(
     binaryColor,
     asciiColor,
     nonPrintableAsciiColor,
+    bloom,
+    bloomIntensity,
   } = options;
 
   const charWidth = config.width;
@@ -652,14 +678,25 @@ function generateReferenceSheetCanvas(
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(charDrawX - 2 * resMult, charDrawY - 2 * resMult, charWidth * scale * resMult + 4 * resMult, charHeight * scale * resMult + 4 * resMult);
 
+        // Set up bloom effect if enabled
+        if (bloom && bloomIntensity > 0) {
+          ctx.shadowColor = foregroundColor;
+          ctx.shadowBlur = (bloomIntensity / 100) * scale * resMult * 2;
+        }
+
+        ctx.fillStyle = foregroundColor;
         for (let py = 0; py < charHeight; py++) {
           for (let px = 0; px < charWidth; px++) {
             const isOn = character.pixels[py]?.[px] || false;
             if (isOn) {
-              ctx.fillStyle = foregroundColor;
               ctx.fillRect(charDrawX + px * scale * resMult, charDrawY + py * scale * resMult, scale * resMult, scale * resMult);
             }
           }
+        }
+
+        // Reset shadow for labels
+        if (bloom && bloomIntensity > 0) {
+          ctx.shadowBlur = 0;
         }
         colX += charColWidth;
 
@@ -798,14 +835,25 @@ function generateReferenceSheetCanvas(
       const charX = cellX + cellPadding;
       const charY = cellY + cellPadding;
 
+      // Set up bloom effect if enabled
+      if (bloom && bloomIntensity > 0) {
+        ctx.shadowColor = foregroundColor;
+        ctx.shadowBlur = (bloomIntensity / 100) * scale * resMult * 2;
+      }
+
+      ctx.fillStyle = foregroundColor;
       for (let py = 0; py < charHeight; py++) {
         for (let px = 0; px < charWidth; px++) {
           const isOn = character.pixels[py]?.[px] || false;
           if (isOn) {
-            ctx.fillStyle = foregroundColor;
             ctx.fillRect(charX + px * scale * resMult, charY + py * scale * resMult, scale * resMult, scale * resMult);
           }
         }
+      }
+
+      // Reset shadow for labels
+      if (bloom && bloomIntensity > 0) {
+        ctx.shadowBlur = 0;
       }
 
       // Draw labels

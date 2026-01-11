@@ -14,7 +14,9 @@ import { CharacterPreview } from "@/components/character-editor/character/Charac
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
+import { CRTEffectsPanel } from "@/components/character-editor/editor/CRTEffectsPanel";
 import { CustomColors, getActiveColors } from "@/lib/character-editor/data/colorPresets";
+import { CRTSettings } from "@/lib/character-editor/data/crtSettings";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { useEditorReturn } from "@/hooks/character-editor/useEditorReturn";
 import { CharacterSet, PaddingDirection, BitDirection, bytesPerCharacter } from "@/lib/character-editor/types";
@@ -626,7 +628,7 @@ export function ExportView() {
                         colors={{
                           foreground: pngOptions.foregroundColor,
                           background: pngOptions.backgroundColor,
-                          gridColor: "#333333",
+                          gridColor: "#4a4a4a",
                         }}
                         onColorsChange={(colors: CustomColors) =>
                           setPngOptions({
@@ -665,6 +667,24 @@ export function ExportView() {
                         Transparent background
                       </label>
                     </div>
+
+                    <CRTEffectsPanel
+                      settings={{
+                        scanlines: false,
+                        scanlinesIntensity: 50,
+                        bloom: pngOptions.bloom,
+                        bloomIntensity: pngOptions.bloomIntensity,
+                        pixelAspectRatio: "none",
+                      }}
+                      onChange={(settings: CRTSettings) =>
+                        setPngOptions({
+                          ...pngOptions,
+                          bloom: settings.bloom,
+                          bloomIntensity: settings.bloomIntensity,
+                        })
+                      }
+                      defaultCollapsed={true}
+                    />
                   </>
                 )}
 
@@ -773,7 +793,7 @@ export function ExportView() {
                         colors={{
                           foreground: referenceSheetOptions.foregroundColor,
                           background: referenceSheetOptions.backgroundColor,
-                          gridColor: "#333333",
+                          gridColor: "#4a4a4a",
                         }}
                         onColorsChange={(colors: CustomColors) =>
                           setReferenceSheetOptions({
@@ -1007,6 +1027,24 @@ export function ExportView() {
                         </div>
                       </div>
                     </div>
+
+                    <CRTEffectsPanel
+                      settings={{
+                        scanlines: false,
+                        scanlinesIntensity: 50,
+                        bloom: referenceSheetOptions.bloom,
+                        bloomIntensity: referenceSheetOptions.bloomIntensity,
+                        pixelAspectRatio: "none",
+                      }}
+                      onChange={(settings: CRTSettings) =>
+                        setReferenceSheetOptions({
+                          ...referenceSheetOptions,
+                          bloom: settings.bloom,
+                          bloomIntensity: settings.bloomIntensity,
+                        })
+                      }
+                      defaultCollapsed={true}
+                    />
                   </>
                 )}
 
