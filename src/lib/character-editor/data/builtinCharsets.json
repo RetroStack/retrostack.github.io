@@ -11,7 +11,7 @@
     "system": "Apple I",
     "chip": "Signetics 2513",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -669,7 +669,7 @@
     "system": "Apple II",
     "chip": "341-0036",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -1327,7 +1327,7 @@
     "system": "C64",
     "chip": "901225-01",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -1985,7 +1985,7 @@
     "system": "PET",
     "chip": "901447-10",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -2643,7 +2643,7 @@
     "system": "VIC-20",
     "chip": "901460-03",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -3301,7 +3301,7 @@
     "system": "C128",
     "chip": "390059-01",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -3959,7 +3959,7 @@
     "system": "IBM PC",
     "chip": "CGA ROM",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -4607,7 +4607,7 @@
     "system": "ZX81",
     "chip": "ZX81 ROM",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -5265,7 +5265,7 @@
     "system": "ZX Spectrum",
     "chip": "Spectrum ROM",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -5923,7 +5923,7 @@
     "system": "TRS-80 Model I",
     "chip": "MCM6670P",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -6581,7 +6581,7 @@
     "system": "TRS-80 Model III",
     "chip": "Model III ROM",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -7239,7 +7239,7 @@
     "system": "TRS-80 Model 4",
     "chip": "Model 4 ROM",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -7961,7 +7961,7 @@
     "system": "MC6847",
     "chip": "MC6847",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -8875,7 +8875,7 @@
     "system": "2513",
     "chip": "2513 (CM2140)",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -9533,7 +9533,7 @@
     "system": "TRS-80 Model 1",
     "chip": "01",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -10831,7 +10831,7 @@
     "system": "TRS-80 Model 1",
     "chip": "02",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -12129,7 +12129,7 @@
     "system": "TRS-80 Model 1",
     "chip": "03",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -13427,7 +13427,7 @@
     "system": "TRS-80 Model 1",
     "chip": "04",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -14725,7 +14725,7 @@
     "system": "TRS-80 Model 1",
     "chip": "05",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -16023,7 +16023,7 @@
     "system": "TRS-80 Model 1",
     "chip": "06",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -17321,7 +17321,7 @@
     "system": "TRS-80 Model 1",
     "chip": "07",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -18619,7 +18619,7 @@
     "system": "TRS-80 Model 1",
     "chip": "08",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -19917,7 +19917,7 @@
     "system": "TRS-80 Model 1",
     "chip": "09",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -21215,7 +21215,7 @@
     "system": "TRS-80 Model 1",
     "chip": "10",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -22513,7 +22513,7 @@
     "system": "TRS-80 Model 1",
     "chip": "11",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -23811,7 +23811,7 @@
     "system": "TRS-80 Model 1",
     "chip": "12",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -25109,7 +25109,7 @@
     "system": "TRS-80 Model 1",
     "chip": "13",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -26407,7 +26407,7 @@
     "system": "TRS-80 Model 1",
     "chip": "14",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -27705,7 +27705,7 @@
     "system": "TRS-80 Model 1",
     "chip": "15",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -29003,7 +29003,7 @@
     "system": "TRS-80 Model 1",
     "chip": "16",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -30301,7 +30301,7 @@
     "system": "TRS-80 Model 1",
     "chip": "17",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -31599,7 +31599,7 @@
     "system": "TRS-80 Model 1",
     "chip": "18",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -32897,7 +32897,7 @@
     "system": "TRS-80 Model 1",
     "chip": "19",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -34195,7 +34195,7 @@
     "system": "TRS-80 Model 1",
     "chip": "20",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -35493,7 +35493,7 @@
     "system": "TRS-80 Model 1",
     "chip": "21",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -36791,7 +36791,7 @@
     "system": "TRS-80 Model 1",
     "chip": "22",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -38089,7 +38089,7 @@
     "system": "TRS-80 Model 1",
     "chip": "23",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -39387,7 +39387,7 @@
     "system": "TRS-80 Model 1",
     "chip": "24",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -40685,7 +40685,7 @@
     "system": "TRS-80 Model 1",
     "chip": "25",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -41983,7 +41983,7 @@
     "system": "TRS-80 Model 1",
     "chip": "26",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -43281,7 +43281,7 @@
     "system": "TRS-80 Model 1",
     "chip": "27",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -44579,7 +44579,7 @@
     "system": "TRS-80 Model 1",
     "chip": "28",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -45877,7 +45877,7 @@
     "system": "TRS-80 Model 1",
     "chip": "29",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -47175,7 +47175,7 @@
     "system": "TRS-80 Model 1",
     "chip": "30",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -48473,7 +48473,7 @@
     "system": "TRS-80 Model 1",
     "chip": "31",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -49771,7 +49771,7 @@
     "system": "TRS-80 Model 1",
     "chip": "32",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -51069,7 +51069,7 @@
     "system": "?",
     "chip": "CG 3 - for Model I",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -52367,7 +52367,7 @@
     "system": "TRS-80",
     "chip": "CG 10",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -53665,7 +53665,7 @@
     "system": "LCD Controller",
     "chip": "HD44780U (Japan)",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -56755,7 +56755,7 @@
     "system": "LCD Controller",
     "chip": "HD44780U (English)",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -59845,7 +59845,7 @@
     "system": "LCD Controller",
     "chip": "HD44780U (Russian)",
     "locale": "Russian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -62935,7 +62935,7 @@
     "system": "LCD Controller",
     "chip": "HD44780U (Patterns)",
     "locale": "Symbols",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -65257,7 +65257,7 @@
     "system": "Teletext",
     "chip": "SAA5050",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -66427,7 +66427,7 @@
     "system": "Teletext",
     "chip": "SAA5051",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -67597,7 +67597,7 @@
     "system": "Teletext",
     "chip": "SAA5052",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -68767,7 +68767,7 @@
     "system": "Teletext",
     "chip": "SAA5053",
     "locale": "Italian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -69937,7 +69937,7 @@
     "system": "Teletext",
     "chip": "SAA5054",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -71107,7 +71107,7 @@
     "system": "Teletext",
     "chip": "SAA5055",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -72277,7 +72277,7 @@
     "system": "Teletext",
     "chip": "SAA5056",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -73447,7 +73447,7 @@
     "system": "Teletext",
     "chip": "SAA5057",
     "locale": "Russian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -74617,7 +74617,7 @@
     "system": "Apple II",
     "chip": "chargen-mouse.pbm",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -77195,7 +77195,7 @@
     "system": "Apple II",
     "chip": "chargen-lc.pbm",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -79773,7 +79773,7 @@
     "system": "C64",
     "chip": "characters.325018-02.C2G007.bin",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -84911,7 +84911,7 @@
     "system": "C64",
     "chip": "characters.325056-03.bin",
     "locale": "Spanish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -90049,7 +90049,7 @@
     "system": "C64",
     "chip": "characters.901225-01-DK.bin",
     "locale": "Danish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -95187,7 +95187,7 @@
     "system": "C64",
     "chip": "characters.901225-01.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -100325,7 +100325,7 @@
     "system": "C64",
     "chip": "characters.906143-02.bin",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -105463,7 +105463,7 @@
     "system": "C64",
     "chip": "characters.turkish.bin",
     "locale": "Turkish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -110601,7 +110601,7 @@
     "system": "PET",
     "chip": "characters-2.901447-10.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -113179,7 +113179,7 @@
     "system": "PET",
     "chip": "characters-german.bin",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -115757,7 +115757,7 @@
     "system": "PET",
     "chip": "characters-german2.bin",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -118335,7 +118335,7 @@
     "system": "PET",
     "chip": "characters-hungarian.bin",
     "locale": "Hungarian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -120913,7 +120913,7 @@
     "system": "PET",
     "chip": "characters-japan.901447-12.bin",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -123491,7 +123491,7 @@
     "system": "PET",
     "chip": "characters-norwegian.bin",
     "locale": "Norwegian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -126069,7 +126069,7 @@
     "system": "PET",
     "chip": "characters-swedish.901447-14.bin",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -128647,7 +128647,7 @@
     "system": "PET",
     "chip": "901439-08.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -131225,7 +131225,7 @@
     "system": "PET",
     "chip": "901447-08.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -133803,7 +133803,7 @@
     "system": "PET",
     "chip": "901447-10.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -136381,7 +136381,7 @@
     "system": "PET",
     "chip": "901447-12-japan.bin",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -138959,7 +138959,7 @@
     "system": "PET",
     "chip": "901447-14-swedish.bin",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -141537,7 +141537,7 @@
     "system": "PET",
     "chip": "901640-01.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -146675,7 +146675,7 @@
     "system": "PET",
     "chip": "324242-01-german.bin",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -151813,7 +151813,7 @@
     "system": "PET",
     "chip": "cbm-french.bin",
     "locale": "French",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -156951,7 +156951,7 @@
     "system": "PET",
     "chip": "cbm-greek.bin",
     "locale": "Greek",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -159529,7 +159529,7 @@
     "system": "PET",
     "chip": "cbm-hungarian.bin",
     "locale": "Hungarian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -162107,7 +162107,7 @@
     "system": "PET",
     "chip": "cbm-russian.bin",
     "locale": "Russian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -164685,7 +164685,7 @@
     "system": "PET",
     "chip": "cbm-norwegian.bin",
     "locale": "Norwegian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -167263,7 +167263,7 @@
     "system": "PET",
     "chip": "cbm-unknown1.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -169841,7 +169841,7 @@
     "system": "PET",
     "chip": "cbm-unknown-8096.bin",
     "locale": "French",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -172419,7 +172419,7 @@
     "system": "PET",
     "chip": "901447-10m.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -174997,7 +174997,7 @@
     "system": "VIC-20",
     "chip": "characters.901460-03.bin",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -180135,7 +180135,7 @@
     "system": "VIC-20",
     "chip": "characters.DK_901460-03.bin",
     "locale": "Danish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -185273,7 +185273,7 @@
     "system": "VIC-20",
     "chip": "characters.NecP22101-207.bin",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -190411,7 +190411,7 @@
     "system": "C128",
     "chip": "characters.danish-d.325175-02.bin",
     "locale": "Danish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -200669,7 +200669,7 @@
     "system": "C128",
     "chip": "characters.danish.325175-01.bin",
     "locale": "Danish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -210927,7 +210927,7 @@
     "system": "C128",
     "chip": "characters.french.325167-01.bin",
     "locale": "French",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -221185,7 +221185,7 @@
     "system": "C128",
     "chip": "characters.german.315079-01.bin",
     "locale": "German",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -231443,7 +231443,7 @@
     "system": "C128",
     "chip": "characters.ifb.325167-02.bin",
     "locale": "French",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -241701,7 +241701,7 @@
     "system": "C128",
     "chip": "characters.norwegian.325078-02.bin",
     "locale": "Norwegian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -251959,7 +251959,7 @@
     "system": "C128",
     "chip": "characters.norwegian.325178-01..bin",
     "locale": "Norwegian",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -272457,7 +272457,7 @@
     "system": "C128",
     "chip": "characters.spanish.325171-01.bin",
     "locale": "Spanish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -282715,7 +282715,7 @@
     "system": "C128",
     "chip": "characters.swedish.325181-01.bin",
     "locale": "Swedish",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -292973,7 +292973,7 @@
     "system": "C128",
     "chip": "characters.swiss.325173-01D.bin",
     "locale": "Swiss",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -303231,7 +303231,7 @@
     "system": "PC",
     "chip": "cp437.txt",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -305809,7 +305809,7 @@
     "system": "TRS-80 Model 1",
     "chip": "CG 1 - for Model I",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -307107,7 +307107,7 @@
     "system": "TRS-80 Model 1",
     "chip": "Model I original character generator ROM (only uppercase is accessible)",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -308405,7 +308405,7 @@
     "system": "TRS-80 Model 1",
     "chip": "Model I character generator ROM (used with the lowercase mod)",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -309703,7 +309703,7 @@
     "system": "TRS-80 Model 1",
     "chip": "CG 2 - for Model I",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -311001,7 +311001,7 @@
     "system": "TRS-80 Model 1",
     "chip": "Gendon3 9E",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -320235,7 +320235,7 @@
     "system": "TRS-80 Model 3",
     "chip": "(Char Gen) - cg3-8126-8044316A-444c8b60.rom",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -322813,7 +322813,7 @@
     "system": "TRS-80 Model 3",
     "chip": "(Char Gen) - cg3-8237-8049000-ce405683.rom",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -325391,7 +325391,7 @@
     "system": "TRS-80 Model 3",
     "chip": "(Char Gen) - cg3-8348-8049007-1ac44bea.rom",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -327969,7 +327969,7 @@
     "system": "TRS-80 Model 3",
     "chip": "CG 4 - for Model III",
     "locale": "Japanese",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -330547,7 +330547,7 @@
     "system": "TRS-80 Model 3",
     "chip": "CG 5 - for Model III",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -333125,7 +333125,7 @@
     "system": "TRS-80 Model 3",
     "chip": "CG 6 - for Model III",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -335703,7 +335703,7 @@
     "system": "TRS-80 Model 4",
     "chip": "CG 8 - for Model 4/4P",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [
@@ -338537,7 +338537,7 @@
     "system": "TRS-80 Model 4",
     "chip": "CG 9 - for Model 4/4P",
     "locale": "English",
-    "bitDirection": "ltr",
+    "bitDirection": "msb",
     "bitPadding": "left",
     "version": 1,
     "data": [

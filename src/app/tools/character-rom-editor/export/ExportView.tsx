@@ -487,6 +487,8 @@ export function ExportView() {
                     bitDirection={bitDirection}
                     onPaddingChange={setPadding}
                     onBitDirectionChange={setBitDirection}
+                    initialChipName={characterSet?.metadata.chip}
+                    initialSystemName={characterSet?.metadata.system}
                   />
                 )}
 
@@ -524,6 +526,8 @@ export function ExportView() {
                       bitDirection={bitDirection}
                       onPaddingChange={setPadding}
                       onBitDirectionChange={setBitDirection}
+                      initialChipName={characterSet?.metadata.chip}
+                      initialSystemName={characterSet?.metadata.system}
                     />
 
                     {/* C Header specific options */}
