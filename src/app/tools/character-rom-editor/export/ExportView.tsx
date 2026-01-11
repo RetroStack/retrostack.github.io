@@ -507,6 +507,28 @@ export function ExportView() {
                 {format === "c-header" && (
                   <>
                     <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+                      <BinarySystemSelector
+                        padding={padding}
+                        bitDirection={bitDirection}
+                        onSystemChange={(newPadding, newBitDirection) => {
+                          setPadding(newPadding);
+                          setBitDirection(newBitDirection);
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Padding</h3>
+                      <PaddingDirectionSelector value={padding} onChange={setPadding} />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Direction</h3>
+                      <BitDirectionSelector value={bitDirection} onChange={setBitDirection} />
+                    </div>
+
+                    <div>
                       <label className="block text-xs font-medium text-gray-400 mb-1">Array Name</label>
                       <input
                         type="text"
@@ -548,6 +570,28 @@ export function ExportView() {
                 {/* Assembly options */}
                 {format === "assembly" && (
                   <>
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Target System</h3>
+                      <BinarySystemSelector
+                        padding={padding}
+                        bitDirection={bitDirection}
+                        onSystemChange={(newPadding, newBitDirection) => {
+                          setPadding(newPadding);
+                          setBitDirection(newBitDirection);
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Padding</h3>
+                      <PaddingDirectionSelector value={padding} onChange={setPadding} />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Bit Direction</h3>
+                      <BitDirectionSelector value={bitDirection} onChange={setBitDirection} />
+                    </div>
+
                     <div>
                       <label className="block text-xs font-medium text-gray-400 mb-1">Label Name</label>
                       <input
