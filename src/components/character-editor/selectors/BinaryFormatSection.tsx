@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { PaddingDirection, BitDirection } from "@/lib/character-editor/types";
 import {
   BINARY_EXPORT_SYSTEM_PRESETS,
@@ -252,6 +252,34 @@ export function BinaryFormatSection({
 
   // The actual selection: user's choice if they've selected, otherwise computed from props
   const selection = hasUserSelected ? userSelection : computedInitialSelection;
+
+  // Track if we've applied the initial preset settings
+  const hasAppliedInitialSettings = useRef(false);
+
+  // Apply preset settings when initial selection is computed (only once)
+  useEffect(() => {
+    // Only apply if:
+    // 1. We have a computed initial selection
+    // 2. User hasn't manually selected anything yet
+    // 3. We haven't already applied initial settings
+    if (computedInitialSelection && !hasUserSelected && !hasAppliedInitialSettings.current) {
+      hasAppliedInitialSettings.current = true;
+
+      if (computedInitialSelection.type === "system") {
+        const preset = BINARY_EXPORT_SYSTEM_PRESETS.find((p) => p.id === computedInitialSelection.id);
+        if (preset) {
+          onPaddingChange(preset.padding);
+          onBitDirectionChange(preset.bitDirection);
+        }
+      } else {
+        const preset = CHIP_BINARY_EXPORT_PRESETS.find((p) => p.id === computedInitialSelection.id);
+        if (preset) {
+          onPaddingChange(preset.padding);
+          onBitDirectionChange(preset.bitDirection);
+        }
+      }
+    }
+  }, [computedInitialSelection, hasUserSelected, onPaddingChange, onBitDirectionChange]);
 
   // Get system presets grouped by manufacturer
   const systemGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
