@@ -927,7 +927,7 @@ export function EditView() {
       id: "reset",
       label: "Reset Set",
       tooltip: "Discard all unsaved changes",
-      shortcut: "Ctrl+Shift+R",
+      shortcut: "Ctrl+Alt+R",
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

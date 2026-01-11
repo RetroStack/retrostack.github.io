@@ -475,7 +475,7 @@ export function createEditorShortcuts(actions: {
           {
             key: "r",
             ctrl: true,
-            shift: true,
+            alt: true,
             action: actions.resetChanges,
             description: "Reset changes",
             context: "Editor",
