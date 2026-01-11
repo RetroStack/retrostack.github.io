@@ -76,10 +76,17 @@ export function useInstallPrompt(): UseInstallPromptResult {
     const isIOSDevice = /iphone|ipad|ipod/.test(userAgent) && !(window as { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
 
-    // Capture beforeinstallprompt event
+    // Check for early-captured prompt from layout script
+    const earlyPrompt = (window as { __pwaInstallPrompt?: BeforeInstallPromptEvent }).__pwaInstallPrompt;
+    if (earlyPrompt) {
+      setDeferredPrompt(earlyPrompt);
+    }
+
+    // Capture beforeinstallprompt event for future prompts
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      (window as { __pwaInstallPrompt?: BeforeInstallPromptEvent }).__pwaInstallPrompt = e as BeforeInstallPromptEvent;
     };
 
     // Listen for app installed event

@@ -73,6 +73,18 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__pwaInstallPrompt = null;
+              window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                window.__pwaInstallPrompt = e;
+              });
+            `,
+          }}
+        />
       </head>
       <body className={`${vt323.variable} ${pressStart2P.variable} ${orbitron.variable} antialiased`}>
         <ToastProvider>{children}</ToastProvider>
