@@ -57,3 +57,6 @@ export const CHARACTER_EDITOR_STORAGE_KEY_SORT_DIRECTION = "retrostack-character
 
 /** localStorage key for library page size */
 export const CHARACTER_EDITOR_STORAGE_KEY_PAGE_SIZE = "retrostack-character-editor-page-size";
+
+/** localStorage key for CRT simulation settings */
+export const CHARACTER_EDITOR_STORAGE_KEY_CRT_SETTINGS = "retrostack-character-editor-crt-settings";

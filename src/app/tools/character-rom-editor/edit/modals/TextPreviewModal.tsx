@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
 import { CustomColors } from "@/lib/character-editor/data/colorPresets";
 import { ColorPresetSelector } from "@/components/character-editor/selectors/ColorPresetSelector";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
+import { CRTEffectsOverlay } from "@/components/character-editor/editor/CRTEffectsOverlay";
+import { CRTEffectsPanel } from "@/components/character-editor/editor/CRTEffectsPanel";
+import { CRTSettings, getCRTSettings, saveCRTSettings } from "@/lib/character-editor/data/crtSettings";
 
 export interface TextPreviewModalProps {
   /** Whether the modal is open */
@@ -108,12 +111,19 @@ export function TextPreviewModal({
   const [text, setText] = useState(SAMPLE_TEXTS[0].text);
   const [scale, setScale] = useState(2);
   const [localColors, setLocalColors] = useState<CustomColors>(initialColors);
+  const [crtSettings, setCrtSettings] = useState<CRTSettings>(getCRTSettings);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Update colors when props change
   useEffect(() => {
     setLocalColors(initialColors);
   }, [initialColors]);
+
+  // Handle CRT settings change with persistence
+  const handleCrtSettingsChange = useCallback((settings: CRTSettings) => {
+    setCrtSettings(settings);
+    saveCRTSettings(settings);
+  }, []);
 
   // Focus textarea on open
   useEffect(() => {
@@ -216,42 +226,55 @@ export function TextPreviewModal({
                 </div>
               </div>
 
+              {/* CRT Effects Panel */}
+              <CRTEffectsPanel
+                settings={crtSettings}
+                onChange={handleCrtSettingsChange}
+                defaultCollapsed={true}
+              />
+
             </div>
 
             {/* Right side - Preview */}
             <div>
               <label className="block text-sm text-gray-300 mb-2">Preview</label>
-              <div
-                className="p-4 rounded border border-retro-grid/30 overflow-auto max-h-[400px]"
-                style={{ backgroundColor: localColors.background }}
+              <CRTEffectsOverlay
+                settings={crtSettings}
+                foregroundColor={localColors.foreground}
+                className="rounded border border-retro-grid/30 overflow-auto max-h-[400px]"
               >
-                {renderedLines.length === 0 || (renderedLines.length === 1 && renderedLines[0].length === 0) ? (
-                  <div className="text-xs text-gray-500 italic">
-                    Type something to see the preview...
-                  </div>
-                ) : (
-                  <div className="space-y-0">
-                    {renderedLines.map((line, lineIndex) => (
-                      <div key={lineIndex} className="flex flex-wrap" style={{ minHeight: config.height * scale }}>
-                        {line.length === 0 ? (
-                          // Empty line - just show line height
-                          <div style={{ height: config.height * scale, width: config.width * scale }} />
-                        ) : (
-                          line.map((char, charIndex) => (
-                            <MiniCharacter
-                              key={charIndex}
-                              character={char}
-                              scale={scale}
-                              foregroundColor={localColors.foreground}
-                              backgroundColor={localColors.background}
-                            />
-                          ))
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                <div
+                  className="p-4"
+                  style={{ backgroundColor: localColors.background }}
+                >
+                  {renderedLines.length === 0 || (renderedLines.length === 1 && renderedLines[0].length === 0) ? (
+                    <div className="text-xs text-gray-500 italic">
+                      Type something to see the preview...
+                    </div>
+                  ) : (
+                    <div className="space-y-0">
+                      {renderedLines.map((line, lineIndex) => (
+                        <div key={lineIndex} className="flex flex-wrap" style={{ minHeight: config.height * scale }}>
+                          {line.length === 0 ? (
+                            // Empty line - just show line height
+                            <div style={{ height: config.height * scale, width: config.width * scale }} />
+                          ) : (
+                            line.map((char, charIndex) => (
+                              <MiniCharacter
+                                key={charIndex}
+                                character={char}
+                                scale={scale}
+                                foregroundColor={localColors.foreground}
+                                backgroundColor={localColors.background}
+                              />
+                            ))
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CRTEffectsOverlay>
               <div className="mt-2 text-xs text-gray-500">
                 {text.length} characters, {renderedLines.length} lines
               </div>
