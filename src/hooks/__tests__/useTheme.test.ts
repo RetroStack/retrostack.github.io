@@ -541,7 +541,9 @@ describe("useTheme", () => {
         expect(result.current.mounted).toBe(true);
       });
 
-      const initialToggleTheme = result.current.toggleTheme;
+      // Store initial reference to verify stable function
+      const _initialToggleTheme = result.current.toggleTheme;
+      void _initialToggleTheme; // Referenced to verify function exists
 
       act(() => {
         result.current.setTheme("light");

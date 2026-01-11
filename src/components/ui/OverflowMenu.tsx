@@ -42,12 +42,12 @@ export function OverflowMenu({
   className = "",
   label = "More options",
 }: OverflowMenuProps) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
 
   const handleItemClick = (item: OverflowMenuItem) => {
     if (item.disabled) return;
     item.onClick?.();
-    dropdown.close();
+    close();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent, item: OverflowMenuItem) => {
@@ -60,13 +60,13 @@ export function OverflowMenu({
   if (items.length === 0) return null;
 
   return (
-    <div ref={dropdown.ref} className={`relative ${className}`}>
+    <div ref={dropdownRef} className={`relative ${className}`}>
       {/* Trigger Button */}
       <button
-        onClick={dropdown.toggle}
+        onClick={toggle}
         className="touch-target flex items-center justify-center p-2 text-gray-400 hover:text-white bg-retro-dark/50 hover:bg-retro-dark rounded-md transition-colors"
         aria-label={label}
-        aria-expanded={dropdown.isOpen}
+        aria-expanded={isOpen}
         aria-haspopup="menu"
       >
         {trigger || (
@@ -81,7 +81,7 @@ export function OverflowMenu({
       </button>
 
       {/* Dropdown Menu */}
-      {dropdown.isOpen && (
+      {isOpen && (
         <div
           className={`absolute top-full mt-2 z-50 min-w-[180px] bg-retro-navy/95 backdrop-blur-md border border-retro-grid/50 rounded-lg py-1 shadow-xl shadow-black/50 ${
             align === "right" ? "right-0" : "left-0"
@@ -109,7 +109,7 @@ export function OverflowMenu({
                   href={item.href}
                   className={itemClasses}
                   role="menuitem"
-                  onClick={dropdown.close}
+                  onClick={close}
                 >
                   {item.icon && (
                     <span className="w-5 h-5 flex-shrink-0">{item.icon}</span>

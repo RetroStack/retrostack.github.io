@@ -17,10 +17,6 @@ import {
   formatDimensionPreset,
   getAnchorPositions,
   getAnchorPositionLabel,
-  // Types
-  type DimensionPresetWithExamples,
-  type CharacterCountPresetWithExamples,
-  type AnchorPositionPreset,
 } from "@/lib/character-editor/presets";
 
 // ============================================================================

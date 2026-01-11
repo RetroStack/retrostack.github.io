@@ -41,42 +41,42 @@ export function SingleSelectDropdown<T extends string | number>({
   className = "",
   ariaLabel,
 }: SingleSelectDropdownProps<T>) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
 
   const handleSelect = useCallback(
     (selectedValue: T) => {
       onChange(selectedValue);
-      dropdown.close();
+      close();
     },
-    [onChange, dropdown]
+    [onChange, close]
   );
 
   const selectedOption = options.find((o) => o.value === value);
   const displayText = selectedOption?.label ?? placeholder ?? "";
 
   return (
-    <div className={`relative ${className}`} ref={dropdown.ref}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       {/* Trigger button */}
       <button
         type="button"
-        onClick={dropdown.toggle}
+        onClick={toggle}
         className={`
           flex items-center justify-between gap-2 w-full px-3 py-1.5
           bg-retro-navy/50 border rounded text-sm text-left
           transition-colors
-          ${dropdown.isOpen
+          ${isOpen
             ? "border-retro-cyan"
             : "border-retro-grid/50 hover:border-retro-grid"
           }
           ${selectedOption ? "text-gray-200" : "text-gray-400"}
         `}
-        aria-expanded={dropdown.isOpen}
+        aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={ariaLabel}
       >
         <span className="truncate">{displayText}</span>
         <svg
-          className={`w-4 h-4 flex-shrink-0 transition-transform ${dropdown.isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -86,7 +86,7 @@ export function SingleSelectDropdown<T extends string | number>({
       </button>
 
       {/* Dropdown */}
-      {dropdown.isOpen && (
+      {isOpen && (
         <div
           className="absolute z-50 w-full mt-1 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl overflow-hidden"
           role="listbox"

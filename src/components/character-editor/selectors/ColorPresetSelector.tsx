@@ -46,17 +46,18 @@ export function ColorPresetSelector({
   className = "",
   dropUp = false,
 }: ColorPresetSelectorProps) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
   const [selectedPresetId, setSelectedPresetId] = useState(() => getSavedPresetId());
   const [customColors, setCustomColors] = useState<CustomColors>(() => getCustomColors());
   const [showCustomPicker, setShowCustomPicker] = useState(false);
 
   // Reset custom picker view when dropdown closes
   useEffect(() => {
-    if (!dropdown.isOpen) {
+    if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: reset state when dropdown closes
       setShowCustomPicker(false);
     }
-  }, [dropdown.isOpen]);
+  }, [isOpen]);
 
   const handlePresetSelect = useCallback(
     (preset: ColorPreset) => {
@@ -72,9 +73,9 @@ export function ColorPresetSelector({
         background: preset.background,
         gridColor: preset.gridColor,
       });
-      dropdown.close();
+      close();
     },
-    [onColorsChange, dropdown]
+    [onColorsChange, close]
   );
 
   const handleCustomColorChange = useCallback(
@@ -93,14 +94,14 @@ export function ColorPresetSelector({
   const displayName = currentPreset?.name || "Custom";
 
   return (
-    <div className={`relative ${className}`} ref={dropdown.ref}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       {/* Trigger button */}
       <button
-        onClick={dropdown.toggle}
+        onClick={toggle}
         className={`flex items-center gap-2 px-3 py-1.5 bg-retro-navy/50 border rounded text-sm text-gray-200 transition-colors ${
-          dropdown.isOpen ? "border-retro-cyan" : "border-retro-grid/50 hover:border-retro-grid"
+          isOpen ? "border-retro-cyan" : "border-retro-grid/50 hover:border-retro-grid"
         }`}
-        aria-expanded={dropdown.isOpen}
+        aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
         {/* Color preview */}
@@ -116,7 +117,7 @@ export function ColorPresetSelector({
         </div>
         <span className="hidden sm:inline">{displayName}</span>
         <svg
-          className={`w-3 h-3 transition-transform ${dropdown.isOpen ? "rotate-180" : ""}`}
+          className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -131,7 +132,7 @@ export function ColorPresetSelector({
       </button>
 
       {/* Dropdown */}
-      {dropdown.isOpen && (
+      {isOpen && (
         <div className={`absolute right-0 w-64 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl z-50 overflow-hidden ${dropUp ? "bottom-full mb-1" : "mt-1"}`}>
           {showCustomPicker ? (
             <div className="p-3 space-y-3">

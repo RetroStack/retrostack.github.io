@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { TextImportView } from "./TextImportView";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function TextImportPage() {
-  return <TextImportView />;
+  return (
+    <Suspense fallback={null}>
+      <TextImportView />
+    </Suspense>
+  );
 }

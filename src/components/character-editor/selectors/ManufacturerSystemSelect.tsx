@@ -52,7 +52,7 @@ export function ManufacturerSystemSelect({
   disabled = false,
   className = "",
 }: ManufacturerSystemSelectProps) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
 
   // Sort manufacturers alphabetically
   const sortedManufacturers = useMemo(() => {
@@ -62,19 +62,19 @@ export function ManufacturerSystemSelect({
   const handleManufacturerClick = (mfr: string) => {
     onManufacturerChange(mfr);
     onSystemChange("");
-    dropdown.close();
+    close();
   };
 
   const handleSystemClick = (mfr: string, sys: string) => {
     onManufacturerChange(mfr);
     onSystemChange(sys);
-    dropdown.close();
+    close();
   };
 
   const handleClear = () => {
     onManufacturerChange("");
     onSystemChange("");
-    dropdown.close();
+    close();
   };
 
   return (
@@ -100,11 +100,11 @@ export function ManufacturerSystemSelect({
       />
 
       {/* Picker dropdown */}
-      <div ref={dropdown.ref} className="relative flex-shrink-0">
-        <Picker3DButton onClick={dropdown.toggle} disabled={disabled} title="Select manufacturer and system" />
+      <div ref={dropdownRef} className="relative flex-shrink-0">
+        <Picker3DButton onClick={toggle} disabled={disabled} title="Select manufacturer and system" />
 
         {/* Dropdown panel */}
-        {dropdown.isOpen && (
+        {isOpen && (
           <DropdownPanel>
             {/* Clear option */}
             {(manufacturer || system) && <DropdownClearButton onClick={handleClear} />}

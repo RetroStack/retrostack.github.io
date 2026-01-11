@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { ImageImportView } from "./ImageImportView";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ImageImportPage() {
-  return <ImageImportView />;
+  return (
+    <Suspense fallback={null}>
+      <ImageImportView />
+    </Suspense>
+  );
 }

@@ -64,7 +64,8 @@ export function ImageImportView() {
   const [step, setStep] = useState<WizardStep>(1);
 
   // Step 1: File state
-  const [file, setFile] = useState<File | null>(null);
+  // Note: file state is tracked for potential future use (e.g., displaying filename)
+  const [, setFile] = useState<File | null>(null);
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -923,7 +924,7 @@ export function ImageImportView() {
                             <p className="text-[10px] text-gray-300">{getPickerInstruction()}</p>
                             {picker.points.length > 0 && (
                               <div className="mt-2 text-[10px] text-gray-400">
-                                Points: {picker.points.map((p, i) => `(${p.x}, ${p.y})`).join(" → ")}
+                                Points: {picker.points.map((p) => `(${p.x}, ${p.y})`).join(" → ")}
                               </div>
                             )}
                           </div>

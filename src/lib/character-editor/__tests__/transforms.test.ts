@@ -49,7 +49,9 @@ function charFromPattern(pattern: string): Character {
 
 /**
  * Convert a character to a visual pattern string for debugging
+ * Kept for debugging purposes - can be used in console.log
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function charToPattern(char: Character): string {
   return char.pixels
     .map((row) => row.map((p) => (p ? "#" : ".")).join(""))
@@ -151,7 +153,7 @@ describe("rotateCharacter", () => {
     it("is opposite of rotate right", () => {
       const input = createMockCharacter(8, 8, "checkerboard");
       const rotatedRight = rotateCharacter(input, "right");
-      const rotatedLeft = rotateCharacter(input, "left");
+      // We only need to verify rightThenLeft returns to original
       const rightThenLeft = rotateCharacter(rotatedRight, "left");
       expect(charactersEqual(rightThenLeft, input)).toBe(true);
     });

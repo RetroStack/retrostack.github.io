@@ -49,7 +49,7 @@ import {
   charactersEqual,
   characterArraysEqual,
 } from "@/lib/character-editor/__tests__/testUtils";
-import type { Character, CharacterSet, CharacterSetConfig } from "@/lib/character-editor/types";
+import type { CharacterSet } from "@/lib/character-editor/types";
 
 // ============================================================================
 // Binary Round-Trip Tests

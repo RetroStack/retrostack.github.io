@@ -80,11 +80,14 @@ export function SelectionModeBar({
   totalItems,
   onSelectAll,
   onClearSelection,
-  onExitMode,
+  onExitMode: _onExitMode,
   actions = [],
   fixed = false,
   className = "",
 }: SelectionModeBarProps) {
+  // Reserved for future use - part of the interface
+  void _onExitMode;
+
   if (!isVisible) return null;
 
   const allSelected = selectionCount >= totalItems;

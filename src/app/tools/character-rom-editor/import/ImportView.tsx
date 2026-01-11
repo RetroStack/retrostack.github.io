@@ -86,7 +86,8 @@ export function ImportView() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // State for imported characters from image (bypasses file parsing)
-  const [importedCharacters, setImportedCharacters] = useState<Character[] | null>(null);
+  // Note: setImportedCharacters is available for future use when image import is integrated
+  const [importedCharacters] = useState<Character[] | null>(null);
 
   // Parse characters from file data (or use imported characters)
   const characters = useMemo(() => {

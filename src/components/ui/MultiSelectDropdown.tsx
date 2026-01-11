@@ -49,7 +49,7 @@ export function MultiSelectDropdown<T extends string | number>({
   showAllOption = true,
   allOptionLabel = "All",
 }: MultiSelectDropdownProps<T>) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle } = useDropdown<HTMLDivElement>();
 
   const toggleOption = useCallback(
     (value: T) => {
@@ -82,29 +82,29 @@ export function MultiSelectDropdown<T extends string | number>({
   const hasSelection = selected.length > 0;
 
   return (
-    <div className={`relative ${className}`} ref={dropdown.ref}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       {/* Trigger button */}
       <button
         type="button"
-        onClick={dropdown.toggle}
+        onClick={toggle}
         className={`
           flex items-center justify-between gap-2 w-full px-3 py-1.5
           bg-retro-navy/50 border rounded text-sm text-left
           transition-colors
-          ${dropdown.isOpen
+          ${isOpen
             ? "border-retro-cyan"
             : "border-retro-grid/50 hover:border-retro-grid"
           }
           ${hasSelection ? "text-gray-200" : "text-gray-400"}
         `}
-        aria-expanded={dropdown.isOpen}
+        aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
         <span className="truncate">
           {hasSelection ? `${label} (${selected.length})` : placeholder}
         </span>
         <svg
-          className={`w-4 h-4 flex-shrink-0 transition-transform ${dropdown.isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -138,7 +138,7 @@ export function MultiSelectDropdown<T extends string | number>({
       )}
 
       {/* Dropdown */}
-      {dropdown.isOpen && (
+      {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl overflow-hidden">
           <div className="max-h-60 overflow-y-auto py-1">
             {/* All option */}

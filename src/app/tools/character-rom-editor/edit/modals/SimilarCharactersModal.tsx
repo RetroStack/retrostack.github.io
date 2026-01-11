@@ -55,9 +55,10 @@ export function SimilarCharactersModal({
   const [calculating, setCalculating] = useState(false);
   const [similarities, setSimilarities] = useState<CharacterSetSimilarity[]>([]);
 
-  // Reset state when modal closes
+  // Reset state when modal closes - intentional state sync with prop
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: reset state when modal closes
       setSelectedSetId(null);
     }
   }, [isOpen]);
@@ -68,10 +69,11 @@ export function SimilarCharactersModal({
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional: show loading state before async calculation
     setCalculating(true);
 
     // Use requestAnimationFrame to avoid blocking the UI
-    requestAnimationFrame(() => {
+    const frameId = requestAnimationFrame(() => {
       const results = calculateSimilarities(
         currentCharacters,
         currentConfig,
@@ -81,6 +83,8 @@ export function SimilarCharactersModal({
       setSimilarities(results);
       setCalculating(false);
     });
+
+    return () => cancelAnimationFrame(frameId);
   }, [isOpen, loading, characterSets, currentCharacters, currentConfig, excludeId]);
 
   // Get the selected similarity result

@@ -65,14 +65,18 @@ export function EditorSidebar({
   onSelect,
   onAddCharacter,
   onDeleteSelected,
-  onSelectAll,
-  onSelectNone,
+  onSelectAll: _onSelectAll,
+  onSelectNone: _onSelectNone,
   onContextMenu,
   showAddButton = true,
   foregroundColor = "#ffffff",
   backgroundColor = "#000000",
   className = "",
 }: EditorSidebarProps) {
+  // These props are part of the interface but not used in this component
+  void _onSelectAll;
+  void _onSelectNone;
+
   const totalSelected = batchSelection.size + 1;
   const hasMultipleSelected = totalSelected > 1;
   const [gridCollapsed, setGridCollapsed] = useState(false);

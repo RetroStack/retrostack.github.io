@@ -32,9 +32,6 @@ import {
   PAGE_SIZE_OPTIONS,
   DEFAULT_PAGE_SIZE,
   type LibraryFilterState,
-  type SortField,
-  type SortDirection,
-  type PageSize,
 } from "@/lib/character-editor/library/filters";
 
 import {

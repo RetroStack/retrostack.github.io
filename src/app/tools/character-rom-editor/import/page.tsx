@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { ImportHubView } from "./ImportHubView";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ImportPage() {
-  return <ImportHubView />;
+  return (
+    <Suspense fallback={null}>
+      <ImportHubView />
+    </Suspense>
+  );
 }

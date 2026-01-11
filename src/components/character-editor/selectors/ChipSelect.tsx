@@ -58,7 +58,7 @@ function getChipsByManufacturer(): Record<string, RomChipInfo[]> {
  * Display chip as editable input with a picker dropdown
  */
 export function ChipSelect({ chip, onChipChange, system, disabled = false, className = "" }: ChipSelectProps) {
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
 
   // Get chips grouped by manufacturer, sorted alphabetically
   const chipsByManufacturer = useMemo(() => {
@@ -76,12 +76,12 @@ export function ChipSelect({ chip, onChipChange, system, disabled = false, class
 
   const handleChipClick = (partNumber: string, chipManufacturer: string) => {
     onChipChange(`${chipManufacturer} ${partNumber}`);
-    dropdown.close();
+    close();
   };
 
   const handleClear = () => {
     onChipChange("");
-    dropdown.close();
+    close();
   };
 
   const isSelected = (partNumber: string, chipManufacturer: string) =>
@@ -100,11 +100,11 @@ export function ChipSelect({ chip, onChipChange, system, disabled = false, class
       />
 
       {/* Picker dropdown */}
-      <div ref={dropdown.ref} className="relative flex-shrink-0">
-        <Picker3DButton onClick={dropdown.toggle} disabled={disabled} title="Select ROM chip" />
+      <div ref={dropdownRef} className="relative flex-shrink-0">
+        <Picker3DButton onClick={toggle} disabled={disabled} title="Select ROM chip" />
 
         {/* Dropdown panel */}
-        {dropdown.isOpen && (
+        {isOpen && (
           <DropdownPanel>
             {/* Clear option */}
             {chip && <DropdownClearButton onClick={handleClear} />}

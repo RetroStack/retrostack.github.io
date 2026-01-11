@@ -6,6 +6,16 @@ import {
   TextImportOptions,
   TextParseResult,
 } from "@/lib/character-editor/import/textImport";
+import { Character } from "@/lib/character-editor/types";
+
+/** Create a mock character with proper boolean[][] pixels */
+function createMockCharacter(width = 8, height = 8): Character {
+  return {
+    pixels: Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => false)
+    ),
+  };
+}
 
 describe("textImport", () => {
   describe("getDefaultTextImportOptions", () => {
@@ -443,7 +453,7 @@ describe("textImport", () => {
     it("returns success message with byte count and format", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
-        characters: [{ pixels: new Uint8ClampedArray(64) }],
+        characters: [createMockCharacter()],
         config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
         detectedFormat: "hex",
         invalidCount: 0,
@@ -459,7 +469,7 @@ describe("textImport", () => {
     it("pluralizes characters correctly", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array(16),
-        characters: [{ pixels: new Uint8ClampedArray(64) }, { pixels: new Uint8ClampedArray(64) }],
+        characters: [createMockCharacter(), createMockCharacter()],
         config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
         detectedFormat: "decimal",
         invalidCount: 0,
@@ -473,7 +483,7 @@ describe("textImport", () => {
     it("includes invalid count when present", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
-        characters: [{ pixels: new Uint8ClampedArray(64) }],
+        characters: [createMockCharacter()],
         config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
         detectedFormat: "hex",
         invalidCount: 3,
@@ -487,7 +497,7 @@ describe("textImport", () => {
     it("pluralizes invalid values correctly for single value", () => {
       const result: TextParseResult = {
         bytes: new Uint8Array([0, 126, 66, 66, 126, 0, 0, 0]),
-        characters: [{ pixels: new Uint8ClampedArray(64) }],
+        characters: [createMockCharacter()],
         config: { width: 8, height: 8, padding: "right", bitDirection: "ltr" },
         detectedFormat: "hex",
         invalidCount: 1,

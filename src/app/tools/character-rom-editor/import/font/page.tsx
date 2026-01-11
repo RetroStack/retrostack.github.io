@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { FontImportView } from "./FontImportView";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function FontImportPage() {
-  return <FontImportView />;
+  return (
+    <Suspense fallback={null}>
+      <FontImportView />
+    </Suspense>
+  );
 }

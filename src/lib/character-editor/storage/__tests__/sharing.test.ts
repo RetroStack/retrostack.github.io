@@ -23,7 +23,7 @@ import {
   createMockCharacters,
   createMockConfig,
 } from "../../__tests__/testUtils";
-import type { Character, CharacterSetConfig } from "../../types";
+import type { CharacterSetConfig } from "../../types";
 
 // ============================================================================
 // Encode/Decode Round-trip Tests

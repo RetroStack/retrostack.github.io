@@ -18,7 +18,7 @@
 
 import { useRef, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useDropdown } from "@/hooks/useDropdown";
-import { DropdownChipButton, DropdownGroup, DropdownSectionHeader } from "@/components/ui/DropdownPrimitives";
+// Re-exported at the bottom of this file for backward compatibility
 
 const BUTTON_WIDTH = 48; // Approximate width of a preset button
 const DROPDOWN_BUTTON_WIDTH = 56; // Width of "More" button
@@ -75,7 +75,7 @@ export function AdaptivePresetSelector<T extends BasePreset>({
 }: AdaptivePresetSelectorProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(presets.length);
-  const dropdown = useDropdown<HTMLDivElement>();
+  const { ref: dropdownRef, isOpen, toggle, close } = useDropdown<HTMLDivElement>();
 
   // Sort presets by priority (highest first) for determining which to show
   const sortedByPriority = [...presets].sort((a, b) => b.priority - a.priority);
@@ -110,9 +110,9 @@ export function AdaptivePresetSelector<T extends BasePreset>({
   const handleSelect = useCallback(
     (preset: T) => {
       onSelect(preset);
-      dropdown.close();
+      close();
     },
-    [onSelect, dropdown]
+    [onSelect, close]
   );
 
   // Determine which presets are visible vs in dropdown based on priority
@@ -159,16 +159,16 @@ export function AdaptivePresetSelector<T extends BasePreset>({
         ))}
 
         {/* Dropdown toggle - always shown */}
-        <div ref={dropdown.ref} className="relative">
+        <div ref={dropdownRef} className="relative">
           <button
             type="button"
-            onClick={dropdown.toggle}
+            onClick={toggle}
             disabled={disabled}
             className="px-3 py-1 text-xs rounded text-retro-cyan bg-gradient-to-b from-gray-600/50 to-gray-700/50 border border-retro-cyan/50 border-t-retro-cyan/70 hover:from-gray-500/50 hover:to-gray-600/50 hover:border-retro-cyan active:from-gray-700/50 active:to-gray-800/50 shadow-md shadow-black/30 active:shadow-sm flex items-center gap-1 transition-all disabled:opacity-50"
           >
             More
             <svg
-              className={`w-3 h-3 transition-transform ${dropdown.isOpen ? "rotate-180" : ""}`}
+              className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -183,7 +183,7 @@ export function AdaptivePresetSelector<T extends BasePreset>({
           </button>
 
           {/* Dropdown panel */}
-          {dropdown.isOpen && (
+          {isOpen && (
             <div className="absolute z-50 left-0 top-full mt-1 w-72 max-h-96 overflow-y-auto bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl">
               {/* Overflow presets section */}
               {overflowPresets.length > 0 && (
@@ -216,7 +216,7 @@ export function AdaptivePresetSelector<T extends BasePreset>({
               )}
 
               {/* Custom dropdown sections */}
-              {renderDropdownSections?.(dropdown.close)}
+              {renderDropdownSections?.(close)}
             </div>
           )}
         </div>

@@ -12,12 +12,13 @@ import {
  * Mock ImageData class for testing browser-dependent functions
  */
 class MockImageData implements ImageData {
-  data: Uint8ClampedArray;
+  // Use explicit ArrayBuffer generic to match ImageData interface
+  data: Uint8ClampedArray<ArrayBuffer>;
   width: number;
   height: number;
   colorSpace: PredefinedColorSpace = "srgb";
 
-  constructor(width: number, height: number, data?: Uint8ClampedArray) {
+  constructor(width: number, height: number, data?: Uint8ClampedArray<ArrayBuffer>) {
     this.width = width;
     this.height = height;
     this.data = data ?? new Uint8ClampedArray(width * height * 4);
@@ -135,6 +136,8 @@ describe("imageImport", () => {
         maxCharacters: 256,
         pixelWidth: 1,
         pixelHeight: 1,
+        readingOrder: "ltr-ttb",
+        rotation: 0,
       });
     });
 
