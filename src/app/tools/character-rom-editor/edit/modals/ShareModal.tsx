@@ -96,8 +96,8 @@ export function ShareModal({
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const scale = 2; // 2x for higher resolution
-      canvas.width = 160 * scale;
-      canvas.height = 160 * scale;
+      canvas.width = 240 * scale;
+      canvas.height = 240 * scale;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
@@ -232,34 +232,31 @@ export function ShareModal({
           {/* QR Code */}
           {canShowQR && (
             <div className="mb-4 p-4 bg-retro-dark/30 rounded border border-retro-grid/20">
-              <div className="flex items-center gap-4">
-                <div className="bg-white p-2 rounded">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-white p-3 rounded-lg shadow-lg">
                   <QRCodeSVG
                     ref={qrRef}
                     value={shareUrl}
-                    size={128}
+                    size={240}
                     bgColor="#ffffff"
                     fgColor="#0a0a1a"
                     level="M"
                   />
                 </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-medium text-white mb-1">QR Code</h4>
-                  <p className="text-xs text-gray-400 mb-3">
-                    Scan with your phone to open the character set
-                  </p>
-                  <Button
-                    onClick={handleDownloadQR}
-                    variant="ghost"
-                    size="sm"
-                    className="text-retro-cyan hover:text-retro-cyan/80"
-                  >
-                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download QR
-                  </Button>
-                </div>
+                <p className="text-xs text-gray-400 mt-3 mb-2">
+                  Scan with your phone to open the character set
+                </p>
+                <Button
+                  onClick={handleDownloadQR}
+                  variant="ghost"
+                  size="sm"
+                  className="text-retro-cyan hover:text-retro-cyan/80"
+                >
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download QR
+                </Button>
               </div>
             </div>
           )}
