@@ -1,13 +1,18 @@
 "use client";
 /* eslint-disable react-hooks/set-state-in-effect -- Modal state reset on open/close is intentional */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Modal, ModalHeader, ModalContent, ModalFooter } from "@/components/ui/Modal";
 import { Character, CharacterSetConfig } from "@/lib/character-editor/types";
-import { formatTimestamp } from "@/lib/character-editor/utils";
+import { formatTimestamp, findChangedCharacterIndices } from "@/lib/character-editor/utils";
 import { Snapshot } from "@/lib/character-editor/storage/snapshots";
 import { CharacterPreviewGrid } from "@/components/character-editor/character/CharacterGrid";
+import { CharacterDiffGridItem } from "@/components/character-editor/character/CharacterDiffGridItem";
+import { SelectionModeBar } from "@/components/ui/SelectionModeBar";
+import { useDragSelect } from "@/hooks/useDragSelect";
+
+type Step = "list" | "select-chars";
 
 export interface SnapshotsModalProps {
   isOpen: boolean;
@@ -25,7 +30,11 @@ export interface SnapshotsModalProps {
   onRestore: (snapshotId: string) => Promise<Character[] | null>;
   onDelete: (snapshotId: string) => Promise<boolean>;
   onRename: (snapshotId: string, newName: string) => Promise<boolean>;
-  onRestoreApply: (characters: Character[], snapshotName?: string) => void;
+  onRestoreApply: (
+    characters: Character[],
+    selectedIndices: Set<number>,
+    snapshotName?: string
+  ) => void;
 }
 
 /**
@@ -57,6 +66,13 @@ export function SnapshotsModal({
   const [editingName, setEditingName] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  // Selection step state
+  const [step, setStep] = useState<Step>("list");
+  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -71,8 +87,19 @@ export function SnapshotsModal({
       setPreviewCharacters(null);
       setEditingId(null);
       setConfirmDeleteId(null);
+      // Reset selection step state
+      setStep("list");
+      setSelectedIndices(new Set());
+      setIsSelectionMode(false);
+      setLastClickedIndex(null);
     }
   }, [isOpen]);
+
+  // Calculate changed character indices for diff highlighting
+  const changedIndices = useMemo(() => {
+    if (!previewCharacters) return new Set<number>();
+    return findChangedCharacterIndices(previewCharacters, currentCharacters);
+  }, [previewCharacters, currentCharacters]);
 
   // Handle save new snapshot
   const handleSave = useCallback(async () => {
@@ -111,14 +138,133 @@ export function SnapshotsModal({
     [selectedSnapshot, onRestore]
   );
 
-  // Handle restore
-  const handleRestore = useCallback(() => {
-    if (previewCharacters && selectedSnapshot) {
+  // Handle transition to selection step
+  const handleStartRestore = useCallback(() => {
+    if (previewCharacters) {
+      // Select all characters by default
+      setSelectedIndices(new Set(previewCharacters.map((_, i) => i)));
+      setIsSelectionMode(true);
+      setStep("select-chars");
+    }
+  }, [previewCharacters]);
+
+  // Handle back to list
+  const handleBackToList = useCallback(() => {
+    setStep("list");
+    setSelectedIndices(new Set());
+    setIsSelectionMode(false);
+    setLastClickedIndex(null);
+  }, []);
+
+  // Handle final restore with selected characters
+  const handleConfirmRestore = useCallback(() => {
+    if (previewCharacters && selectedSnapshot && selectedIndices.size > 0) {
       const snapshot = snapshots.find((s) => s.id === selectedSnapshot);
-      onRestoreApply(previewCharacters, snapshot?.name);
+      onRestoreApply(previewCharacters, selectedIndices, snapshot?.name);
       onClose();
     }
-  }, [previewCharacters, selectedSnapshot, snapshots, onRestoreApply, onClose]);
+  }, [previewCharacters, selectedSnapshot, selectedIndices, snapshots, onRestoreApply, onClose]);
+
+  // Handle character selection click
+  const handleCharacterClick = useCallback(
+    (index: number, shiftKey: boolean, ctrlKey: boolean) => {
+      setSelectedIndices((prev) => {
+        const newSet = new Set(prev);
+
+        if (shiftKey && lastClickedIndex !== null) {
+          // Range selection
+          const start = Math.min(lastClickedIndex, index);
+          const end = Math.max(lastClickedIndex, index);
+          for (let i = start; i <= end; i++) {
+            newSet.add(i);
+          }
+        } else if (ctrlKey || isSelectionMode) {
+          // Toggle selection
+          if (newSet.has(index)) {
+            newSet.delete(index);
+          } else {
+            newSet.add(index);
+          }
+        } else {
+          // Single selection (not typical in this use case, but support it)
+          if (newSet.has(index)) {
+            newSet.delete(index);
+          } else {
+            newSet.add(index);
+          }
+        }
+
+        return newSet;
+      });
+      setLastClickedIndex(index);
+    },
+    [lastClickedIndex, isSelectionMode]
+  );
+
+  // Handle long press to enter selection mode
+  const handleLongPress = useCallback((index: number) => {
+    setIsSelectionMode(true);
+    setSelectedIndices((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(index);
+      return newSet;
+    });
+  }, []);
+
+  // Handle select all
+  const handleSelectAll = useCallback(() => {
+    if (previewCharacters) {
+      setSelectedIndices(new Set(previewCharacters.map((_, i) => i)));
+    }
+  }, [previewCharacters]);
+
+  // Handle clear selection
+  const handleClearSelection = useCallback(() => {
+    setSelectedIndices(new Set());
+  }, []);
+
+  // Handle exit selection mode
+  const handleExitSelectionMode = useCallback(() => {
+    setIsSelectionMode(false);
+  }, []);
+
+  // Get index from point for drag select
+  const getIndexFromPoint = useCallback(
+    (clientX: number, clientY: number): number | null => {
+      const element = document.elementFromPoint(clientX, clientY);
+      if (!element) return null;
+
+      // Find the closest element with data-grid-index
+      const gridItem = element.closest("[data-grid-index]");
+      if (!gridItem) return null;
+
+      const indexStr = gridItem.getAttribute("data-grid-index");
+      if (!indexStr) return null;
+
+      return parseInt(indexStr, 10);
+    },
+    []
+  );
+
+  // Toggle selection for drag select
+  const handleDragToggle = useCallback((index: number) => {
+    setSelectedIndices((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Drag select hook
+  const dragSelect = useDragSelect({
+    enabled: isSelectionMode,
+    onItemTouched: handleDragToggle,
+    getIndexFromPoint,
+  });
 
   // Handle delete
   const handleDelete = useCallback(
@@ -149,16 +295,22 @@ export function SnapshotsModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="4xl" maxHeight="90vh">
-      <ModalHeader onClose={onClose} showCloseButton>
+      <ModalHeader onClose={step === "list" ? onClose : handleBackToList} showCloseButton>
         <div>
-          <h2 className="text-lg font-medium text-white">Snapshots</h2>
+          <h2 className="text-lg font-medium text-white">
+            {step === "list" ? "Snapshots" : "Select Characters"}
+          </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Save and restore character set states ({snapshots.length}/{maxSnapshots})
+            {step === "list"
+              ? `Save and restore character set states (${snapshots.length}/${maxSnapshots})`
+              : `Choose which characters to restore from "${snapshots.find((s) => s.id === selectedSnapshot)?.name || "snapshot"}"`}
           </p>
         </div>
       </ModalHeader>
 
-      <ModalContent className="p-0 flex-1 overflow-hidden flex flex-col md:flex-row">
+      <ModalContent className="p-0 flex-1 overflow-hidden flex flex-col">
+        {step === "list" ? (
+          <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
           {/* Snapshots list */}
           <div className="flex-1 overflow-y-auto p-4 border-r border-retro-grid/30">
             {/* New snapshot form */}
@@ -353,12 +505,12 @@ export function SnapshotsModal({
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleRestore} variant="cyan" size="sm" className="flex-1">
+                  <Button onClick={handleStartRestore} variant="cyan" size="sm" className="flex-1">
                     Restore This Snapshot
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  This will replace your current work
+                  Click to select characters to restore
                 </p>
               </>
             ) : (
@@ -388,27 +540,127 @@ export function SnapshotsModal({
               </div>
             )}
           </div>
-      </ModalContent>
+          </div>
+        ) : (
+          /* Selection step */
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            {/* Header */}
+            <div className="p-4 border-b border-retro-grid/30 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-white">
+                  Select Characters to Restore
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {selectedIndices.size} of {previewCharacters?.length || 0} selected
+                  {changedIndices.size > 0 && (
+                    <span className="ml-2 text-amber-500">
+                      ({changedIndices.size} changed)
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSelectAll}
+                  className="px-2 py-1 text-xs text-gray-400 hover:text-retro-cyan transition-colors"
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={handleClearSelection}
+                  className="px-2 py-1 text-xs text-gray-400 hover:text-retro-pink transition-colors"
+                >
+                  Select None
+                </button>
+              </div>
+            </div>
 
-      <ModalFooter className="bg-retro-dark/30">
-        <div className="flex items-center gap-4">
-          <div>
-            <h4 className="text-xs text-gray-400 mb-1">Current State</h4>
-            <CharacterPreviewGrid
-              characters={currentCharacters.slice(0, 16)}
-              config={currentConfig}
-              foregroundColor={foregroundColor}
-              backgroundColor={backgroundColor}
-              smallScale={2}
-              maxCharacters={16}
+            {/* Character grid */}
+            <div
+              ref={gridRef}
+              className="flex-1 overflow-auto p-4"
+              onTouchStart={dragSelect.onTouchStart}
+              onTouchMove={dragSelect.onTouchMove}
+              onTouchEnd={dragSelect.onTouchEnd}
+              onMouseDown={dragSelect.onMouseDown}
+              onMouseMove={dragSelect.onMouseMove}
+              onMouseUp={dragSelect.onMouseUp}
+              onClickCapture={dragSelect.onClickCapture}
+            >
+              <div
+                className="grid gap-2"
+                style={{
+                  gridTemplateColumns: `repeat(auto-fill, minmax(${(currentConfig.width * 3) + 8}px, max-content))`,
+                }}
+              >
+                {previewCharacters?.map((char, index) => (
+                  <CharacterDiffGridItem
+                    key={index}
+                    character={char}
+                    comparisonCharacter={currentCharacters[index]}
+                    index={index}
+                    isSelected={selectedIndices.has(index)}
+                    isSelectionMode={isSelectionMode}
+                    onClick={handleCharacterClick}
+                    onLongPress={handleLongPress}
+                    scale={3}
+                    foregroundColor={foregroundColor}
+                    backgroundColor={backgroundColor}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Footer with actions */}
+            <div className="p-4 border-t border-retro-grid/30 flex items-center justify-between bg-retro-dark/50">
+              <Button onClick={handleBackToList} variant="ghost" size="sm">
+                Back
+              </Button>
+              <Button
+                onClick={handleConfirmRestore}
+                variant="cyan"
+                size="sm"
+                disabled={selectedIndices.size === 0}
+              >
+                Restore {selectedIndices.size} Character{selectedIndices.size !== 1 ? "s" : ""}
+              </Button>
+            </div>
+
+            {/* Selection mode bar */}
+            <SelectionModeBar
+              isVisible={isSelectionMode}
+              selectionCount={selectedIndices.size}
+              totalItems={previewCharacters?.length || 0}
+              onSelectAll={handleSelectAll}
+              onClearSelection={handleClearSelection}
+              onExitMode={handleExitSelectionMode}
+              fixed={false}
             />
           </div>
-          <div className="text-xs text-gray-500">
-            <p>{currentCharacters.length} characters</p>
-            <p>{currentConfig.width}x{currentConfig.height} px</p>
+        )}
+      </ModalContent>
+
+      {step === "list" && (
+        <ModalFooter className="bg-retro-dark/30">
+          <div className="flex items-center gap-4">
+            <div>
+              <h4 className="text-xs text-gray-400 mb-1">Current State</h4>
+              <CharacterPreviewGrid
+                characters={currentCharacters.slice(0, 16)}
+                config={currentConfig}
+                foregroundColor={foregroundColor}
+                backgroundColor={backgroundColor}
+                smallScale={2}
+                maxCharacters={16}
+              />
+            </div>
+            <div className="text-xs text-gray-500">
+              <p>{currentCharacters.length} characters</p>
+              <p>{currentConfig.width}x{currentConfig.height} px</p>
+            </div>
           </div>
-        </div>
-      </ModalFooter>
+        </ModalFooter>
+      )}
     </Modal>
   );
 }

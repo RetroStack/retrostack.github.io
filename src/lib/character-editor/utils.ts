@@ -14,7 +14,7 @@
  * easy to test and reuse across components and hooks.
  */
 
-import { CharacterSetConfig } from "./types";
+import { Character, CharacterSetConfig } from "./types";
 
 /**
  * Format file size for display
@@ -166,4 +166,85 @@ export function formatTimestamp(timestamp: number): string {
   } else {
     return date.toLocaleDateString();
   }
+}
+
+/**
+ * Compare two characters pixel-by-pixel
+ *
+ * @param a - First character
+ * @param b - Second character
+ * @returns true if characters are identical (same dimensions and pixel values)
+ */
+export function areCharactersEqual(a: Character, b: Character): boolean {
+  // Check dimensions first
+  if (a.pixels.length !== b.pixels.length) return false;
+  if (a.pixels.length === 0) return true;
+  if (a.pixels[0].length !== b.pixels[0].length) return false;
+
+  // Compare each pixel
+  for (let row = 0; row < a.pixels.length; row++) {
+    for (let col = 0; col < a.pixels[0].length; col++) {
+      if (a.pixels[row][col] !== b.pixels[row][col]) return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Find indices of characters that differ between two character arrays
+ *
+ * @param source - Source character array (e.g., from snapshot)
+ * @param target - Target character array (e.g., current state)
+ * @returns Set of indices where characters differ
+ */
+export function findChangedCharacterIndices(
+  source: Character[],
+  target: Character[]
+): Set<number> {
+  const changed = new Set<number>();
+  const maxLength = Math.max(source.length, target.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    // If index doesn't exist in one array, it's changed
+    if (i >= source.length || i >= target.length) {
+      changed.add(i);
+    } else if (!areCharactersEqual(source[i], target[i])) {
+      changed.add(i);
+    }
+  }
+  return changed;
+}
+
+/**
+ * Find pixels that differ between two characters
+ *
+ * @param charA - First character (e.g., from snapshot)
+ * @param charB - Second character (e.g., current state)
+ * @returns Set of "row,col" strings for pixels that differ
+ */
+export function findDifferingPixels(
+  charA: Character,
+  charB: Character
+): Set<string> {
+  const diffPixels = new Set<string>();
+
+  // Get max dimensions (handle different sized characters)
+  const maxRows = Math.max(charA.pixels.length, charB.pixels.length);
+  const maxCols = Math.max(
+    charA.pixels[0]?.length || 0,
+    charB.pixels[0]?.length || 0
+  );
+
+  for (let row = 0; row < maxRows; row++) {
+    for (let col = 0; col < maxCols; col++) {
+      const pixelA = charA.pixels[row]?.[col] ?? false;
+      const pixelB = charB.pixels[row]?.[col] ?? false;
+
+      if (pixelA !== pixelB) {
+        diffPixels.add(`${row},${col}`);
+      }
+    }
+  }
+
+  return diffPixels;
 }

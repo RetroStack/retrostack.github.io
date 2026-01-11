@@ -51,6 +51,10 @@ export interface PixelGridProps {
   mixedPixels?: Set<string>;
   /** Mixed pixel pattern color */
   mixedColor?: string;
+  /** Pixels that differ (for diff highlighting) - Set of "row,col" keys */
+  diffPixels?: Set<string>;
+  /** Color for diff pixels */
+  diffColor?: string;
 }
 
 /**
@@ -76,6 +80,8 @@ export function PixelGrid({
   interactive = true,
   mixedPixels,
   mixedColor = "#666666",
+  diffPixels,
+  diffColor = "#ff3333",
 }: PixelGridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -113,6 +119,7 @@ export function PixelGrid({
 
         const pixelKey = `${row},${col}`;
         const isMixed = mixedPixels?.has(pixelKey);
+        const isDiff = diffPixels?.has(pixelKey);
         const isOn = pixels[row]?.[col] || false;
 
         if (isMixed) {
@@ -124,6 +131,10 @@ export function PixelGrid({
           ctx.fillStyle = backgroundColor;
           ctx.fillRect(x + halfScale, y, scale - halfScale, halfScale);
           ctx.fillRect(x, y + halfScale, halfScale, scale - halfScale);
+        } else if (isDiff) {
+          // Highlight differing pixels in red
+          ctx.fillStyle = diffColor;
+          ctx.fillRect(x, y, scale, scale);
         } else {
           ctx.fillStyle = isOn ? foregroundColor : backgroundColor;
           ctx.fillRect(x, y, scale, scale);
@@ -144,6 +155,8 @@ export function PixelGrid({
     height,
     mixedPixels,
     mixedColor,
+    diffPixels,
+    diffColor,
   ]);
 
   // Convert canvas coordinates to pixel coordinates
