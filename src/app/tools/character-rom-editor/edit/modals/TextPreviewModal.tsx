@@ -269,7 +269,7 @@ export function TextPreviewModal({
             </div>
 
             {/* CRT Effects */}
-            <CRTEffectsPanel settings={crtSettings} onChange={handleCrtSettingsChange} defaultCollapsed={false} />
+            <CRTEffectsPanel settings={crtSettings} onChange={handleCrtSettingsChange} defaultCollapsed={true} />
           </div>
 
           {/* Right side - Preview */}
