@@ -15,12 +15,14 @@ import { DimensionPresetSelector } from "@/components/character-editor/selectors
 import { MetadataStep } from "@/components/character-editor/import/MetadataStep";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
+import { ByteOrderSelector } from "@/components/character-editor/selectors/ByteOrderSelector";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { useEditorReturn } from "@/hooks/character-editor/useEditorReturn";
 import {
   CharacterSetConfig,
   PaddingDirection,
   BitDirection,
+  ByteOrder,
   createDefaultConfig,
   generateId,
 } from "@/lib/character-editor/types";
@@ -168,6 +170,10 @@ export function BinaryImportView() {
 
   const handleBitDirectionChange = useCallback((bitDirection: BitDirection) => {
     setConfig((prev) => ({ ...prev, bitDirection }));
+  }, []);
+
+  const handleByteOrderChange = useCallback((byteOrder: ByteOrder) => {
+    setConfig((prev) => ({ ...prev, byteOrder }));
   }, []);
 
   const handlePresetClick = useCallback((width: number, height: number) => {
@@ -537,6 +543,22 @@ export function BinaryImportView() {
                       />
                     </div>
                   </div>
+
+                  {/* Byte order - only for multi-byte rows (width > 8) */}
+                  {config.width > 8 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">
+                        Byte Order
+                      </h3>
+                      <ByteOrderSelector
+                        value={config.byteOrder ?? "big"}
+                        onChange={handleByteOrderChange}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Controls byte arrangement in multi-byte rows
+                      </p>
+                    </div>
+                  )}
 
                   {/* Stats */}
                   {file && (

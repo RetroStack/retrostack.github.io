@@ -21,6 +21,8 @@ import {
  * Reverses the encoding from characterToBytes:
  * - MSB first (msb): pixel 0 from leftmost data position
  * - LSB first (lsb): pixel 0 from rightmost data position
+ * - Big-endian (big): Byte 0 = pixels 0-7, Byte 1 = pixels 8-15 (default)
+ * - Little-endian (little): Byte 0 = pixels 8-15, Byte 1 = pixels 0-7
  *
  * @param bytes - Raw binary data for one character
  * @param config - Character set configuration
@@ -30,7 +32,7 @@ export function bytesToCharacter(
   bytes: Uint8Array,
   config: CharacterSetConfig
 ): Character {
-  const { width, height, padding, bitDirection } = config;
+  const { width, height, padding, bitDirection, byteOrder = "big" } = config;
   const bpl = bytesPerLine(width);
   const pixels: boolean[][] = [];
 
@@ -39,10 +41,21 @@ export function bytesToCharacter(
     const totalBits = bpl * 8;
     const paddingBits = totalBits - width;
 
+    // Get row bytes
+    const rowBytes: number[] = [];
+    for (let byteIndex = 0; byteIndex < bpl; byteIndex++) {
+      rowBytes.push(bytes[rowStart + byteIndex] || 0);
+    }
+
+    // Reverse bytes for little-endian (only affects multi-byte rows)
+    if (byteOrder === "little" && bpl > 1) {
+      rowBytes.reverse();
+    }
+
     // Convert bytes to allBits (allBits[0] = bit 7 of byte 0, etc.)
     const allBits: boolean[] = [];
     for (let byteIndex = 0; byteIndex < bpl; byteIndex++) {
-      const byte = bytes[rowStart + byteIndex] || 0;
+      const byte = rowBytes[byteIndex];
       for (let bit = 0; bit < 8; bit++) {
         allBits.push((byte & (1 << (7 - bit))) !== 0);
       }
@@ -75,6 +88,10 @@ export function bytesToCharacter(
  * - MSB first (msb): pixel 0 at leftmost data position
  * - LSB first (lsb): pixel 0 at rightmost data position (pixels reversed)
  *
+ * Byte order affects multi-byte rows (width > 8):
+ * - Big-endian (big): Byte 0 = pixels 0-7, Byte 1 = pixels 8-15 (default)
+ * - Little-endian (little): Byte 0 = pixels 8-15, Byte 1 = pixels 0-7
+ *
  * Padding is then added on the specified side.
  *
  * Example for 7-bit data `0001110`:
@@ -91,7 +108,7 @@ export function characterToBytes(
   character: Character,
   config: CharacterSetConfig
 ): Uint8Array {
-  const { width, height, padding, bitDirection } = config;
+  const { width, height, padding, bitDirection, byteOrder = "big" } = config;
   const bpl = bytesPerLine(width);
   const bytes = new Uint8Array(height * bpl);
 
@@ -120,6 +137,7 @@ export function characterToBytes(
     }
 
     // Convert allBits to bytes (allBits[0] = bit 7 of byte 0, etc.)
+    const rowBytes: number[] = [];
     for (let byteIndex = 0; byteIndex < bpl; byteIndex++) {
       let byte = 0;
       for (let bit = 0; bit < 8; bit++) {
@@ -128,7 +146,17 @@ export function characterToBytes(
           byte |= 1 << (7 - bit);
         }
       }
-      bytes[row * bpl + byteIndex] = byte;
+      rowBytes.push(byte);
+    }
+
+    // Reverse bytes for little-endian (only affects multi-byte rows)
+    if (byteOrder === "little" && bpl > 1) {
+      rowBytes.reverse();
+    }
+
+    // Write row bytes to output
+    for (let byteIndex = 0; byteIndex < bpl; byteIndex++) {
+      bytes[row * bpl + byteIndex] = rowBytes[byteIndex];
     }
   }
 

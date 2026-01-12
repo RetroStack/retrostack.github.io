@@ -11,7 +11,7 @@
  * - Lookup maps for fast access by ID
  */
 
-import type { PaddingDirection, BitDirection } from "../types";
+import type { PaddingDirection, BitDirection, ByteOrder } from "../types";
 
 import {
   DATA,
@@ -470,6 +470,8 @@ export interface BinaryExportSystemPreset {
   padding: PaddingDirection;
   /** Bit order within bytes (msb = leftmost pixel is bit 7, lsb = leftmost pixel is bit 0) */
   bitDirection: BitDirection;
+  /** Byte order for multi-byte rows (width > 8). Defaults to "big". */
+  byteOrder?: ByteOrder;
 }
 
 /**
@@ -499,6 +501,7 @@ export const BINARY_EXPORT_SYSTEM_PRESETS: BinaryExportSystemPreset[] = COMPUTER
         year: s.year,
         padding: format.padding,
         bitDirection: format.bitOrder,
+        byteOrder: format.byteOrder,
       };
     }),
 ).sort((a, b) =>
@@ -628,6 +631,8 @@ export interface ChipBinaryExportPreset {
   padding: PaddingDirection;
   /** Bit order within bytes */
   bitDirection: BitDirection;
+  /** Byte order for multi-byte rows (width > 8). Defaults to "big". */
+  byteOrder?: ByteOrder;
 }
 
 /**
@@ -653,6 +658,7 @@ export const CHIP_BINARY_EXPORT_PRESETS: ChipBinaryExportPreset[] = CHIP_MANUFAC
       manufacturer: m.name,
       padding: chip.binaryFormat!.padding,
       bitDirection: chip.binaryFormat!.bitOrder,
+      byteOrder: chip.binaryFormat!.byteOrder,
     })),
 ).sort((a, b) => a.manufacturer.localeCompare(b.manufacturer) || a.partNumber.localeCompare(b.partNumber));
 

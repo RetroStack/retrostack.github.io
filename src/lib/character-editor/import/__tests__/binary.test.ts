@@ -248,6 +248,267 @@ describe("bytesToCharacter", () => {
 });
 
 // ============================================================================
+// Byte Order Tests (Multi-byte rows)
+// ============================================================================
+
+describe("bytesToCharacter with byte order", () => {
+  describe("16-bit wide characters", () => {
+    const config16Big = createMockConfig({
+      width: 16,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "big",
+    });
+    const config16Little = createMockConfig({
+      width: 16,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "little",
+    });
+
+    it("big-endian: byte 0 = leftmost pixels (0-7)", () => {
+      // Byte 0 = 0xFF (pixels 0-7 on), Byte 1 = 0x00 (pixels 8-15 off)
+      const bytes = new Uint8Array([0xff, 0x00]);
+      const character = bytesToCharacter(bytes, config16Big);
+
+      // First 8 pixels should be on, last 8 off
+      expect(character.pixels[0].slice(0, 8).every((p) => p === true)).toBe(true);
+      expect(character.pixels[0].slice(8, 16).every((p) => p === false)).toBe(true);
+    });
+
+    it("little-endian: byte 0 = rightmost pixels (8-15)", () => {
+      // Byte 0 = 0xFF (pixels 8-15), Byte 1 = 0x00 (pixels 0-7)
+      const bytes = new Uint8Array([0xff, 0x00]);
+      const character = bytesToCharacter(bytes, config16Little);
+
+      // First 8 pixels should be off, last 8 on (reversed byte order)
+      expect(character.pixels[0].slice(0, 8).every((p) => p === false)).toBe(true);
+      expect(character.pixels[0].slice(8, 16).every((p) => p === true)).toBe(true);
+    });
+
+    it("big-endian with alternating bytes", () => {
+      // Byte 0 = 0xAA, Byte 1 = 0x55
+      const bytes = new Uint8Array([0xaa, 0x55]);
+      const character = bytesToCharacter(bytes, config16Big);
+
+      // 0xAA = 10101010, 0x55 = 01010101
+      expect(character.pixels[0]).toEqual([
+        true, false, true, false, true, false, true, false, // 0xAA
+        false, true, false, true, false, true, false, true, // 0x55
+      ]);
+    });
+
+    it("little-endian with alternating bytes", () => {
+      // Byte 0 = 0xAA, Byte 1 = 0x55, but bytes are swapped
+      const bytes = new Uint8Array([0xaa, 0x55]);
+      const character = bytesToCharacter(bytes, config16Little);
+
+      // Bytes are reversed, so 0x55 first, then 0xAA
+      expect(character.pixels[0]).toEqual([
+        false, true, false, true, false, true, false, true, // 0x55
+        true, false, true, false, true, false, true, false, // 0xAA
+      ]);
+    });
+  });
+
+  describe("8-bit wide characters (byte order has no effect)", () => {
+    const config8Big = createMockConfig({
+      width: 8,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "big",
+    });
+    const config8Little = createMockConfig({
+      width: 8,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "little",
+    });
+
+    it("byte order does not affect 8-bit wide characters", () => {
+      const bytes = new Uint8Array([0xaa]);
+      const charBig = bytesToCharacter(bytes, config8Big);
+      const charLittle = bytesToCharacter(bytes, config8Little);
+
+      // Should be identical since there's only one byte per row
+      expect(charactersEqual(charBig, charLittle)).toBe(true);
+    });
+  });
+
+  describe("defaults to big-endian when byteOrder is undefined", () => {
+    it("treats undefined byteOrder as big-endian", () => {
+      const configNoByteOrder = createMockConfig({
+        width: 16,
+        height: 1,
+        bitDirection: "msb",
+        padding: "right",
+      });
+      // Explicitly remove byteOrder to simulate old config
+      delete (configNoByteOrder as Partial<CharacterSetConfig>).byteOrder;
+
+      const configBig = createMockConfig({
+        width: 16,
+        height: 1,
+        bitDirection: "msb",
+        padding: "right",
+        byteOrder: "big",
+      });
+
+      const bytes = new Uint8Array([0xff, 0x00]);
+      const charNoByteOrder = bytesToCharacter(bytes, configNoByteOrder);
+      const charBig = bytesToCharacter(bytes, configBig);
+
+      expect(charactersEqual(charNoByteOrder, charBig)).toBe(true);
+    });
+  });
+});
+
+describe("characterToBytes with byte order", () => {
+  describe("16-bit wide characters", () => {
+    const config16Big = createMockConfig({
+      width: 16,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "big",
+    });
+    const config16Little = createMockConfig({
+      width: 16,
+      height: 1,
+      bitDirection: "msb",
+      padding: "right",
+      byteOrder: "little",
+    });
+
+    it("big-endian: outputs byte 0 = leftmost pixels", () => {
+      // First 8 pixels on, last 8 off
+      const pixels = [
+        [true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false],
+      ];
+      const character: Character = { pixels };
+      const bytes = characterToBytes(character, config16Big);
+
+      expect(bytes[0]).toBe(0xff); // pixels 0-7
+      expect(bytes[1]).toBe(0x00); // pixels 8-15
+    });
+
+    it("little-endian: outputs byte 0 = rightmost pixels", () => {
+      // First 8 pixels on, last 8 off
+      const pixels = [
+        [true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false],
+      ];
+      const character: Character = { pixels };
+      const bytes = characterToBytes(character, config16Little);
+
+      // Bytes are reversed in output
+      expect(bytes[0]).toBe(0x00); // pixels 8-15 (reversed to position 0)
+      expect(bytes[1]).toBe(0xff); // pixels 0-7 (reversed to position 1)
+    });
+
+    it("big-endian and little-endian produce different byte output", () => {
+      const character = createMockCharacter(16, 8, "checkerboard");
+      const bytesBig = characterToBytes(character, config16Big);
+      const bytesLittle = characterToBytes(character, { ...config16Little, height: 8 });
+
+      // Should be different due to byte swapping
+      expect(Array.from(bytesBig)).not.toEqual(Array.from(bytesLittle));
+    });
+  });
+
+  describe("8-bit wide characters (byte order has no effect)", () => {
+    it("byte order does not affect output for 8-bit characters", () => {
+      const configBig = createMockConfig({
+        width: 8,
+        height: 8,
+        bitDirection: "msb",
+        padding: "right",
+        byteOrder: "big",
+      });
+      const configLittle = createMockConfig({
+        width: 8,
+        height: 8,
+        bitDirection: "msb",
+        padding: "right",
+        byteOrder: "little",
+      });
+
+      const character = createMockCharacter(8, 8, "checkerboard");
+      const bytesBig = characterToBytes(character, configBig);
+      const bytesLittle = characterToBytes(character, configLittle);
+
+      expect(Array.from(bytesBig)).toEqual(Array.from(bytesLittle));
+    });
+  });
+});
+
+describe("byte order round-trip tests", () => {
+  const byteOrderConfigs = [
+    { name: "16x8 big-endian", config: createMockConfig({ width: 16, height: 8, byteOrder: "big" }) },
+    { name: "16x8 little-endian", config: createMockConfig({ width: 16, height: 8, byteOrder: "little" }) },
+    { name: "12x8 big-endian", config: createMockConfig({ width: 12, height: 8, byteOrder: "big" }) },
+    { name: "12x8 little-endian", config: createMockConfig({ width: 12, height: 8, byteOrder: "little" }) },
+  ];
+
+  byteOrderConfigs.forEach(({ name, config }) => {
+    describe(`${name} configuration`, () => {
+      it("round-trips empty character", () => {
+        const original = createMockCharacter(config.width, config.height, "empty");
+        const bytes = characterToBytes(original, config);
+        const restored = bytesToCharacter(bytes, config);
+
+        expect(charactersEqual(original, restored)).toBe(true);
+      });
+
+      it("round-trips filled character", () => {
+        const original = createMockCharacter(config.width, config.height, "filled");
+        const bytes = characterToBytes(original, config);
+        const restored = bytesToCharacter(bytes, config);
+
+        expect(charactersEqual(original, restored)).toBe(true);
+      });
+
+      it("round-trips checkerboard pattern", () => {
+        const original = createMockCharacter(config.width, config.height, "checkerboard");
+        const bytes = characterToBytes(original, config);
+        const restored = bytesToCharacter(bytes, config);
+
+        expect(charactersEqual(original, restored)).toBe(true);
+      });
+
+      it("round-trips diagonal pattern", () => {
+        const original = createMockCharacter(config.width, config.height, "diagonal");
+        const bytes = characterToBytes(original, config);
+        const restored = bytesToCharacter(bytes, config);
+
+        expect(charactersEqual(original, restored)).toBe(true);
+      });
+    });
+  });
+
+  it("bytes -> character -> bytes returns original bytes with big-endian", () => {
+    const config = createMockConfig({ width: 16, height: 2, byteOrder: "big" });
+    const originalBytes = new Uint8Array([0xff, 0x00, 0xaa, 0x55]);
+    const character = bytesToCharacter(originalBytes, config);
+    const restoredBytes = characterToBytes(character, config);
+
+    expect(Array.from(restoredBytes)).toEqual(Array.from(originalBytes));
+  });
+
+  it("bytes -> character -> bytes returns original bytes with little-endian", () => {
+    const config = createMockConfig({ width: 16, height: 2, byteOrder: "little" });
+    const originalBytes = new Uint8Array([0xff, 0x00, 0xaa, 0x55]);
+    const character = bytesToCharacter(originalBytes, config);
+    const restoredBytes = characterToBytes(character, config);
+
+    expect(Array.from(restoredBytes)).toEqual(Array.from(originalBytes));
+  });
+});
+
+// ============================================================================
 // characterToBytes Tests
 // ============================================================================
 

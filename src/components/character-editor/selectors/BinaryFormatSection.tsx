@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import type { PaddingDirection, BitDirection } from "@/lib/character-editor/types";
+import type { PaddingDirection, BitDirection, ByteOrder } from "@/lib/character-editor/types";
 import {
   BINARY_EXPORT_SYSTEM_PRESETS,
   CHIP_BINARY_EXPORT_PRESETS,
@@ -23,16 +23,23 @@ import {
 } from "@/components/ui/DropdownPrimitives";
 import { PaddingDirectionSelector } from "./PaddingDirectionSelector";
 import { BitDirectionSelector } from "./BitDirectionSelector";
+import { ByteOrderSelector } from "./ByteOrderSelector";
 
 export interface BinaryFormatSectionProps {
   /** Current padding direction */
   padding: PaddingDirection;
   /** Current bit direction */
   bitDirection: BitDirection;
+  /** Current byte order (only relevant for width > 8) */
+  byteOrder?: ByteOrder;
   /** Callback when padding changes */
   onPaddingChange: (padding: PaddingDirection) => void;
   /** Callback when bit direction changes */
   onBitDirectionChange: (bitDirection: BitDirection) => void;
+  /** Callback when byte order changes */
+  onByteOrderChange?: (byteOrder: ByteOrder) => void;
+  /** Current character width (to determine if byte order is relevant) */
+  characterWidth?: number;
   /** Initial chip/character generator name to pre-select (higher priority than system) */
   initialChipName?: string;
   /** Initial system name to pre-select (from character set metadata) */
@@ -217,8 +224,11 @@ function findInitialSelection(chipName?: string, systemName?: string): { type: "
 export function BinaryFormatSection({
   padding,
   bitDirection,
+  byteOrder = "big",
   onPaddingChange,
   onBitDirectionChange,
+  onByteOrderChange,
+  characterWidth,
   initialChipName,
   initialSystemName,
   disabled = false,
@@ -270,16 +280,22 @@ export function BinaryFormatSection({
         if (preset) {
           onPaddingChange(preset.padding);
           onBitDirectionChange(preset.bitDirection);
+          if (onByteOrderChange && preset.byteOrder) {
+            onByteOrderChange(preset.byteOrder);
+          }
         }
       } else {
         const preset = CHIP_BINARY_EXPORT_PRESETS.find((p) => p.id === computedInitialSelection.id);
         if (preset) {
           onPaddingChange(preset.padding);
           onBitDirectionChange(preset.bitDirection);
+          if (onByteOrderChange && preset.byteOrder) {
+            onByteOrderChange(preset.byteOrder);
+          }
         }
       }
     }
-  }, [computedInitialSelection, hasUserSelected, onPaddingChange, onBitDirectionChange]);
+  }, [computedInitialSelection, hasUserSelected, onPaddingChange, onBitDirectionChange, onByteOrderChange]);
 
   // Get system presets grouped by manufacturer
   const systemGroups = useMemo(() => getBinaryExportPresetsByManufacturer(), []);
@@ -409,9 +425,12 @@ export function BinaryFormatSection({
       setHasUserSelected(true);
       onPaddingChange(preset.padding);
       onBitDirectionChange(preset.bitDirection);
+      if (onByteOrderChange && preset.byteOrder) {
+        onByteOrderChange(preset.byteOrder);
+      }
       closeDropdown();
     },
-    [onPaddingChange, onBitDirectionChange, closeDropdown]
+    [onPaddingChange, onBitDirectionChange, onByteOrderChange, closeDropdown]
   );
 
   const handleChipPresetClick = useCallback(
@@ -420,19 +439,25 @@ export function BinaryFormatSection({
       setHasUserSelected(true);
       onPaddingChange(preset.padding);
       onBitDirectionChange(preset.bitDirection);
+      if (onByteOrderChange && preset.byteOrder) {
+        onByteOrderChange(preset.byteOrder);
+      }
       closeDropdown();
     },
-    [onPaddingChange, onBitDirectionChange, closeDropdown]
+    [onPaddingChange, onBitDirectionChange, onByteOrderChange, closeDropdown]
   );
 
   const handleClear = useCallback(() => {
-    // Reset to default (most common: right padding, MSB first)
+    // Reset to default (most common: right padding, MSB first, big-endian)
     setUserSelection(null);
     setHasUserSelected(true);
     onPaddingChange("right");
     onBitDirectionChange("msb");
+    if (onByteOrderChange) {
+      onByteOrderChange("big");
+    }
     closeDropdown();
-  }, [onPaddingChange, onBitDirectionChange, closeDropdown]);
+  }, [onPaddingChange, onBitDirectionChange, onByteOrderChange, closeDropdown]);
 
   const toggleCustomSection = useCallback(() => {
     setCustomExpanded((prev) => !prev);
@@ -572,6 +597,17 @@ export function BinaryFormatSection({
               <label className="block text-xs text-gray-400 mb-1.5">Bit Direction</label>
               <BitDirectionSelector value={bitDirection} onChange={onBitDirectionChange} disabled={disabled} />
             </div>
+
+            {/* Only show byte order for multi-byte rows (width > 8) */}
+            {characterWidth !== undefined && characterWidth > 8 && onByteOrderChange && (
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">Byte Order</label>
+                <ByteOrderSelector value={byteOrder} onChange={onByteOrderChange} disabled={disabled} />
+                <p className="text-xs text-gray-500 mt-1">
+                  Controls byte arrangement in multi-byte rows
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

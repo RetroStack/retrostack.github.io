@@ -18,7 +18,7 @@ import { BloomEffectPanel, BloomEffectSettings } from "@/components/character-ed
 import { CustomColors, getActiveColors } from "@/lib/character-editor/data/colorPresets";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { useEditorReturn } from "@/hooks/character-editor/useEditorReturn";
-import { CharacterSet, PaddingDirection, BitDirection, bytesPerCharacter } from "@/lib/character-editor/types";
+import { CharacterSet, PaddingDirection, BitDirection, ByteOrder, bytesPerCharacter } from "@/lib/character-editor/types";
 import { createDownloadBlob, downloadBlob } from "@/lib/character-editor/import/binary";
 import { getSuggestedFilename, formatFileSize } from "@/lib/character-editor/utils";
 import {
@@ -113,6 +113,7 @@ export function ExportView() {
   const [filename, setFilename] = useState("");
   const [padding, setPadding] = useState<PaddingDirection>("right");
   const [bitDirection, setBitDirection] = useState<BitDirection>("msb");
+  const [byteOrder, setByteOrder] = useState<ByteOrder>("big");
 
   // Code export options (C Header or Assembly)
   const [codeOutputFormat, setCodeOutputFormat] = useState<CodeOutputFormat>("c-header");
@@ -148,6 +149,7 @@ export function ExportView() {
           setFilename(getSuggestedFilename(loaded.metadata.name));
           setPadding(loaded.config.padding);
           setBitDirection(loaded.config.bitDirection);
+          setByteOrder(loaded.config.byteOrder ?? "big");
           setCHeaderOptions(getDefaultCHeaderOptions(loaded.metadata.name));
           setAssemblyOptions(getDefaultAssemblyOptions(loaded.metadata.name));
 
@@ -185,9 +187,9 @@ export function ExportView() {
     if (!characterSet || characterSet.characters.length === 0) {
       return { hex: "", bytes: [] };
     }
-    const config = { ...characterSet.config, padding, bitDirection };
+    const config = { ...characterSet.config, padding, bitDirection, byteOrder };
     return getHexPreviewWithBytes(characterSet.characters, config, 512);
-  }, [characterSet, padding, bitDirection]);
+  }, [characterSet, padding, bitDirection, byteOrder]);
 
   // Compute bit layout from the same bytes used in hex preview
   // Handles multi-byte rows (e.g., 12-pixel width = 2 bytes per row)
@@ -224,16 +226,16 @@ export function ExportView() {
   // Get C header preview
   const cHeaderPreview = useMemo(() => {
     if (!characterSet || characterSet.characters.length === 0) return "";
-    const config = { ...characterSet.config, padding, bitDirection };
+    const config = { ...characterSet.config, padding, bitDirection, byteOrder };
     return exportToCHeader(characterSet.characters, config, cHeaderOptions);
-  }, [characterSet, padding, bitDirection, cHeaderOptions]);
+  }, [characterSet, padding, bitDirection, byteOrder, cHeaderOptions]);
 
   // Get assembly preview
   const assemblyPreview = useMemo(() => {
     if (!characterSet || characterSet.characters.length === 0) return "";
-    const config = { ...characterSet.config, padding, bitDirection };
+    const config = { ...characterSet.config, padding, bitDirection, byteOrder };
     return exportToAssembly(characterSet.characters, config, assemblyOptions);
-  }, [characterSet, padding, bitDirection, assemblyOptions]);
+  }, [characterSet, padding, bitDirection, byteOrder, assemblyOptions]);
 
   // Get file extension based on format
   const getExtension = useCallback(() => {
@@ -291,6 +293,7 @@ export function ExportView() {
         ...characterSet.config,
         padding,
         bitDirection,
+        byteOrder,
       };
 
       let blob: Blob;
@@ -361,6 +364,7 @@ export function ExportView() {
     filename,
     padding,
     bitDirection,
+    byteOrder,
     codeOutputFormat,
     cHeaderOptions,
     assemblyOptions,
@@ -485,8 +489,11 @@ export function ExportView() {
                   <BinaryFormatSection
                     padding={padding}
                     bitDirection={bitDirection}
+                    byteOrder={byteOrder}
                     onPaddingChange={setPadding}
                     onBitDirectionChange={setBitDirection}
+                    onByteOrderChange={setByteOrder}
+                    characterWidth={characterSet?.config.width}
                     initialChipName={characterSet?.metadata.chip}
                     initialSystemName={characterSet?.metadata.system}
                   />
@@ -524,8 +531,11 @@ export function ExportView() {
                     <BinaryFormatSection
                       padding={padding}
                       bitDirection={bitDirection}
+                      byteOrder={byteOrder}
                       onPaddingChange={setPadding}
                       onBitDirectionChange={setBitDirection}
+                      onByteOrderChange={setByteOrder}
+                      characterWidth={characterSet?.config.width}
                       initialChipName={characterSet?.metadata.chip}
                       initialSystemName={characterSet?.metadata.system}
                     />

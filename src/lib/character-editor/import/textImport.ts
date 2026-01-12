@@ -8,6 +8,7 @@
 import {
   Character,
   CharacterSetConfig,
+  ByteOrder,
   createDefaultConfig,
 } from "../types";
 import { parseCharacterRom } from "./binary";
@@ -20,6 +21,7 @@ export interface TextImportOptions {
   charHeight: number;
   padding: "left" | "right";
   bitDirection: "msb" | "lsb";
+  byteOrder?: ByteOrder;
 }
 
 /**
@@ -54,6 +56,7 @@ export function getDefaultTextImportOptions(): TextImportOptions {
     charHeight: 8,
     padding: "right",
     bitDirection: "msb",
+    byteOrder: "big",
   };
 }
 
@@ -216,6 +219,7 @@ export function parseTextToCharacters(
     height: options.charHeight,
     padding: options.padding,
     bitDirection: options.bitDirection,
+    byteOrder: options.byteOrder,
   };
 
   const characters = parseCharacterRom(bytes, config);

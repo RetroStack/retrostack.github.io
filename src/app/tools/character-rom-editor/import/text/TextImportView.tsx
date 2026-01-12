@@ -14,6 +14,7 @@ import { MetadataStep } from "@/components/character-editor/import/MetadataStep"
 import { DimensionPresetSelector } from "@/components/character-editor/selectors/DimensionPresetSelector";
 import { PaddingDirectionSelector } from "@/components/character-editor/selectors/PaddingDirectionSelector";
 import { BitDirectionSelector } from "@/components/character-editor/selectors/BitDirectionSelector";
+import { ByteOrderSelector } from "@/components/character-editor/selectors/ByteOrderSelector";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { useEditorReturn } from "@/hooks/character-editor/useEditorReturn";
 import { useResizeObserver } from "@/hooks/useResizeObserver";
@@ -80,6 +81,7 @@ export function TextImportView() {
     height: options.charHeight,
     padding: options.padding,
     bitDirection: options.bitDirection,
+    byteOrder: options.byteOrder,
   };
 
   // Calculate responsive preview dimensions
@@ -325,6 +327,20 @@ Examples:
                           onChange={(bitDirection) => updateOption("bitDirection", bitDirection)}
                         />
                       </div>
+
+                      {/* Byte order - only for multi-byte rows (width > 8) */}
+                      {options.charWidth > 8 && (
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-2">Byte Order</label>
+                          <ByteOrderSelector
+                            value={options.byteOrder ?? "big"}
+                            onChange={(byteOrder) => updateOption("byteOrder", byteOrder)}
+                          />
+                          <p className="text-xs text-gray-600 mt-1">
+                            Controls byte arrangement in multi-byte rows
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Tips */}

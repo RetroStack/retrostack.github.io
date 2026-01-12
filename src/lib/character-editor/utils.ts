@@ -70,6 +70,14 @@ export function validateConfig(config: CharacterSetConfig): string[] {
     errors.push("Bit direction must be 'msb' or 'lsb'");
   }
 
+  if (
+    config.byteOrder !== undefined &&
+    config.byteOrder !== "big" &&
+    config.byteOrder !== "little"
+  ) {
+    errors.push("Byte order must be 'big' or 'little'");
+  }
+
   return errors;
 }
 

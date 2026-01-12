@@ -27,6 +27,7 @@ describe("textImport", () => {
         charHeight: 8,
         padding: "right",
         bitDirection: "msb",
+        byteOrder: "big",
       });
     });
 

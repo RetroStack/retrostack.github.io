@@ -15,7 +15,7 @@
  * @internal
  */
 
-import type { PaddingDirection } from "../types";
+import type { PaddingDirection, ByteOrder } from "../types";
 
 // ============================================================================
 // Type Definitions
@@ -36,6 +36,8 @@ export interface BinaryFormat {
   padding: PaddingDirection;
   /** Bit ordering within bytes: "msb" or "lsb" */
   bitOrder: BitOrder;
+  /** Byte order for multi-byte rows (width > 8): "big" or "little". Defaults to "big". */
+  byteOrder?: ByteOrder;
 }
 
 // ============================================================================

@@ -15,6 +15,11 @@ export type PaddingDirection = "left" | "right";
 // - "lsb": Least Significant Bit first (leftmost pixel = bit 0) - Teletext, etc.
 export type BitDirection = "msb" | "lsb";
 
+// Byte order for multi-byte rows (characters wider than 8 pixels)
+// - "big": Big-endian - Byte 0 = pixels 0-7, Byte 1 = pixels 8-15 (default, most common)
+// - "little": Little-endian - Byte 0 = pixels 8-15, Byte 1 = pixels 0-7
+export type ByteOrder = "big" | "little";
+
 // Anchor points for resize operations (3x3 grid)
 export type AnchorPoint =
   | "tl" | "tc" | "tr"   // top-left, top-center, top-right
@@ -53,6 +58,8 @@ export interface CharacterSetConfig {
   padding: PaddingDirection;
   /** Bit interpretation direction */
   bitDirection: BitDirection;
+  /** Byte order for multi-byte rows (width > 8). Defaults to "big" if not specified. */
+  byteOrder?: ByteOrder;
 }
 
 /**
@@ -242,6 +249,7 @@ export interface ImportState {
 export interface ExportOptions {
   padding: PaddingDirection;
   bitDirection: BitDirection;
+  byteOrder?: ByteOrder;
   filename: string;
 }
 
@@ -303,6 +311,7 @@ export function createDefaultConfig(): CharacterSetConfig {
     height: 8,
     padding: "right",
     bitDirection: "msb",
+    byteOrder: "big",
   };
 }
 
