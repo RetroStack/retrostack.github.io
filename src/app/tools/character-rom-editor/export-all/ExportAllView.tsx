@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ToolLayout, ToolContent } from "@/components/layout/ToolLayout";
 import { useCharacterLibrary } from "@/hooks/character-editor/useCharacterLibrary";
 import { LibraryFilters } from "@/components/character-editor/library/LibraryFilters";
@@ -43,7 +43,6 @@ interface ExportData {
  * Hidden route for exporting multiple character sets to JSON
  */
 export function ExportAllView() {
-  const router = useRouter();
   const { characterSets, loading, error, refresh } = useCharacterLibrary();
   const { showToast } = useToast();
 
@@ -52,7 +51,7 @@ export function ExportAllView() {
 
   // Filter state
   const [filters, setFilters] = useState<LibraryFilterState>(createEmptyFilterState);
-  const [sortField, setSortField] = useState<SortField>("updatedAt");
+  const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   // Export state
@@ -229,55 +228,6 @@ export function ExportAllView() {
     return `${(totalBytes / (1024 * 1024)).toFixed(1)} MB`;
   }, [selectedIds, characterSets]);
 
-  // Sidebar content
-  const sidebarContent = (
-    <div className="flex flex-col gap-6 p-4">
-      {/* Export info */}
-      <div className="p-4 bg-retro-navy/30 rounded-lg border border-retro-grid/30">
-        <h3 className="text-sm font-medium text-retro-cyan mb-3">Export Info</h3>
-        <div className="flex flex-col gap-2 text-xs text-gray-400">
-          <p>
-            Export format: <span className="text-gray-300">JSON</span>
-          </p>
-          <p>
-            Includes metadata, configuration, and binary data (base64 encoded).
-          </p>
-          <p className="mt-2 text-gray-500">
-            The exported JSON file can be imported back into the character editor.
-          </p>
-        </div>
-      </div>
-
-      {/* Selection summary */}
-      {selectedIds.size > 0 && (
-        <div className="p-4 bg-retro-navy/30 rounded-lg border border-retro-grid/30">
-          <h3 className="text-sm font-medium text-retro-cyan mb-3">Selection Summary</h3>
-          <div className="flex flex-col gap-1 text-xs text-gray-400">
-            <p>
-              Total: <span className="text-gray-300">{selectedIds.size} character sets</span>
-            </p>
-            <p>
-              Est. file size: <span className="text-gray-300">{totalSizeEstimate}</span>
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden route notice */}
-      <div className="p-4 bg-retro-amber/10 rounded-lg border border-retro-amber/30">
-        <div className="flex items-start gap-2">
-          <svg className="w-4 h-4 text-retro-amber flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <div className="text-xs text-retro-amber/80">
-            <p className="font-medium mb-1">Developer Tool</p>
-            <p>This is a hidden export route for bulk exporting character sets. Not linked in navigation.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   if (error) {
     return (
       <ToolLayout title="Export Character Sets">
@@ -290,72 +240,71 @@ export function ExportAllView() {
 
   return (
     <ToolLayout title="Export Character Sets">
-      <ToolContent
-        rightSidebar={sidebarContent}
-        rightSidebarWidth="280px"
-        rightSidebarTitle="Export Info"
-      >
-        <div className="flex flex-col gap-6">
+      <ToolContent className="!items-start !justify-start">
+        <div className="flex flex-col h-full w-full max-w-5xl mx-auto p-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-retro-cyan">Export Character Sets</h1>
-              <p className="text-sm text-gray-400 mt-1">
-                Select character sets to export to a single JSON file
-              </p>
-            </div>
-            <button
-              onClick={() => router.push("/tools/character-rom-editor")}
-              className="px-4 py-2 text-sm border border-retro-grid/50 text-gray-400 rounded hover:text-gray-200 hover:border-retro-grid transition-colors"
+          <div className="flex-shrink-0">
+            <Link
+              href="/tools/character-rom-editor"
+              className="text-xs text-gray-500 hover:text-retro-cyan transition-colors mb-2 inline-flex items-center gap-1"
             >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
               Back to Library
-            </button>
+            </Link>
+            <h1 className="text-2xl font-bold text-retro-cyan">Export Character Sets</h1>
+            <p className="text-sm text-gray-400 mt-1">
+              Select character sets to export to a single JSON file
+            </p>
           </div>
 
           {/* Filters */}
-          <LibraryFilters
-            searchQuery={filters.searchQuery}
-            onSearchChange={handleSearchChange}
-            availableSizes={availableSizes}
-            widthFilters={filters.widthFilters}
-            heightFilters={filters.heightFilters}
-            onSizeFilterChange={handleSizeFilterChange}
-            availableCharacterCounts={availableCharacterCounts}
-            characterCountFilters={filters.characterCountFilters}
-            onCharacterCountFilterChange={handleCharacterCountFilterChange}
-            availableManufacturers={availableManufacturers}
-            availableSystems={availableSystems}
-            manufacturerFilters={filters.manufacturerFilters}
-            systemFilters={filters.systemFilters}
-            onManufacturerFilterChange={handleManufacturerFilterChange}
-            onSystemFilterChange={handleSystemFilterChange}
-            availableChips={availableChips}
-            chipFilters={filters.chipFilters}
-            onChipFilterChange={handleChipFilterChange}
-            availableLocales={availableLocales}
-            localeFilters={filters.localeFilters}
-            onLocaleFilterChange={handleLocaleFilterChange}
-            availableTags={availableTags}
-            tagFilters={filters.tagFilters}
-            onTagFilterChange={handleTagFilterChange}
-            availableSources={availableSources}
-            sourceFilters={filters.sourceFilters}
-            onSourceFilterChange={handleSourceFilterChange}
-            isPinnedFilters={filters.isPinnedFilters}
-            onIsPinnedFiltersChange={handleIsPinnedFiltersChange}
-            availableOrigins={availableOrigins}
-            originFilters={filters.originFilters}
-            onOriginFilterChange={handleOriginFilterChange}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            onSortFieldChange={handleSortFieldChange}
-            onSortDirectionToggle={handleSortDirectionToggle}
-            totalCount={characterSets.length}
-            filteredCount={filteredSets.length}
-          />
+          <div className="mt-6 flex-shrink-0">
+            <LibraryFilters
+              searchQuery={filters.searchQuery}
+              onSearchChange={handleSearchChange}
+              availableSizes={availableSizes}
+              widthFilters={filters.widthFilters}
+              heightFilters={filters.heightFilters}
+              onSizeFilterChange={handleSizeFilterChange}
+              availableCharacterCounts={availableCharacterCounts}
+              characterCountFilters={filters.characterCountFilters}
+              onCharacterCountFilterChange={handleCharacterCountFilterChange}
+              availableManufacturers={availableManufacturers}
+              availableSystems={availableSystems}
+              manufacturerFilters={filters.manufacturerFilters}
+              systemFilters={filters.systemFilters}
+              onManufacturerFilterChange={handleManufacturerFilterChange}
+              onSystemFilterChange={handleSystemFilterChange}
+              availableChips={availableChips}
+              chipFilters={filters.chipFilters}
+              onChipFilterChange={handleChipFilterChange}
+              availableLocales={availableLocales}
+              localeFilters={filters.localeFilters}
+              onLocaleFilterChange={handleLocaleFilterChange}
+              availableTags={availableTags}
+              tagFilters={filters.tagFilters}
+              onTagFilterChange={handleTagFilterChange}
+              availableSources={availableSources}
+              sourceFilters={filters.sourceFilters}
+              onSourceFilterChange={handleSourceFilterChange}
+              isPinnedFilters={filters.isPinnedFilters}
+              onIsPinnedFiltersChange={handleIsPinnedFiltersChange}
+              availableOrigins={availableOrigins}
+              originFilters={filters.originFilters}
+              onOriginFilterChange={handleOriginFilterChange}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSortFieldChange={handleSortFieldChange}
+              onSortDirectionToggle={handleSortDirectionToggle}
+              totalCount={characterSets.length}
+              filteredCount={filteredSets.length}
+            />
+          </div>
 
           {/* Selection controls */}
-          <div className="flex items-center justify-between py-3 px-4 bg-retro-navy/30 rounded-lg border border-retro-grid/30">
+          <div className="mt-6 flex items-center justify-between py-3 px-4 bg-retro-navy/30 rounded-lg border border-retro-grid/30 flex-shrink-0">
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">
                 <span className="text-retro-cyan font-medium">{selectedIds.size}</span> selected
@@ -401,29 +350,31 @@ export function ExportAllView() {
             </div>
           </div>
 
-          {/* Character set list */}
-          {loading ? (
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-20 bg-retro-navy/30 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : filteredSets.length === 0 ? (
-            <LibraryGridEmptyResults
-              onClearFilters={() => setFilters(createEmptyFilterState())}
-            />
-          ) : (
-            <div className="flex flex-col gap-2">
-              {filteredSets.map((set) => (
-                <SelectableCharacterSetRow
-                  key={set.metadata.id}
-                  characterSet={set}
-                  selected={selectedIds.has(set.metadata.id)}
-                  onToggle={() => toggleSelection(set.metadata.id)}
-                />
-              ))}
-            </div>
-          )}
+          {/* Character set list - scrollable */}
+          <div className="mt-6 flex-1 min-h-0 overflow-y-auto">
+            {loading ? (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="h-20 bg-retro-navy/30 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : filteredSets.length === 0 ? (
+              <LibraryGridEmptyResults
+                onClearFilters={() => setFilters(createEmptyFilterState())}
+              />
+            ) : (
+              <div className="flex flex-col gap-2 pb-4">
+                {filteredSets.map((set) => (
+                  <SelectableCharacterSetRow
+                    key={set.metadata.id}
+                    characterSet={set}
+                    selected={selectedIds.has(set.metadata.id)}
+                    onToggle={() => toggleSelection(set.metadata.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </ToolContent>
     </ToolLayout>
