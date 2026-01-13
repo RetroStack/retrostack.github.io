@@ -466,6 +466,7 @@ export function EditorCanvas({
   return (
     <div
       ref={containerRef}
+      data-testid="editor-canvas"
       className={`flex items-center justify-center w-full h-full overflow-hidden ${className} ${isCursorActive ? "ring-2 ring-retro-cyan/50 rounded" : ""}`}
       tabIndex={0}
       role="application"

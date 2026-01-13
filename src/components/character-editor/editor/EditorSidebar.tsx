@@ -129,7 +129,7 @@ export function EditorSidebar({
   );
 
   return (
-    <div className={`flex flex-col relative ${className}`} onKeyDown={handleKeyDown}>
+    <div data-testid="editor-sidebar" className={`flex flex-col relative ${className}`} onKeyDown={handleKeyDown}>
       {/* Header */}
       <div className="p-3 border-b border-retro-grid/30">
         <div className="flex items-center justify-between">

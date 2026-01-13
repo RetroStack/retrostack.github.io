@@ -94,10 +94,11 @@ export function ColorPresetSelector({
   const displayName = currentPreset?.name || "Custom";
 
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div data-testid="color-preset-selector" className={`relative ${className}`} ref={dropdownRef}>
       {/* Trigger button */}
       <button
         onClick={toggle}
+        data-testid="color-preset-trigger"
         className={`flex items-center gap-2 px-3 py-1.5 bg-retro-navy/50 border rounded text-sm text-gray-200 transition-colors ${
           isOpen ? "border-retro-cyan" : "border-retro-grid/50 hover:border-retro-grid"
         }`}
@@ -133,7 +134,7 @@ export function ColorPresetSelector({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className={`absolute right-0 w-64 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl z-50 overflow-hidden ${dropUp ? "bottom-full mb-1" : "mt-1"}`}>
+        <div data-testid="color-preset-dropdown" className={`absolute right-0 w-64 bg-retro-navy border border-retro-grid/50 rounded-lg shadow-xl z-50 overflow-hidden ${dropUp ? "bottom-full mb-1" : "mt-1"}`}>
           {showCustomPicker ? (
             <div className="p-3 space-y-3">
               <div className="flex items-center justify-between">

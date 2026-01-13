@@ -113,6 +113,7 @@ export function CharacterGrid({
   return (
     <div
       ref={containerRef}
+      data-testid="character-grid"
       className={`overflow-auto ${className}`}
       role="listbox"
       aria-label="Character grid"

@@ -279,6 +279,7 @@ export function TransformToolbar({
 
   return (
     <div
+      data-testid="transform-toolbar"
       className={`
         flex flex-col items-center py-1 px-2 bg-retro-navy/50 border-l border-retro-grid/30 overflow-y-auto
         ${className}

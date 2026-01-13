@@ -10,7 +10,7 @@
  * To invalidate caches after a breaking change, increment CACHE_VERSION.
  */
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v4";
 const STATIC_CACHE = `retrostack-static-${CACHE_VERSION}`;
 const PAGES_CACHE = `retrostack-pages-${CACHE_VERSION}`;
 
@@ -22,6 +22,39 @@ const PRECACHE_ASSETS = [
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",
   "/images/logo.png",
+  // Tips & Tricks images - Drawing
+  "/images/tips/drawing/click-toggle.png",
+  "/images/tips/drawing/color-presets.png",
+  "/images/tips/drawing/editor-overview.png",
+  "/images/tips/drawing/zoom-controls.png",
+  // Tips & Tricks images - Navigation
+  "/images/tips/navigation/ascii-map.png",
+  "/images/tips/navigation/character-overview.png",
+  "/images/tips/navigation/go-to-dialog.png",
+  "/images/tips/navigation/sidebar-click.png",
+  // Tips & Tricks images - Transform
+  "/images/tips/transform/center.png",
+  "/images/tips/transform/clear.png",
+  "/images/tips/transform/fill.png",
+  "/images/tips/transform/flip.png",
+  "/images/tips/transform/invert.png",
+  "/images/tips/transform/rotate.png",
+  "/images/tips/transform/shift-pixels.png",
+  "/images/tips/transform/toolbar.png",
+  // Tips & Tricks images - Selection
+  "/images/tips/selection/ctrl-select.png",
+  "/images/tips/selection/select-all.png",
+  "/images/tips/selection/selection-bar.png",
+  "/images/tips/selection/shift-range.png",
+  "/images/tips/selection/sidebar-selection.png",
+  // Tips & Tricks images - Overlay
+  "/images/tips/overlay/overlay-selector.png",
+  // Tips & Tricks images - Saving
+  "/images/tips/saving/autosave.png",
+  "/images/tips/saving/notes.png",
+  // Tips & Tricks images - Export
+  "/images/tips/export/export-formats.png",
+  "/images/tips/export/text-preview.png",
 ];
 
 // =============================================================================

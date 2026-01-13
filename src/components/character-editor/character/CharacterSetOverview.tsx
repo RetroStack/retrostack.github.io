@@ -467,7 +467,7 @@ export function CharacterSetOverview({
   }, []);
 
   return (
-    <div className={`${className}`} ref={containerRef}>
+    <div data-testid="character-set-overview" className={`${className}`} ref={containerRef}>
       {/* Header */}
       {collapsible && (
         <button

@@ -91,7 +91,7 @@ export function EditorHeader({
   const controlCharInfo = getControlCharInfo(characterIndex);
 
   return (
-    <div className={`flex items-center gap-4 px-4 py-2 bg-retro-navy/50 border-b border-retro-grid/50 ${className}`}>
+    <div data-testid="editor-header" className={`flex items-center gap-4 px-4 py-2 bg-retro-navy/50 border-b border-retro-grid/50 ${className}`}>
       {/* Back button */}
       <button
         onClick={onBack}
@@ -163,7 +163,7 @@ export function EditorHeader({
       <div className="flex-1" />
 
       {/* Zoom controls */}
-      <div className="flex items-center gap-1">
+      <div data-testid="zoom-controls" className="flex items-center gap-1">
         <Tooltip content="Zoom out" shortcut="-">
           <button
             onClick={handleZoomOut}

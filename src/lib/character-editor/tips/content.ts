@@ -28,6 +28,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Click to Toggle Pixels",
         description:
           "Click any pixel on the canvas to toggle it between foreground and background colors. This is the most basic drawing operation - simple clicks let you place individual pixels with precision.",
+        image: "/images/tips/drawing/click-toggle.png",
+        imageAlt: "The pixel editing canvas showing character A",
       },
       {
         id: "drag-paint",
@@ -46,6 +48,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Zoom for Precision",
         description:
           "Use the zoom slider in the header or scroll your mouse wheel over the canvas to zoom in and out. Higher zoom levels are great for detailed pixel work, while zoomed out gives you a better view of the overall character shape.",
+        image: "/images/tips/drawing/zoom-controls.png",
+        imageAlt: "Zoom controls in the header toolbar",
       },
       {
         id: "grid-visibility",
@@ -58,6 +62,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Color Presets",
         description:
           "Choose from various color presets in the header to change the foreground and background colors. Different color schemes can help you visualize how your characters will look on different systems - from classic green phosphor to amber CRT to modern high-contrast displays.",
+        image: "/images/tips/drawing/color-presets.png",
+        imageAlt: "Color preset dropdown showing available color schemes",
       },
     ],
   },
@@ -98,6 +104,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press G to open the Go To dialog where you can enter a specific character index (0-255) or hexadecimal value (00-FF) to jump directly to that character. You can also enter an ASCII character to find its position.",
         shortcut: "G",
+        image: "/images/tips/navigation/go-to-dialog.png",
+        imageAlt: "Go To Character dialog for direct navigation",
       },
       {
         id: "ascii-map",
@@ -105,12 +113,16 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press M to open the ASCII Map - a complete grid showing all characters with their decimal and hex codes. Click any character in the map to select it for editing. Great for finding specific characters or getting an overview of your entire set.",
         shortcut: "M",
+        image: "/images/tips/navigation/ascii-map.png",
+        imageAlt: "ASCII Map showing all characters with their codes",
       },
       {
         id: "sidebar-click",
         title: "Sidebar Character Grid",
         description:
           "The sidebar shows a scrollable grid of all characters in your set. Click any character thumbnail to immediately select and edit it. The current character is highlighted, and the sidebar scrolls to keep your selection visible.",
+        image: "/images/tips/navigation/sidebar-click.png",
+        imageAlt: "Sidebar showing character grid with overview",
       },
     ],
   },
@@ -130,6 +142,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press [ (left bracket) to rotate the character 90 degrees counter-clockwise, or ] (right bracket) to rotate clockwise. Multiple rotations let you orient characters in any direction. Works on selected characters in batch mode too.",
         shortcut: "[ / ]",
+        image: "/images/tips/transform/rotate.png",
+        imageAlt: "Character A rotated 90 degrees",
       },
       {
         id: "flip",
@@ -137,6 +151,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press H to flip horizontally (mirror left-to-right) or V to flip vertically (mirror top-to-bottom). Flipping is perfect for creating mirrored versions of characters or fixing orientation issues.",
         shortcut: "H / V",
+        image: "/images/tips/transform/flip.png",
+        imageAlt: "Character A flipped horizontally",
       },
       {
         id: "shift-pixels",
@@ -144,6 +160,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Use Shift + Arrow keys to move all pixels in the character one position in that direction. Pixels that move off one edge wrap around to the opposite edge. Great for repositioning characters within their grid.",
         shortcut: "Shift+Arrows",
+        image: "/images/tips/transform/shift-pixels.png",
+        imageAlt: "Character A shifted to the right",
       },
       {
         id: "invert",
@@ -151,18 +169,24 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press I to invert all pixels in the character - foreground becomes background and vice versa. This creates an inverse video effect, useful for highlighted or selected-state characters.",
         shortcut: "I",
+        image: "/images/tips/transform/invert.png",
+        imageAlt: "Character with inverted colors",
       },
       {
         id: "clear-fill",
         title: "Clear and Fill",
         description:
           "The transform toolbar on the right side has Clear (empties all pixels) and Fill (sets all pixels) buttons. Clear is useful for starting fresh, while Fill creates a solid block character.",
+        image: "/images/tips/transform/toolbar.png",
+        imageAlt: "Transform toolbar with shift, rotate, flip, and modify buttons",
       },
       {
         id: "center",
         title: "Center Character",
         description:
           "The Center button automatically repositions your character to be centered within the grid. Useful after importing or when pixels have drifted to one side. Found in the transform toolbar.",
+        image: "/images/tips/transform/center.png",
+        imageAlt: "Character centered within the grid",
       },
       {
         id: "scale",
@@ -188,6 +212,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Hold Ctrl (or Cmd on Mac) and click characters in the sidebar to add them to your selection. Each click toggles that character's selection state. Build up a selection of non-contiguous characters for batch operations.",
         shortcut: "Ctrl+Click",
+        image: "/images/tips/selection/ctrl-select.png",
+        imageAlt: "Character overview showing multiple characters selected with Ctrl+click",
       },
       {
         id: "shift-range",
@@ -195,6 +221,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Click a character, then Shift+click another to select all characters between them (inclusive). This is the fastest way to select a contiguous range like all uppercase letters or all digits.",
         shortcut: "Shift+Click",
+        image: "/images/tips/selection/shift-range.png",
+        imageAlt: "Character overview showing a range of characters selected with Shift+click",
       },
       {
         id: "select-all",
@@ -202,6 +230,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press Ctrl+A (or Cmd+A on Mac) to select every character in your set. Useful when you want to apply a transform to the entire character set at once.",
         shortcut: "Ctrl+A",
+        image: "/images/tips/selection/select-all.png",
+        imageAlt: "Character overview showing all characters selected",
       },
       {
         id: "batch-transforms",
@@ -220,6 +250,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Selection Mode Bar",
         description:
           "When multiple characters are selected, a floating bar appears showing the selection count and quick action buttons. Use it to apply transforms, copy, delete, or clear your selection. Press Escape to exit selection mode.",
+        image: "/images/tips/selection/selection-bar.png",
+        imageAlt: "Selection mode bar showing selection count and action buttons",
       },
       {
         id: "drag-select",
@@ -290,6 +322,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Character Set Overlay",
         description:
           "Load another character set as a transparent overlay on your canvas for tracing or comparison. Click the Overlay button in the toolbar to select a reference set. The overlay appears semi-transparent so you can see both your work and the reference.",
+        image: "/images/tips/overlay/overlay-selector.png",
+        imageAlt: "Overlay selector dialog for choosing reference character sets",
       },
       {
         id: "overlay-modes",
@@ -326,6 +360,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         title: "Auto-Save Recovery",
         description:
           "The editor automatically saves your work in progress. If your browser closes unexpectedly or you navigate away, you'll be prompted to recover your unsaved changes when you return. Your work is never lost.",
+        image: "/images/tips/saving/autosave.png",
+        imageAlt: "Editor header showing character set name and status",
       },
       {
         id: "snapshots",
@@ -351,6 +387,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press N to add notes and annotations to any character set. Notes are saved with your set and can include information about the design, intended use, or any other details you want to remember.",
         shortcut: "N",
+        image: "/images/tips/saving/notes.png",
+        imageAlt: "Character set notes dialog",
       },
     ],
   },
@@ -370,6 +408,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Export your character set as: binary ROM files (ready to burn), C header files, assembly source, PNG images of individual characters or the full set, and printable PDF reference sheets. Each format is optimized for its use case.",
         shortcut: "E",
+        image: "/images/tips/export/export-formats.png",
+        imageAlt: "Export page showing format options",
       },
       {
         id: "import-sources",
@@ -389,6 +429,8 @@ export const TIPS_CATEGORIES: TipCategory[] = [
         description:
           "Press T to open the text preview panel where you can type sample text and see how it renders with your character set. Includes CRT effects simulation to see how your characters look on vintage displays.",
         shortcut: "T",
+        image: "/images/tips/export/text-preview.png",
+        imageAlt: "Text preview panel showing sample text rendered with character set",
       },
       {
         id: "color-export",
